@@ -1,6 +1,21 @@
 const token = localStorage.getItem("authToken") || "";
+let apBootBlocked = false;
 if (!token) {
-  window.location.href = "auth.html?next=" + encodeURIComponent("admin-panel.html");
+  apBootBlocked = true;
+  document.body.innerHTML = `
+    <main style="min-height:100vh;display:grid;place-items:center;background:#0f172a;color:#e2e8f0;padding:24px;font-family:system-ui,-apple-system,Segoe UI,sans-serif">
+      <section style="max-width:640px;width:100%;background:#111827;border:1px solid #334155;border-radius:14px;padding:22px">
+        <h1 style="margin:0 0 10px;font-size:20px">Доступ в админ-панель</h1>
+        <p style="margin:0 0 14px;color:#94a3b8;line-height:1.45">
+          Сессия не найдена. Войдите под администратором.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a href="auth.html?next=admin-panel.html" style="padding:9px 13px;border-radius:9px;background:#1d4ed8;color:#fff;text-decoration:none">Войти</a>
+          <a href="index.html" style="padding:9px 13px;border-radius:9px;border:1px solid #475569;color:#e2e8f0;text-decoration:none">На главную</a>
+        </div>
+      </section>
+    </main>
+  `;
 }
 
 let authUser = {};
@@ -16,7 +31,8 @@ let apRolePermissionDefs = [];
 let apRolePermissionMatrix = {};
 
 function apCan(permission) {
-  return authUser.role === "admin" || Boolean(apCurrentPermissions?.[permission]);
+  const roleNorm = String(authUser?.role || "").trim().toLowerCase();
+  return roleNorm === "admin" || Boolean(apCurrentPermissions?.[permission]);
 }
 
 function apiUrl(p) {
@@ -2113,7 +2129,8 @@ const AP_USER_ROLE_LABELS = {
 let apUsersCache = [];
 
 async function loadCurrentPermissions() {
-  if (authUser.role === "admin") return;
+  const roleNorm = String(authUser?.role || "").trim().toLowerCase();
+  if (roleNorm === "admin") return;
   try {
     const data = await apiAdmin("GET", "/api/auth/permissions");
     apCurrentPermissions = data.permissions && typeof data.permissions === "object" ? data.permissions : {};
@@ -2126,6 +2143,44 @@ async function loadCurrentPermissions() {
   } catch {
     apCurrentPermissions = {};
   }
+}
+
+async function refreshAuthUserFromMe() {
+  if (!token) return;
+  try {
+    const me = await apiAdmin("GET", "/api/auth/me");
+    if (me && typeof me === "object") {
+      authUser = me;
+      if (me.permissions && typeof me.permissions === "object") {
+        apCurrentPermissions = me.permissions;
+      }
+      try {
+        localStorage.setItem("authUser", JSON.stringify(me));
+      } catch {
+        /* ignore */
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function renderAdminAccessDenied() {
+  document.body.innerHTML = `
+    <main style="min-height:100vh;display:grid;place-items:center;background:#0f172a;color:#e2e8f0;padding:24px;font-family:system-ui,-apple-system,Segoe UI,sans-serif">
+      <section style="max-width:640px;width:100%;background:#111827;border:1px solid #334155;border-radius:14px;padding:22px">
+        <h1 style="margin:0 0 10px;font-size:20px">Нет доступа к админ-панели</h1>
+        <p style="margin:0 0 14px;color:#94a3b8;line-height:1.45">
+          У текущей сессии нет прав <code>admin</code> или <code>adminPanel.view</code>.
+          Войдите под администратором.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a href="auth.html?next=admin-panel.html" style="padding:9px 13px;border-radius:9px;background:#1d4ed8;color:#fff;text-decoration:none">Войти как админ</a>
+          <a href="index.html" style="padding:9px 13px;border-radius:9px;border:1px solid #475569;color:#e2e8f0;text-decoration:none">На главную</a>
+        </div>
+      </section>
+    </main>
+  `;
 }
 
 function apPermissionViewMap() {
@@ -5344,9 +5399,12 @@ document.getElementById("ap-price-admin-search")?.addEventListener("keydown", (e
 });
 
 (async function init() {
+  if (apBootBlocked) return;
+  await refreshAuthUserFromMe();
   await loadCurrentPermissions();
-  if (authUser.role !== "admin" && !apCan("adminPanel.view")) {
-    window.location.href = "index.html";
+  const roleNorm = String(authUser?.role || "").trim().toLowerCase();
+  if (roleNorm !== "admin" && !apCan("adminPanel.view")) {
+    renderAdminAccessDenied();
     return;
   }
   applyAdminPermissionsUi();

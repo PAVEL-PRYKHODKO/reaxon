@@ -14,29 +14,32 @@
   function setButtonsState(user) {
     const trigger = byId("home-account-trigger");
     const adminBtn = byId("home-admin-btn");
-    if (!trigger) return;
 
     const hasToken = Boolean(localStorage.getItem("authToken"));
     const isLogged = Boolean(hasToken && user && (user.email || user.id));
     const role = String(user?.role || "").toLowerCase();
     const isAdmin = isLogged && role === "admin";
 
-    if (isLogged) {
-      trigger.setAttribute("href", "account.html");
-      trigger.setAttribute("aria-label", "Личный кабинет и профиль");
-    } else {
-      trigger.setAttribute("href", "auth.html");
-      trigger.setAttribute("aria-label", "Вход и регистрация");
+    if (trigger) {
+      if (isLogged) {
+        trigger.setAttribute("href", "account.html");
+        trigger.setAttribute("aria-label", "Личный кабинет и профиль");
+      } else {
+        trigger.setAttribute("href", "auth.html");
+        trigger.setAttribute("aria-label", "Вход и регистрация");
+      }
     }
 
-    if (adminBtn) adminBtn.hidden = !isAdmin;
+    if (adminBtn) {
+      adminBtn.hidden = !isAdmin;
+      if (isAdmin) adminBtn.setAttribute("href", "admin-panel.html");
+    }
   }
 
   async function fetchMeIfNeeded() {
     const token = localStorage.getItem("authToken");
     if (!token) return null;
     const cached = parseUser();
-    if (cached && cached.role) return cached;
     try {
       const url = typeof window.dpApiUrl === "function" ? window.dpApiUrl("/api/auth/me") : "/api/auth/me";
       const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
@@ -66,7 +69,12 @@
     adminBtn?.addEventListener("click", (e) => {
       const u = parseUser();
       const role = String(u?.role || "").toLowerCase();
-      if (role === "admin") return;
+      if (role === "admin") {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = "admin-panel.html";
+        return;
+      }
       e.preventDefault();
       alert("Доступ в админ-панель только для администратора. Выполните вход под админ-аккаунтом.");
       window.location.href = "auth.html?next=admin-panel.html";

@@ -1592,10 +1592,23 @@ function optionalAuthMiddleware(req, res, next) {
 }
 
 function roleMiddleware(roles = []) {
-  return (req, res, next) => {
-    if (!req.user?.role) return res.status(403).json({ error: "forbidden" });
-    if (!roles.includes(req.user.role)) return res.status(403).json({ error: "forbidden_role" });
-    next();
+  return async (req, res, next) => {
+    if (!req.user?.sub) return res.status(403).json({ error: "forbidden" });
+    const tokenRole = String(req.user.role || "").trim().toLowerCase();
+    const need = roles.map((r) => String(r || "").trim().toLowerCase());
+    if (tokenRole && need.includes(tokenRole)) return next();
+    try {
+      const db = await crmSnapshot();
+      const user = db.users.find((u) => u.id === req.user.sub);
+      const actualRole = String(user?.role || "").trim().toLowerCase();
+      if (actualRole && need.includes(actualRole)) {
+        req.user.role = actualRole;
+        return next();
+      }
+    } catch {
+      /* ignore and fall through */
+    }
+    return res.status(403).json({ error: "forbidden_role" });
   };
 }
 

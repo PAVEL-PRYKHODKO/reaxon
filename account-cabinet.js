@@ -355,8 +355,9 @@
     }
     const adminEl = document.getElementById("account-drawer-admin-tools");
     const crmEl = document.getElementById("account-drawer-crm-tools");
-    if (adminEl) adminEl.hidden = !(u && u.role === "admin");
-    if (crmEl) crmEl.hidden = !(u && (u.role === "moderator" || u.role === "accountant"));
+    const role = String(u?.role || "").trim().toLowerCase();
+    if (adminEl) adminEl.hidden = !(role === "admin");
+    if (crmEl) crmEl.hidden = !(role === "moderator" || role === "accountant");
   }
 
   function updateAuthSections() {
