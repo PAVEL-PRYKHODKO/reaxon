@@ -1,0 +1,32 @@
+/* Базовые правила, применяются всегда (тема одна — светлая) */
+.section-solid {
+  background: #ffffff;
+  border-color: rgba(0, 59, 126, 0.1);
+}
+
+.section-muted {
+  background: linear-gradient(180deg, #e8ecf4 0%, #f0f3fa 50%, #f5f7fb 100%);
+  border-color: rgba(0, 59, 126, 0.1);
+}
+
+.card,
+.tile,
+.advice-card,
+.stat,
+.catalog-sidebar,
+.catalog-layout-strong,
+.hero-card,
+.product-panel,
+.price-box {
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.footer {
+  background: #061a3d;
+}
+
+.nav-products-menu {
+  background: #ffffff;
+  box-shadow: var(--shadow-md);
+}

@@ -1,0 +1,473 @@
+/**
+ * CRM внутри admin-panel (iframe ?embed=admin).
+ * Совпадает с токенами admin-panel.css, без шапки сайта.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+html.crm-embed-admin {
+  /* Совпадает с :root в admin-panel.css */
+  --crm-ap-bg: #f1f5f9;
+  --crm-ap-surface: #ffffff;
+  --crm-ap-surface-2: #e8eef5;
+  --crm-ap-border: rgba(15, 23, 42, 0.1);
+  --crm-ap-text: #0f172a;
+  --crm-ap-muted: #64748b;
+  --crm-ap-accent: #2563eb;
+  --crm-ap-accent-soft: rgba(37, 99, 235, 0.1);
+  --crm-ap-accent-text: #1d4ed8;
+  --crm-ap-danger: #dc2626;
+}
+
+html.crm-embed-admin,
+html.crm-embed-admin body.crm-app {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+html.crm-embed-admin body.crm-app {
+  margin: 0;
+  color: var(--crm-ap-text);
+  background: var(--crm-ap-bg) !important;
+}
+
+html.crm-embed-admin body.crm-app::before,
+html.crm-embed-admin body.crm-app::after {
+  display: none !important;
+}
+
+/* Шапка как на главной — скрыта */
+html.crm-embed-admin .crm-header {
+  display: none !important;
+}
+
+html.crm-embed-admin .crm-embed-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  border-bottom: 1px solid var(--crm-ap-border);
+  background: var(--crm-ap-surface);
+}
+
+html.crm-embed-admin .crm-embed-toolbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-right: auto;
+  min-height: 2rem;
+}
+
+html.crm-embed-admin .crm-embed-toolbar a,
+html.crm-embed-admin .crm-embed-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid var(--crm-ap-border);
+  background: transparent;
+  color: var(--crm-ap-muted);
+}
+
+html.crm-embed-admin .crm-embed-toolbar a:hover,
+html.crm-embed-admin .crm-embed-toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--crm-ap-text);
+}
+
+html.crm-embed-admin .crm-embed-toolbar-btn--primary {
+  border: none;
+  background: var(--crm-ap-accent);
+  color: #fff;
+}
+
+html.crm-embed-admin .crm-embed-toolbar-btn--primary:hover {
+  filter: brightness(1.08);
+  color: #fff;
+}
+
+html.crm-embed-admin .crm-main {
+  min-height: calc(100vh - 48px);
+  padding: 0 0 1rem !important;
+  background: transparent !important;
+}
+
+html.crm-embed-admin .crm-container {
+  max-width: none;
+  margin: 0;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
+html.crm-embed-admin .crm-shell {
+  gap: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+@media (min-width: 880px) {
+  html.crm-embed-admin .crm-shell {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+    border: 1px solid var(--crm-ap-border) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background: var(--crm-ap-surface) !important;
+  }
+}
+
+html.crm-embed-admin .crm-sidebar {
+  background: var(--crm-ap-surface-2) !important;
+  border: 1px solid var(--crm-ap-border) !important;
+  border-radius: 12px !important;
+}
+
+@media (min-width: 880px) {
+  html.crm-embed-admin .crm-sidebar {
+    border: none !important;
+    border-right: 1px solid var(--crm-ap-border) !important;
+    border-radius: 0 !important;
+    min-height: min(70vh, 640px) !important;
+  }
+}
+
+html.crm-embed-admin .crm-sidebar-title {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-sb-item,
+html.crm-embed-admin .crm-sb-sub {
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-sb-item:hover,
+html.crm-embed-admin .crm-sb-sub:hover {
+  background: rgba(15, 23, 42, 0.06) !important;
+  border-color: transparent !important;
+}
+
+html.crm-embed-admin .crm-sb-item.is-active {
+  background: var(--crm-ap-accent-soft) !important;
+  border-color: transparent !important;
+  color: var(--crm-ap-accent-text) !important;
+}
+
+html.crm-embed-admin .crm-sb-sub.is-active {
+  background: rgba(220, 38, 38, 0.1) !important;
+  border-color: rgba(220, 38, 38, 0.25) !important;
+  color: #b91c1c !important;
+}
+
+html.crm-embed-admin .crm-sidebar-admin,
+html.crm-embed-admin .crm-leads-filter-block {
+  border-top-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-nav-summary,
+html.crm-embed-admin .crm-nav-children {
+  background: var(--crm-ap-surface) !important;
+  border-color: var(--crm-ap-border) !important;
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-nav-summary-sub {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-nav-children-nested {
+  border-left-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-filter-summary {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-filter-label {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-filter-select,
+html.crm-embed-admin select,
+html.crm-embed-admin input,
+html.crm-embed-admin textarea {
+  background: var(--crm-ap-bg) !important;
+  color: var(--crm-ap-text) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-workspace {
+  background: var(--crm-ap-surface) !important;
+}
+
+@media (min-width: 880px) {
+  html.crm-embed-admin .crm-workspace {
+    padding: 1.1rem 1.25rem 1.5rem !important;
+  }
+}
+
+html.crm-embed-admin .crm-workspace-title {
+  color: var(--crm-ap-text) !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}
+
+html.crm-embed-admin .crm-workspace-lead {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-filters.filters {
+  background: var(--crm-ap-surface-2) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-filters input[type="search"] {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+html.crm-embed-admin .btn-primary {
+  background: var(--crm-ap-accent) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+html.crm-embed-admin .btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+html.crm-embed-admin .btn-ghost {
+  color: var(--crm-ap-muted) !important;
+  border-color: var(--crm-ap-border) !important;
+  background: transparent !important;
+}
+
+html.crm-embed-admin .btn-ghost:hover {
+  background: rgba(15, 23, 42, 0.06) !important;
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-kanban {
+  gap: 0.5rem;
+}
+
+html.crm-embed-admin .crm-kanban-col {
+  background: var(--crm-ap-surface-2) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-kanban-col h4 {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-kanban-card {
+  background: var(--crm-ap-bg) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-kanban-card strong {
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-kanban-card p {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-card {
+  background: var(--crm-ap-surface) !important;
+  border-color: var(--crm-ap-border) !important;
+  box-shadow: none !important;
+}
+
+html.crm-embed-admin .crm-lead-row {
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-lead-row:hover,
+html.crm-embed-admin .crm-lead-card.is-expanded .crm-lead-row {
+  background: var(--crm-ap-surface-2) !important;
+}
+
+html.crm-embed-admin .crm-lead-id,
+html.crm-embed-admin .crm-lead-toggle {
+  color: var(--crm-ap-accent-text) !important;
+}
+
+html.crm-embed-admin .crm-lead-main small,
+html.crm-embed-admin .crm-lead-route,
+html.crm-embed-admin .crm-lead-assignee,
+html.crm-embed-admin .crm-lead-date {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-lead-details,
+html.crm-embed-admin .crm-detail-panel,
+html.crm-embed-admin .crm-actions,
+html.crm-embed-admin .crm-kanban-wrap,
+html.crm-embed-admin .crm-time-group,
+html.crm-embed-admin .crm-client-history {
+  background: var(--crm-ap-surface) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-time-summary--month,
+html.crm-embed-admin .crm-client-history-item,
+html.crm-embed-admin .crm-time-group--week {
+  background: var(--crm-ap-surface-2) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-time-summary strong {
+  background: var(--crm-ap-surface) !important;
+  border-color: var(--crm-ap-border) !important;
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-top h3 {
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-badge {
+  background: var(--crm-ap-accent-soft) !important;
+  border-color: rgba(96, 165, 250, 0.45) !important;
+  color: var(--crm-ap-accent-text) !important;
+}
+
+html.crm-embed-admin .crm-card p,
+html.crm-embed-admin .crm-card strong {
+  color: inherit;
+}
+
+html.crm-embed-admin .crm-card p {
+  color: var(--crm-ap-muted);
+}
+
+html.crm-embed-admin .crm-users-toolbar {
+  background: var(--crm-ap-surface-2) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-users-toolbar-text {
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-user-card {
+  background: var(--crm-ap-bg) !important;
+  border-color: var(--crm-ap-border) !important;
+  box-shadow: none !important;
+}
+
+html.crm-embed-admin .crm-user-name {
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-user-email {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-user-pill {
+  background: var(--crm-ap-surface-2) !important;
+  border-color: var(--crm-ap-border) !important;
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-user-delete-btn {
+  border-color: rgba(220, 38, 38, 0.35) !important;
+  color: #dc2626 !important;
+}
+
+html.crm-embed-admin .crm-form-status.form-status,
+html.crm-embed-admin .form-status {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-readonly-hint {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-manager-notes-heading {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-manager-notes-log {
+  background: var(--crm-ap-bg) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-manager-comment {
+  background: var(--crm-ap-surface-2) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-manager-comment-meta {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-manager-comment-text,
+html.crm-embed-admin .crm-note-view {
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-note-label {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-order-block {
+  background: var(--crm-ap-bg) !important;
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-order-heading {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-order-line {
+  background: var(--crm-ap-surface-2) !important;
+  border-color: var(--crm-ap-border) !important;
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-order-total {
+  color: var(--crm-ap-text) !important;
+  border-top-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-user-profile-details {
+  border-top-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-user-profile-details summary {
+  color: var(--crm-ap-text) !important;
+}
+
+html.crm-embed-admin .crm-user-profile-list li {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-user-avatar img {
+  border-color: var(--crm-ap-border) !important;
+}
+
+html.crm-embed-admin .crm-privacy-badge {
+  color: var(--crm-ap-muted) !important;
+}
+
+html.crm-embed-admin .crm-user-mod-hint {
+  color: var(--crm-ap-muted) !important;
+}
+
+/* По умолчанию тулбар скрыт (полноэкранная CRM) */
+.crm-embed-toolbar {
+  display: none;
+}

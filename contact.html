@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DP Coatings — Контакты</title>
+  <meta name="description" content="Контакты DP Coatings: юридический и производственный адрес, телефоны, почта и онлайн-заявка." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="redesign-shared.css" />
+  <link rel="stylesheet" href="contact-page.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+</head>
+<body data-page="contact">
+  <div class="page-bg page-bg--site">
+    <div class="site-shell">
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="topbar">
+        <a href="index.html" class="logo" aria-label="Reaxon">
+          <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+        </a>
+        <nav class="topnav" aria-label="Основная навигация">
+          <a href="index.html" data-i18n="navHome">Главная</a>
+          <a href="products.html" data-i18n="navCatalog">Каталог</a>
+          <a href="price.html" data-i18n="navPrice">Прайс</a>
+          <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+          <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
+          <a href="news.html" data-i18n="navNews">Новости</a>
+          <a href="contact.html" data-i18n="navContacts" aria-current="page">Контакты</a>
+        </nav>
+        <div class="top-actions">
+          <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+            <label for="language-switcher" class="visually-hidden">
+              <span data-i18n="langLabel">Язык</span>
+            </label>
+            <select id="language-switcher" class="lang-switcher__select">
+              <option value="ru">RU</option>
+              <option value="uk">UA</option>
+            </select>
+          </div>
+          <div class="header-search-inline topbar-search home-site-search">
+            <input
+              id="site-search-input"
+              type="search"
+              data-i18n-placeholder="siteSearchPlaceholderHome"
+              data-i18n-aria-label="siteSearchPlaceholderHome"
+              placeholder="Поиск по названию, артикулу"
+              autocomplete="off"
+            />
+          </div>
+          <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+            🛒
+            <span class="cart-badge" id="cart-count">0</span>
+          </button>
+          <a
+            href="account.html"
+            class="icon-btn header-account-trigger topbar-account-btn"
+            id="home-account-trigger"
+            data-i18n-aria-label="accountDrawerTrigger"
+            aria-label="Личный кабинет"
+          >            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section section-muted contact-page-section" id="contact" aria-labelledby="contact-heading">
+      <div class="container contact-page-v2">
+        <nav class="products-breadcrumbs" aria-label="Навигация по разделу">
+          <a href="index.html" data-i18n="navHome">Главная</a>
+          <span aria-hidden="true">/</span>
+          <span data-i18n="navContacts">Контакты</span>
+        </nav>
+
+        <header class="contact-v2-head">
+          <h1 class="products-page-title" id="contact-heading" data-i18n="navContacts">Контакты</h1>
+          <p class="contact-section-lead" data-i18n="contactSectionLead">
+            Свяжитесь с нами для консультации и заказов.
+          </p>
+        </header>
+
+        <div class="contact-v2-grid">
+          <div class="contact-v2-col contact-v2-stack">
+            <section class="contact-v2-panel" aria-labelledby="contact-our-title">
+              <h2 id="contact-our-title" class="contact-v2-panel-title" data-i18n="contactOurTitle">Наши контакты</h2>
+              <ul class="contact-v2-lines">
+                <li class="contact-v2-line">
+                  <span class="contact-v2-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  </span>
+                  <div class="contact-v2-line-body">
+                    <span class="contact-v2-label" data-i18n="contactAddressLabel">Адрес:</span>
+                    <div class="contact-v2-value">
+                      <address>
+                        <strong data-i18n="contactLegalTitle">Юридический адрес</strong><br />
+                        69002, г. Запорожье,<br />
+                        ул. Константина Великого, 20<br /><br />
+                        <strong data-i18n="contactProductionTitle">Адрес производственных мощностей</strong><br />
+                        Запорожская обл., пгт Балабино,<br />
+                        ул. Степная, д. 2-е<br /><br />
+                        <strong data-i18n="contactMailTitle">Для корреспонденции</strong><br />
+                        69002, г. Запорожье, а/я 2330
+                      </address>
+                    </div>
+                  </div>
+                </li>
+                <li class="contact-v2-line">
+                  <span class="contact-v2-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </span>
+                  <div class="contact-v2-line-body">
+                    <span class="contact-v2-label" data-i18n="contactPhoneRowLabel">Телефон:</span>
+                    <div class="contact-v2-value contact-v2-phones-stack">
+                      <a href="tel:+380612209445">+38 (061) 220-94-45</a>
+                      <span class="contact-v2-phone-hint" data-i18n="contactPhoneLandline">Городской (т/факс)</span>
+                      <a href="tel:+380676134220">+38 (067) 613-42-20</a>
+                      <a href="tel:+380676135155">+38 (067) 613-51-55</a>
+                    </div>
+                  </div>
+                </li>
+                <li class="contact-v2-line">
+                  <span class="contact-v2-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </span>
+                  <div class="contact-v2-line-body">
+                    <span class="contact-v2-label" data-i18n="contactEmailLabel">E-mail:</span>
+                    <div class="contact-v2-value">
+                      <a href="mailto:reaxondh@gmail.com">reaxondh@gmail.com</a>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </section>
+
+            <section class="contact-v2-panel contact-v2-hours" aria-labelledby="contact-hours-title">
+              <h2 id="contact-hours-title" class="contact-v2-panel-title" data-i18n="contactHoursTitle">Режим работы</h2>
+              <ul class="contact-v2-lines">
+                <li class="contact-v2-line">
+                  <span class="contact-v2-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </span>
+                  <div class="contact-v2-line-body">
+                    <div class="contact-v2-value">
+                      <span data-i18n="contactHoursWeek">Пн–Пт: 9:00 – 18:00</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="contact-v2-line">
+                  <span class="contact-v2-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </span>
+                  <div class="contact-v2-line-body">
+                    <div class="contact-v2-value">
+                      <span data-i18n="contactHoursWeekend">Сб, Вс: выходной</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </section>
+          </div>
+
+          <div class="contact-v2-col contact-v2-col--form">
+            <div class="contact-v2-panel contact-v2-map-wrap">
+              <iframe
+                data-i18n-title="contactMapIframeTitle"
+                title="Карта — офис в Запорожье"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=35.125%2C47.825%2C35.155%2C47.850&amp;layer=mapnik&amp;marker=47.8388%2C35.1396"
+              ></iframe>
+              <a
+                class="contact-v2-map-btn"
+                href="https://www.google.com/maps/search/?api=1&amp;query=%D0%B2%D1%83%D0%BB.%20%D0%9A%D0%BE%D0%BD%D1%81%D1%82%D0%B0%D0%BD%D1%82%D0%B8%D0%BD%D0%B0%20%D0%92%D0%B5%D0%BB%D0%B8%D0%BA%D0%BE%D0%B3%D0%BE%2C%2020%2C%20%D0%97%D0%B0%D0%BF%D0%BE%D1%80%D1%96%D0%B6%D0%B6%D1%8F"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-i18n="contactOpenMap"
+                >Открыть в Google Картах</a
+              >
+            </div>
+
+            <div class="contact-v2-panel contact-v2-form-panel">
+              <h3 class="contact-form-title" data-i18n="formTitle">Форма обратной связи</h3>
+              <p class="contact-form-lead" data-i18n="formLead">Оставьте контакт, и менеджер подготовит предложение для розницы или опта.</p>
+              <form id="lead-form" class="lead-form contact-v2-lead-form">
+                <p class="contact-form-auth-hint" data-lead-auth-hint hidden data-i18n="leadFormAuthHint">
+                  Контактные данные подставляются из личного кабинета. При необходимости дополните сообщение.
+                </p>
+                <div class="lead-form-identity" data-lead-identity>
+                <input name="name" required data-i18n-placeholder="contactFormNamePlaceholder" placeholder="Ваше имя" />
+                <input name="phone" required data-i18n-placeholder="formPhonePlaceholder" placeholder="Телефон" />
+                <input name="email" type="email" data-i18n-placeholder="formEmailPlaceholder" placeholder="Email" />
+                </div>
+                <label class="contact-form-topic-label"
+                  ><span data-i18n="leadFormTopicLabel">Тема</span>
+                  <input
+                    name="topic"
+                    required
+                    maxlength="200"
+                    data-i18n-placeholder="leadFormTopicPlaceholder"
+                    placeholder="Тема обращения"
+                    autocomplete="off"
+                /></label>
+                <textarea name="comment" rows="3" data-i18n-placeholder="contactFormCommentPlaceholder" placeholder="Сообщение"></textarea>
+                <button class="btn btn-primary" type="submit" data-i18n="sendRequest">Отправить</button>
+                <p id="form-status" class="form-status"></p>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-v2-cta-banner">
+          <p data-i18n="contactCtaBanner">Остались вопросы? Мы всегда готовы помочь!</p>
+          <div class="contact-v2-cta-action">
+            <button type="button" class="contact-v2-cta-btn" id="contact-cta-callback" data-i18n="contactRequestCall">
+              Заказать звонок
+            </button>
+            <p id="contact-cta-callback-status" class="contact-cta-callback-status" role="status" hidden></p>
+          </div>
+        </div>
+
+        <div class="contact-v2-trust" role="list">
+          <div class="contact-v2-trust-item" role="listitem">
+            <span class="contact-v2-trust-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M6 16V9l6-4 6 4v7"/><path d="M10 20v-6h4v6"/></svg>
+            </span>
+            <p data-i18n="contactTrust1">Собственное производство</p>
+          </div>
+          <div class="contact-v2-trust-item" role="listitem">
+            <span class="contact-v2-trust-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </span>
+            <p data-i18n="contactTrust2">Доставка по всей Украине</p>
+          </div>
+          <div class="contact-v2-trust-item" role="listitem">
+            <span class="contact-v2-trust-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            <p data-i18n="contactTrust3">Гарантия качества</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer footer--site-laconic" aria-label="Подвал">
+    <div class="container footer-site-laconic-inner">
+      <div class="footer-laconic-row footer-laconic-row--brand">
+        <span class="footer-laconic-brand" aria-hidden="true">REAXON</span>
+        <p class="footer-laconic-tagline" data-i18n="footerAbout">
+          Промышленные лакокрасочные материалы: эмали, грунтовки и сопутствующие решения для B2B и розницы.
+        </p>
+      </div>
+      <nav class="footer-laconic-nav" aria-label="Разделы сайта">
+        <a href="products.html" data-i18n="navCatalog">Каталог</a>
+        <a href="price.html" data-i18n="navPrice">Прайс</a>
+        <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+        <a href="delivery.html" data-dp-delivery="footerLink" data-i18n="navDelivery">Доставка и оплата</a>
+        <a href="contact.html" data-i18n="navContacts" aria-current="page">Контакты</a>
+      </nav>
+      <div class="footer-laconic-row footer-laconic-row--meta">
+        <a class="footer-laconic-tel" href="tel:+380676134220">+38 (067) 613-42-20</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="tel:+380676135155">+38 (067) 613-51-55</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="tel:+380612209445">+38 (061) 220-94-45</a>
+        <span class="footer-laconic-fax-hint footer-phone-hint">т/факс</span>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-mail" href="mailto:reaxondh@gmail.com">reaxondh@gmail.com</a>
+        <span class="footer-laconic-dot footer-laconic-dot--wide" aria-hidden="true">·</span>
+        <span class="footer-laconic-addr">69002, Запорожье, ул. Константина Великого, 20</span>
+        <a class="footer-laconic-all" href="contact.html#contact" data-i18n="footerContactAll">Все реквизиты</a>
+      </div>
+    </div>
+  </footer>
+    </div>
+  </div>
+
+  <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
+    <div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-drawer-shell">
+        <header class="cart-header">
+          <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
+          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть корзину">
+            <svg class="cart-close-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="cart-modal-toolbar">
+          <label class="cart-sort-label">
+            <span class="cart-sort-text" data-i18n="cartSortLabel">Сортировка</span>
+            <select id="cart-sort-select" class="cart-sort-select" aria-label="Sort order">
+              <option value="price-asc" data-i18n="cartSortPriceAsc">От дешёвых к дорогим</option>
+              <option value="price-desc" data-i18n="cartSortPriceDesc">От дорогих к дешёвым</option>
+              <option value="name-asc" data-i18n="cartSortNameAsc">По названию (А–Я)</option>
+              <option value="add-order" data-i18n="cartSortAddOrder">Порядок добавления</option>
+            </select>
+          </label>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <footer class="cart-footer">
+          <div class="cart-footer-totals">
+            <div class="cart-grand-row">
+              <span data-i18n="cartGrandTotal">Итого по заказу</span>
+              <strong class="cart-grand-value"><span id="cart-total">0</span><span class="cart-currency"> грн</span></strong>
+            </div>
+          </div>
+          <div class="cart-footer-actions">
+            <button type="button" id="cart-pay-btn" class="btn btn-primary cart-pay-btn" data-i18n="payButton">Оплатить</button>
+            <button type="button" id="checkout" class="btn btn-ghost" data-i18n="checkoutRequest">Заявка без оплаты</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <div id="product-modal" class="modal" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+      <div class="modal-top">
+        <h3 id="product-modal-title"></h3>
+        <button id="close-product-modal" class="btn btn-ghost" type="button" aria-label="Close">×</button>
+      </div>
+      <div id="product-modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="script.js"></script>
+  <script src="home-auth-ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+/* Оплата: контент внутри main.apay-main > .container (карточка-«лист» из redesign-shared) */
+
+.apay-main {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.apay-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(16px, 2vw, 20px);
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.apay-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  color: var(--rd-muted, #64748b);
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+
+.apay-hero {
+  min-width: 0;
+}
+
+.apay-hero .apay-hero-title,
+.apay-hero h1.apay-hero-title {
+  margin: 0 0 0.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+.apay-lead {
+  color: var(--rd-muted, #475569);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+  max-width: 44rem;
+}
+
+#apay-status.form-status:empty {
+  display: none;
+}
+
+.apay-card {
+  min-width: 0;
+  border: 1px solid var(--rd-line, rgba(0, 59, 126, 0.12));
+  border-radius: 16px;
+  background: var(--rd-surface, #fff);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  padding: 1.25rem 1.25rem 1.15rem;
+  box-sizing: border-box;
+}
+
+.apay-card-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  color: var(--rd-text, #0a1933);
+}
+
+.apay-richtext p {
+  margin: 0 0 0.7em;
+  line-height: 1.55;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.apay-richtext p:last-child {
+  margin-bottom: 0;
+}
+
+.apay-iban-dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.apay-iban-dl > div {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 8.2rem) 1fr;
+  gap: 8px 14px;
+  align-items: start;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.apay-iban-dl > div:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.apay-iban-dl > div:first-child {
+  padding-top: 0;
+}
+
+.apay-iban-dl dt {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  font-weight: 700;
+  margin: 0;
+}
+
+.apay-iban-dl dd {
+  margin: 0;
+  font-size: 0.92rem;
+  word-break: break-word;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.apay-iban .apay-hint,
+.apay-muted {
+  color: #64748b;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+
+.apay-muted code {
+  font-size: 0.82em;
+  background: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+}
+
+.apay-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.apay-field span {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.apay-field input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 59, 126, 0.18);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: #fafbfe;
+}
+
+.apay-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: #334155;
+}
+
+.apay-check input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.apay-btn {
+  width: 100%;
+  max-width: 22rem;
+  min-height: 48px;
+  font-size: 0.95rem;
+  justify-content: center;
+}
+
+.apay-copy {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 59, 126, 0.2);
+  background: #fff;
+  color: #003b7e;
+  cursor: pointer;
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.apay-copy:hover {
+  background: #f0f4fb;
+}
+
+.apay-hidden {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+@media (max-width: 520px) {
+  .apay-iban-dl > div {
+    grid-template-columns: 1fr;
+    gap: 4px 0;
+  }
+}

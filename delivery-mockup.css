@@ -1,0 +1,568 @@
+/* Страница доставки — макет как на референсе (2 колонки + строки + футер) */
+body[data-page="delivery"] .delivery-main-v2 {
+  --dv2-bg: transparent;
+  --dv2-card: #ffffff;
+  --dv2-ink: #152238;
+  --dv2-muted: #5c6678;
+  --dv2-blue: #1e4b96;
+  --dv2-link: #2563eb;
+  /* Кнопки — фирменный красный как у .btn-primary на главной */
+  --dv2-btn-bg: var(--rd-red, #d62629);
+  --dv2-btn-hover: #b51f22;
+  --dv2-line: #e2e6ee;
+  --dv2-radius: 14px;
+  --dv2-shadow: 0 8px 28px rgba(18, 34, 62, 0.08);
+  background: transparent;
+  padding: clamp(14px, 2vw, 22px) clamp(12px, 2vw, 22px);
+}
+
+body[data-page="delivery"] .delivery-v2-inner {
+  max-width: var(--rd-content-max, 1120px);
+  margin: 0 auto;
+}
+
+body[data-page="delivery"] .delivery-v2-title {
+  margin: 0 0 6px;
+  font-size: clamp(1.12rem, 1.95vw, 1.35rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--dv2-ink);
+}
+
+body[data-page="delivery"] .delivery-v2-lead {
+  margin: 0 0 20px;
+  max-width: 56ch;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--dv2-muted);
+}
+
+body[data-page="delivery"] .delivery-v2-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: clamp(18px, 2.4vw, 28px);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  body[data-page="delivery"] .delivery-v2-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* —— Левая колонка —— */
+body[data-page="delivery"] .delivery-v2-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 72px;
+}
+
+@media (max-width: 900px) {
+  body[data-page="delivery"] .delivery-v2-sidebar {
+    position: static;
+  }
+}
+
+body[data-page="delivery"] .dv2-card {
+  background: var(--dv2-card);
+  border-radius: var(--dv2-radius);
+  box-shadow: var(--dv2-shadow);
+  border: 1px solid var(--dv2-line);
+  padding: 18px 18px 16px;
+}
+
+body[data-page="delivery"] .dv2-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+body[data-page="delivery"] .dv2-card__head > div:not(.dv2-card__icon) {
+  flex: 1;
+  min-width: 0;
+}
+
+body[data-page="delivery"] .dv2-card__icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(30, 75, 150, 0.1);
+  color: var(--dv2-blue);
+  display: grid;
+  place-items: center;
+}
+
+body[data-page="delivery"] .dv2-card__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+body[data-page="delivery"] .dv2-card h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--dv2-ink);
+  line-height: 1.25;
+}
+
+body[data-page="delivery"] .dv2-card__sub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--dv2-muted);
+  line-height: 1.35;
+}
+
+/* Две суммы: подпись и сумма в одну строку («от 300 грн» · «до 1000+ грн») */
+body[data-page="delivery"] .dv2-card__prices,
+body[data-page="delivery"] .dv2-row__price-cols {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+}
+
+body[data-page="delivery"] .dv2-card__prices {
+  margin: 0 0 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--dv2-line);
+}
+
+body[data-page="delivery"] .dv2-card__prices > div,
+body[data-page="delivery"] .dv2-row__price-col {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 3px;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+body[data-page="delivery"] .dv2-card__prices .dv2-label,
+body[data-page="delivery"] .dv2-row__price-col .dv2-label {
+  display: inline;
+  flex-shrink: 0;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--dv2-muted);
+  line-height: 1.2;
+}
+
+body[data-page="delivery"] .dv2-card__prices strong,
+body[data-page="delivery"] .dv2-row__price-col strong {
+  display: inline;
+  font-size: clamp(0.62rem, 1.35vw, 0.78rem);
+  font-weight: 800;
+  color: var(--dv2-ink);
+  line-height: 1.12;
+  white-space: nowrap;
+}
+
+/* Запорожье / область: широкая карточка + строка справа — крупнее суммы */
+body[data-page="delivery"] .dv2-card--wide .dv2-card__prices strong,
+body[data-page="delivery"] #delivery-local .dv2-row__price-col strong,
+body[data-page="delivery"] #delivery-local .dv2-row__price-inner strong {
+  font-size: clamp(0.92rem, 2.4vw, 1.15rem);
+}
+
+body[data-page="delivery"] .dv2-card--wide .dv2-card__prices .dv2-label,
+body[data-page="delivery"] #delivery-local .dv2-row__price-col .dv2-label {
+  font-size: 10px;
+}
+
+body[data-page="delivery"] .dv2-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 4px;
+  padding: 11px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--dv2-btn-bg);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(214, 38, 41, 0.28);
+}
+
+body[data-page="delivery"] .dv2-btn:hover {
+  background: var(--dv2-btn-hover);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(214, 38, 41, 0.35);
+}
+
+body[data-page="delivery"] .dv2-btn:focus-visible {
+  outline: 2px solid var(--rd-blue, #153f97);
+  outline-offset: 2px;
+}
+
+body[data-page="delivery"] .dv2-card__figure {
+  margin: 14px -6px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  line-height: 0;
+  background: #e8ecf4;
+}
+
+body[data-page="delivery"] .dv2-card__figure img {
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+  object-fit: cover;
+  object-position: center 35%;
+  display: block;
+}
+
+body[data-page="delivery"] .dv2-card--wide .dv2-card__figure img {
+  max-height: 200px;
+}
+
+/* Баннер «Запорожье и область»: кадрирование под шапку с текстом */
+body[data-page="delivery"] .dv2-card__figure--zaporizhzhia img {
+  object-position: center 28%;
+}
+
+body[data-page="delivery"] .dv2-card__note {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--dv2-muted);
+}
+
+/* FAQ */
+body[data-page="delivery"] .dv2-faq {
+  background: var(--dv2-card);
+  border-radius: var(--dv2-radius);
+  box-shadow: var(--dv2-shadow);
+  border: 1px solid var(--dv2-line);
+  padding: 16px 14px;
+}
+
+body[data-page="delivery"] .dv2-faq h2 {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--dv2-blue);
+}
+
+body[data-page="delivery"] .dv2-faq details {
+  border-bottom: 1px solid var(--dv2-line);
+}
+
+body[data-page="delivery"] .dv2-faq details:last-child {
+  border-bottom: none;
+}
+
+body[data-page="delivery"] .dv2-faq summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dv2-link);
+}
+
+body[data-page="delivery"] .dv2-faq .dv2-faq__q {
+  flex: 1;
+  text-align: left;
+}
+
+body[data-page="delivery"] .dv2-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+body[data-page="delivery"] .dv2-faq summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--dv2-link);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+  margin-right: 6px;
+}
+
+body[data-page="delivery"] .dv2-faq details[open] summary::before {
+  content: "−";
+}
+
+body[data-page="delivery"] .dv2-faq .dv2-faq__chev {
+  color: var(--dv2-muted);
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+body[data-page="delivery"] .dv2-faq details[open] .dv2-faq__chev {
+  transform: rotate(90deg);
+}
+
+body[data-page="delivery"] .dv2-faq__body {
+  padding: 0 8px 14px 34px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--dv2-muted);
+}
+
+/* —— Правая колонка: строки —— */
+body[data-page="delivery"] .delivery-v2-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+body[data-page="delivery"] .dv2-row {
+  display: grid;
+  grid-template-columns: minmax(158px, 232px) 1fr minmax(118px, 172px);
+  gap: 0;
+  background: var(--dv2-card);
+  border-radius: var(--dv2-radius);
+  box-shadow: var(--dv2-shadow);
+  border: 1px solid var(--dv2-line);
+  overflow: hidden;
+  align-items: stretch;
+}
+
+@media (max-width: 800px) {
+  body[data-page="delivery"] .dv2-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+body[data-page="delivery"] .dv2-row__visual {
+  background: #e8ecf4;
+  min-height: 168px;
+}
+
+body[data-page="delivery"] .dv2-row__visual img {
+  width: 100%;
+  height: 100%;
+  min-height: 168px;
+  object-fit: cover;
+  display: block;
+}
+
+/* «По Украине»: баннер на всю ширину и высоту ячейки сетки строки */
+body[data-page="delivery"] .dv2-row__visual--fill {
+  position: relative;
+  min-height: 168px;
+  overflow: hidden;
+}
+
+/* В одноколоночной сетке ячейка картинки одна — задаём пропорции, чтобы блок не схлопнулся */
+@media (max-width: 800px) {
+  body[data-page="delivery"] .dv2-row__visual--fill {
+    aspect-ratio: 16 / 9;
+    min-height: min(240px, 58vw);
+  }
+}
+
+body[data-page="delivery"] .dv2-row__visual--fill img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* Портретное фото в строке «Запорожье и область» — фургон с логотипом и слоганом */
+body[data-page="delivery"] #delivery-local .dv2-row__visual--fill img {
+  object-position: center 36%;
+}
+
+@media (max-width: 800px) {
+  body[data-page="delivery"] #delivery-local .dv2-row__visual--fill {
+    aspect-ratio: 3 / 4;
+    min-height: min(280px, 76vw);
+  }
+}
+
+/* «По Украине»: портрет с фурой — логотип и слоган на полуприцепе */
+body[data-page="delivery"] #delivery-national .dv2-row__visual--fill img {
+  object-position: center 38%;
+}
+
+@media (max-width: 800px) {
+  body[data-page="delivery"] #delivery-national .dv2-row__visual--fill {
+    aspect-ratio: 3 / 4;
+    min-height: min(280px, 76vw);
+  }
+}
+
+/* «Самовывоз»: портрет с фургоном и подписью на кузове */
+body[data-page="delivery"] #delivery-pickup .dv2-row__visual--fill img {
+  object-position: center 40%;
+}
+
+@media (max-width: 800px) {
+  body[data-page="delivery"] #delivery-pickup .dv2-row__visual--fill {
+    aspect-ratio: 3 / 4;
+    min-height: min(280px, 76vw);
+  }
+}
+
+body[data-page="delivery"] .dv2-row__main {
+  padding: 10px 12px;
+  border-left: 1px solid var(--dv2-line);
+  border-right: 1px solid var(--dv2-line);
+}
+
+@media (max-width: 800px) {
+  body[data-page="delivery"] .dv2-row__main {
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid var(--dv2-line);
+  }
+}
+
+body[data-page="delivery"] .dv2-row__main h3 {
+  margin: 0 0 6px;
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--dv2-ink);
+  line-height: 1.2;
+}
+
+body[data-page="delivery"] .dv2-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+body[data-page="delivery"] .dv2-pill {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 7px;
+  background: #f0f2f7;
+  font-size: 11px;
+  color: var(--dv2-ink);
+  border: 1px solid var(--dv2-line);
+}
+
+body[data-page="delivery"] .dv2-row__price:empty {
+  display: none;
+}
+
+body[data-page="delivery"] .dv2-row__price:not([hidden]) {
+  margin: 0 0 10px;
+  padding-top: 12px;
+  margin-top: 2px;
+  border-top: 1px solid var(--dv2-line);
+  font-size: 12px;
+  color: var(--dv2-muted);
+}
+
+body[data-page="delivery"] .dv2-row__price--split {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+body[data-page="delivery"] .dv2-row__price-intro {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dv2-ink);
+  line-height: 1.3;
+}
+
+body[data-page="delivery"] .dv2-row__price-trail {
+  display: block;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--dv2-muted);
+}
+
+body[data-page="delivery"] .dv2-row__price-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35em 0.65em;
+}
+
+body[data-page="delivery"] .dv2-row__price-inner strong {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--dv2-ink);
+}
+
+body[data-page="delivery"] .dv2-row__main .dv2-btn {
+  width: auto;
+  min-width: 124px;
+  margin-top: 0;
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+body[data-page="delivery"] .dv2-row__aside {
+  padding: 10px 11px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--dv2-muted);
+  background: #fafbfd;
+}
+
+body[data-page="delivery"] .dv2-row__aside h4 {
+  margin: 0 0 5px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dv2-ink);
+}
+
+body[data-page="delivery"] .dv2-row__aside ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+body[data-page="delivery"] .dv2-row__aside li {
+  margin-bottom: 3px;
+}
+
+body[data-page="delivery"] .dv2-row__aside p {
+  margin: 0 0 8px;
+}
+
+body[data-page="delivery"] .dv2-row__aside p:last-child {
+  margin-bottom: 0;
+}
+
+body[data-page="delivery"] .dv2-row__address {
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: var(--dv2-ink);
+  line-height: 1.45;
+}
+
+body[data-page="delivery"] .dv2-row__address a {
+  color: var(--dv2-link);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+body[data-page="delivery"] .dv2-row__address a:hover {
+  text-decoration: underline;
+}

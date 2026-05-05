@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DP Coatings - Советы и статьи</title>
+  <meta name="description" content="Практические советы по выбору, нанесению и хранению лакокрасочных материалов." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="redesign-shared.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+</head>
+<body data-page="advice">
+  <div class="page-bg page-bg--site">
+    <div class="site-shell">
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="topbar">
+        <a href="index.html" class="logo" aria-label="Reaxon">
+          <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+        </a>
+        <nav class="topnav" aria-label="Основная навигация">
+          <a href="index.html" data-i18n="navHome">Главная</a>
+          <a href="products.html" data-i18n="navCatalog">Каталог</a>
+          <a href="price.html" data-i18n="navPrice">Прайс</a>
+          <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+          <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
+          <a href="news.html" data-i18n="navNews">Новости</a>
+          <a href="contact.html" data-i18n="navContacts">Контакты</a>
+        </nav>
+        <div class="top-actions">
+          <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+            <label for="language-switcher" class="visually-hidden">
+              <span data-i18n="langLabel">Язык</span>
+            </label>
+            <select id="language-switcher" class="lang-switcher__select">
+              <option value="ru">RU</option>
+              <option value="uk">UA</option>
+            </select>
+          </div>
+          <div class="header-search-inline topbar-search home-site-search">
+            <input
+              id="site-search-input"
+              type="search"
+              data-i18n-placeholder="siteSearchPlaceholderHome"
+              data-i18n-aria-label="siteSearchPlaceholderHome"
+              placeholder="Поиск по названию, артикулу"
+              autocomplete="off"
+            />
+          </div>
+          <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+            🛒
+            <span class="cart-badge" id="cart-count">0</span>
+          </button>
+          <a
+            href="account.html"
+            class="icon-btn header-account-trigger topbar-account-btn"
+            id="home-account-trigger"
+            data-i18n-aria-label="accountDrawerTrigger"
+            aria-label="Личный кабинет"
+          >            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section section-muted">
+      <div class="container">
+        <nav class="products-breadcrumbs" aria-label="Навигация по разделу">
+          <a href="index.html" data-i18n="navHome">Главная</a>
+          <span aria-hidden="true">/</span>
+          <span data-i18n="navAdvice">Советы</span>
+        </nav>
+        <div class="section-head">
+          <h2 data-i18n="adviceTitle">Советы и статьи</h2>
+        </div>
+        <div class="advice-grid">
+          <article class="advice-card">
+            <img class="advice-image" src="https://images.pexels.com/photos/5691633/pexels-photo-5691633.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="primer-enamel" alt="Грунт и эмаль" loading="lazy" />
+            <h3 data-i18n="advice1Title">Как выбрать систему: грунт + эмаль</h3>
+            <p data-i18n="advice1Text">Краткая методика подбора лакокрасочной системы в зависимости от основания и условий эксплуатации.</p>
+            <a class="advice-read-link" href="advice-item.html?id=primer-enamel">Читать статью</a>
+          </article>
+          <article class="advice-card">
+            <img class="advice-image" src="https://images.pexels.com/photos/6474348/pexels-photo-6474348.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="surface-prep" alt="Подготовка поверхности" loading="lazy" />
+            <h3 data-i18n="advice2Title">Подготовка поверхности перед окраской</h3>
+            <p data-i18n="advice2Text">Практические рекомендации по очистке, обезжириванию и межслойной сушке для стабильного результата.</p>
+            <a class="advice-read-link" href="advice-item.html?id=surface-prep">Читать статью</a>
+          </article>
+          <article class="advice-card">
+            <img class="advice-image" src="https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="calc" alt="Расчет расхода" loading="lazy" />
+            <h3 data-i18n="advice3Title">Как рассчитать расход материалов</h3>
+            <p data-i18n="advice3Text">Простой подход к расчету расхода эмали и грунтовки на объект с учетом запаса и технологических потерь.</p>
+            <a class="advice-read-link" href="advice-item.html?id=calc">Читать статью</a>
+          </article>
+          <article class="advice-card">
+            <img class="advice-image" src="https://images.pexels.com/photos/6474471/pexels-photo-6474471.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="two-coats" alt="Нанесение в два слоя" loading="lazy" />
+            <h3>Нанесение в 2 слоя: как не получить перерасход</h3>
+            <p>Первый слой делайте тоньше и дайте полноценную межслойную сушку. Второй слой выравнивает укрывистость и снижает риск потеков.</p>
+            <a class="advice-read-link" href="advice-item.html?id=two-coats">Читать статью</a>
+          </article>
+          <article class="advice-card">
+            <img class="advice-image" src="https://images.pexels.com/photos/5799173/pexels-photo-5799173.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="roller-vs-spray" alt="Валик и распыление" loading="lazy" />
+            <h3>Когда выбирать валик, а когда распыление</h3>
+            <p>Валик удобен для небольших объектов, локального ремонта и интерьера. Распыление выбирайте для больших площадей, металлоконструкций и равномерного промышленного слоя.</p>
+            <a class="advice-read-link" href="advice-item.html?id=roller-vs-spray">Читать статью</a>
+          </article>
+          <article class="advice-card">
+            <img class="advice-image" src="https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="storage" alt="Хранение материалов" loading="lazy" />
+            <h3>Как хранить материалы, чтобы не терять свойства</h3>
+            <p>Держите тару герметично закрытой, в сухом помещении без перегрева и прямого солнца. Перед нанесением проверяйте вязкость и однородность.</p>
+            <a class="advice-read-link" href="advice-item.html?id=storage">Читать статью</a>
+          </article>
+          <article class="advice-card">
+            <img class="advice-image" src="https://images.pexels.com/photos/6474478/pexels-photo-6474478.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="outdoor" alt="Наружные работы" loading="lazy" />
+            <h3>Система «грунт + эмаль» для наружных работ</h3>
+            <p>На улице важны антикоррозионная подготовка, правильная температура нанесения и соблюдение времени сушки между слоями.</p>
+            <a class="advice-read-link" href="advice-item.html?id=outdoor">Читать статью</a>
+          </article>
+          <article class="advice-card">
+            <img class="advice-image" src="https://images.pexels.com/photos/6474475/pexels-photo-6474475.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="metal" alt="Окраска металла" loading="lazy" />
+            <h3>Окраска металла: как избежать коррозии через сезон</h3>
+            <p>Главные шаги: удаление ржавчины, обезжиривание, полноценный слой грунтовки и контроль толщины финишного покрытия.</p>
+            <a class="advice-read-link" href="advice-item.html?id=metal">Читать статью</a>
+          </article>
+          <article class="advice-card" data-monthly-slot="0">
+            <img class="advice-image" src="https://images.pexels.com/photos/355952/pexels-photo-355952.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="weather" alt="Погодные условия" loading="lazy" />
+            <h3>Температура и влажность: частые ошибки при нанесении</h3>
+            <p>Не наносите ЛКМ на влажную или перегретую поверхность. Контролируйте температуру основания и условия сушки между слоями.</p>
+            <a class="advice-read-link" href="advice-item.html?id=weather">Читать статью</a>
+          </article>
+          <article class="advice-card" data-monthly-slot="1">
+            <img class="advice-image" src="https://images.pexels.com/photos/8853507/pexels-photo-8853507.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="safety" alt="Безопасность работ" loading="lazy" />
+            <h3>Безопасность малярных работ на объекте</h3>
+            <p>Используйте СИЗ, вентиляцию и соблюдайте требования по хранению/разбавлению материалов, особенно в закрытых помещениях.</p>
+            <a class="advice-read-link" href="advice-item.html?id=safety">Читать статью</a>
+          </article>
+          <article class="advice-card" data-monthly-slot="2">
+            <img class="advice-image" src="https://images.pexels.com/photos/6474478/pexels-photo-6474478.jpeg?auto=compress&cs=tinysrgb&w=1200" data-advice-image="outdoor" alt="Окраска фасадов и наружных конструкций" loading="lazy" />
+            <h3>Окраска фасадов и наружных конструкций: сезонный чеклист</h3>
+            <p>Проверяйте влажность основания, прогноз погоды и межслойные интервалы, чтобы покрытие не теряло свойства в первый сезон.</p>
+            <a class="advice-read-link" href="advice-item.html?id=outdoor">Читать статью</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-solid">
+      <div class="container">
+        <div class="section-head">
+          <h2>Рекомендуемые товары</h2>
+          <a class="btn btn-ghost" href="price.html">Открыть прайс</a>
+        </div>
+        <div id="advice-reco-products" class="products"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer footer--site-laconic" aria-label="Подвал">
+    <div class="container footer-site-laconic-inner">
+      <div class="footer-laconic-row footer-laconic-row--brand">
+        <span class="footer-laconic-brand" aria-hidden="true">REAXON</span>
+        <p class="footer-laconic-tagline" data-i18n="footerAbout">
+          Промышленные лакокрасочные материалы: эмали, грунтовки и сопутствующие решения для B2B и розницы.
+        </p>
+      </div>
+      <nav class="footer-laconic-nav" aria-label="Разделы сайта">
+        <a href="products.html" data-i18n="navCatalog">Каталог</a>
+        <a href="price.html" data-i18n="navPrice">Прайс</a>
+        <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+        <a href="delivery.html" data-dp-delivery="footerLink" data-i18n="navDelivery">Доставка и оплата</a>
+        <a href="contact.html" data-i18n="navContacts">Контакты</a>
+      </nav>
+      <div class="footer-laconic-row footer-laconic-row--meta">
+        <a class="footer-laconic-tel" href="tel:+380676134220">+38 (067) 613-42-20</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="tel:+380676135155">+38 (067) 613-51-55</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="tel:+380612209445">+38 (061) 220-94-45</a>
+        <span class="footer-laconic-fax-hint footer-phone-hint">т/факс</span>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-mail" href="mailto:reaxondh@gmail.com">reaxondh@gmail.com</a>
+        <span class="footer-laconic-dot footer-laconic-dot--wide" aria-hidden="true">·</span>
+        <span class="footer-laconic-addr">69002, Запорожье, ул. Константина Великого, 20</span>
+        <a class="footer-laconic-all" href="contact.html#contact" data-i18n="footerContactAll">Все реквизиты</a>
+      </div>
+    </div>
+  </footer>
+    </div>
+  </div>
+
+  <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
+    <div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-drawer-shell">
+        <header class="cart-header">
+          <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
+          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть корзину">
+            <svg class="cart-close-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="cart-modal-toolbar">
+          <label class="cart-sort-label">
+            <span class="cart-sort-text" data-i18n="cartSortLabel">Сортировка</span>
+            <select id="cart-sort-select" class="cart-sort-select" aria-label="Sort order">
+              <option value="price-asc" data-i18n="cartSortPriceAsc">От дешёвых к дорогим</option>
+              <option value="price-desc" data-i18n="cartSortPriceDesc">От дорогих к дешёвым</option>
+              <option value="name-asc" data-i18n="cartSortNameAsc">По названию (А–Я)</option>
+              <option value="add-order" data-i18n="cartSortAddOrder">Порядок добавления</option>
+            </select>
+          </label>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <footer class="cart-footer">
+          <div class="cart-footer-totals">
+            <div class="cart-grand-row">
+              <span data-i18n="cartGrandTotal">Итого по заказу</span>
+              <strong class="cart-grand-value"><span id="cart-total">0</span><span class="cart-currency"> грн</span></strong>
+            </div>
+          </div>
+          <div class="cart-footer-actions">
+            <button type="button" id="cart-pay-btn" class="btn btn-primary cart-pay-btn" data-i18n="payButton">Оплатить</button>
+            <button type="button" id="checkout" class="btn btn-ghost" data-i18n="checkoutRequest">Заявка без оплаты</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="script.js"></script>
+  <script src="home-auth-ui.js"></script>
+</body>
+</html>

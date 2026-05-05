@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DP Coatings - Вход и регистрация</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="redesign-shared.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+</head>
+<body data-page="auth">
+  <div class="page-bg page-bg--site">
+    <div class="site-shell">
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="topbar">
+        <a href="index.html" class="logo" aria-label="Reaxon">
+          <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+        </a>
+        <nav class="topnav" aria-label="Основная навигация">
+          <a href="index.html" data-i18n="navHome">Главная</a>
+          <a href="products.html" data-i18n="navCatalog">Каталог</a>
+          <a href="price.html" data-i18n="navPrice">Прайс</a>
+          <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+          <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
+          <a href="news.html" data-i18n="navNews">Новости</a>
+          <a href="contact.html" data-i18n="navContacts">Контакты</a>
+        </nav>
+        <div class="top-actions">
+          <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+            <label for="language-switcher" class="visually-hidden">
+              <span data-i18n="langLabel">Язык</span>
+            </label>
+            <select id="language-switcher" class="lang-switcher__select">
+              <option value="ru">RU</option>
+              <option value="uk">UA</option>
+            </select>
+          </div>
+          <a href="index.html" class="auth-btn topbar-account-btn" data-ru="На главную" data-uk="На головну">На главную</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-page-main">
+    <nav class="products-breadcrumbs auth-breadcrumbs" aria-label="Навигация по разделу">
+      <a href="index.html" data-i18n="navHome">Главная</a>
+      <span aria-hidden="true">/</span>
+      <span data-i18n="navLogin">Вход</span>
+    </nav>
+    <div class="auth-page-wrap" id="auth-page-wrap">
+      <div class="auth-window auth-window--login" id="auth-window-login" role="region" aria-labelledby="auth-heading-login">
+        <h1 class="auth-page-title" id="auth-heading-login">Вход</h1>
+
+        <form id="login-form" class="lead-form" autocomplete="on" data-auth-mode="login">
+          <input name="email" type="text" required placeholder="Email" data-ru-placeholder="Email" data-uk-placeholder="Email" autocomplete="username" inputmode="email" />
+          <input name="password" type="password" required placeholder="Пароль" data-ru-placeholder="Пароль" data-uk-placeholder="Пароль" autocomplete="current-password" />
+          <button class="btn btn-primary" type="submit">Войти</button>
+        </form>
+
+        <div class="auth-switch">
+          <span id="auth-switch-hint-login">Нет аккаунта?</span>
+          <button type="button" class="auth-switch-btn" id="auth-open-register" aria-label="Перейти к регистрации">Регистрация</button>
+        </div>
+      </div>
+
+      <div class="auth-window auth-window--register" id="auth-window-register" role="region" aria-labelledby="auth-heading-register" hidden aria-hidden="true">
+        <h1 class="auth-page-title" id="auth-heading-register">Регистрация</h1>
+
+        <form id="register-form" class="lead-form auth-form-register" autocomplete="on" novalidate>
+          <div class="auth-reg-grid">
+            <label class="auth-form-field">
+              <span class="auth-form-label" data-ru="Имя *" data-uk="Імʼя *">Имя *</span>
+              <input name="firstName" type="text" required maxlength="200" autocomplete="given-name" />
+            </label>
+            <label class="auth-form-field">
+              <span class="auth-form-label" data-ru="Фамилия" data-uk="Прізвище">Фамилия</span>
+              <input name="lastName" type="text" maxlength="200" autocomplete="family-name" />
+            </label>
+          </div>
+          <label class="auth-form-field auth-form-field--full">
+            <span class="auth-form-label" data-ru="Электронный адрес *" data-uk="Електронна пошта *">Электронный адрес *</span>
+            <input name="email" type="email" required autocomplete="email" inputmode="email" />
+          </label>
+          <div class="auth-reg-grid">
+            <label class="auth-form-field">
+              <span class="auth-form-label" data-ru="Пароль *" data-uk="Пароль *">Пароль *</span>
+              <input name="password" type="password" required minlength="10" maxlength="200" autocomplete="new-password" />
+            </label>
+            <label class="auth-form-field">
+              <span class="auth-form-label" data-ru="Подтверждение *" data-uk="Підтвердження *">Подтверждение *</span>
+              <input name="passwordConfirm" type="password" required minlength="10" maxlength="200" autocomplete="new-password" />
+            </label>
+          </div>
+          <div class="auth-reg-grid">
+            <label class="auth-form-field">
+              <span class="auth-form-label" data-ru="Адрес доставки" data-uk="Адреса доставки">Адрес доставки</span>
+              <input name="deliveryAddress" type="text" maxlength="500" autocomplete="shipping street-address" />
+            </label>
+            <label class="auth-form-field">
+              <span class="auth-form-label" data-ru="Город *" data-uk="Місто *">Город *</span>
+              <input name="city" type="text" required maxlength="200" autocomplete="address-level2" />
+            </label>
+          </div>
+          <label class="auth-form-field auth-form-field--full">
+            <span class="auth-form-label" data-ru="Телефон *" data-uk="Телефон *">Телефон *</span>
+            <input name="phone" type="tel" required maxlength="80" autocomplete="tel" />
+          </label>
+          <label class="auth-legal-check">
+            <input type="checkbox" name="isLegalEntity" value="1" id="reg-legal" />
+            <span data-ru="Юридическое лицо" data-uk="Юридична особа">Юридическое лицо</span>
+          </label>
+          <div class="auth-legal-block" id="reg-legal-block" hidden>
+            <label class="auth-form-field auth-form-field--full">
+              <span class="auth-form-label" id="reg-company-label">Название предприятия *</span>
+              <input name="companyName" type="text" maxlength="200" id="reg-company" autocomplete="organization" />
+            </label>
+            <div class="auth-reg-grid">
+              <label class="auth-form-field">
+                <span class="auth-form-label" data-ru="Сайт" data-uk="Сайт">Сайт</span>
+                <input name="website" type="text" inputmode="url" placeholder="https://…" data-ru-placeholder="https://…" data-uk-placeholder="https://…" />
+              </label>
+              <label class="auth-form-field">
+                <span class="auth-form-label" data-ru="Юр. адрес" data-uk="Юр. адреса">Юр. адрес</span>
+                <input name="legalAddress" type="text" maxlength="500" autocomplete="off" />
+              </label>
+            </div>
+          </div>
+          <button class="btn btn-primary auth-reg-submit" type="submit">Создать аккаунт</button>
+        </form>
+
+        <div class="auth-switch">
+          <span id="auth-switch-hint-reg">Уже есть аккаунт?</span>
+          <button type="button" class="auth-switch-btn" id="auth-back-login" aria-label="Перейти ко входу">Войти</button>
+        </div>
+      </div>
+
+      <p id="auth-status" class="auth-status" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <footer class="footer footer--site-laconic" aria-label="Подвал">
+    <div class="container footer-site-laconic-inner">
+      <div class="footer-laconic-row footer-laconic-row--brand">
+        <span class="footer-laconic-brand" aria-hidden="true">REAXON</span>
+        <p class="footer-laconic-tagline" data-i18n="footerAbout">
+          Промышленные лакокрасочные материалы: эмали, грунтовки и сопутствующие решения для B2B и розницы.
+        </p>
+      </div>
+      <nav class="footer-laconic-nav" aria-label="Разделы сайта">
+        <a href="products.html" data-i18n="navCatalog">Каталог</a>
+        <a href="price.html" data-i18n="navPrice">Прайс</a>
+        <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+        <a href="delivery.html" data-dp-delivery="footerLink" data-i18n="navDelivery">Доставка и оплата</a>
+        <a href="contact.html" data-i18n="navContacts">Контакты</a>
+      </nav>
+      <div class="footer-laconic-row footer-laconic-row--meta">
+        <a class="footer-laconic-tel" href="tel:+380676134220">+38 (067) 613-42-20</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="tel:+380676135155">+38 (067) 613-51-55</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="tel:+380612209445">+38 (061) 220-94-45</a>
+        <span class="footer-laconic-fax-hint footer-phone-hint">т/факс</span>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-mail" href="mailto:reaxondh@gmail.com">reaxondh@gmail.com</a>
+        <span class="footer-laconic-dot footer-laconic-dot--wide" aria-hidden="true">·</span>
+        <span class="footer-laconic-addr">69002, Запорожье, ул. Константина Великого, 20</span>
+        <a class="footer-laconic-all" href="contact.html#contact" data-i18n="footerContactAll">Все реквизиты</a>
+      </div>
+    </div>
+  </footer>
+    </div>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="script.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

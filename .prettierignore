@@ -1,0 +1,6 @@
+node_modules
+uploads
+data/catalog-backups
+*.min.js
+*.min.css
+package-lock.json

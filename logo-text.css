@@ -1,0 +1,53 @@
+/* Логотип Reaxon — отображается как изображение (assets/reaxon-logo-tight.png).
+   Для лучшей читаемости слогана «КАЧЕСТВО. ЗАЩИТА. РЕЗУЛЬТАТ.» используется
+   плотно обрезанная версия логотипа (без белых полей), а сам элемент .logo-main
+   увеличен по сравнению с прежним текстовым вариантом. Структура HTML не
+   меняется: текст «Rea<span class="logo-red">xon</span>» внутри визуально
+   скрыт, а доступность обеспечивается атрибутом aria-label="Reaxon" на .logo. */
+.header .logo-main,
+.logo .logo-main {
+  display: inline-block;
+  vertical-align: middle;
+  /* Размер увеличен, чтобы слоган стал различим. Аспект 2.75:1 совпадает
+     с пропорциями обрезанного файла (880×320). Высота при ширине 240px
+     ≈ 87px, при 200px ≈ 73px — слоган в этих размерах ~12–14px. */
+  width: clamp(200px, 24vw, 260px);
+  aspect-ratio: 2.75 / 1;
+  height: auto;
+  background-image: url("assets/reaxon-logo-tight.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+  /* Скрываем исходный текст внутри .logo-main (узел «Rea» и .logo-red). */
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.header .logo-red,
+.logo .logo-red {
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+}
+
+@media (max-width: 640px) {
+  .header .logo-main,
+  .logo .logo-main {
+    /* На мобильных ширина чуть меньше, но логотип со слоганом по-прежнему
+       читается: при 180px высота ≈ 65px, слоган ≈ 10px. */
+    width: 180px;
+  }
+}
+
+/* CRM-вариант ссылки .logo с дополнительной плашкой .logo-crm-tag —
+   сохраняем поведение flex-контейнера. */
+.logo:has(.logo-crm-tag) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}

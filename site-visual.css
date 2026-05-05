@@ -1,0 +1,82 @@
+/* REAXON — обновлённый визуальный слой: типографика, герой, категории */
+
+:root {
+  --sv-radius: 18px;
+  --sv-radius-sm: 12px;
+  --sv-shadow: 0 18px 48px rgba(12, 22, 48, 0.14);
+  --sv-shadow-soft: 0 8px 24px rgba(12, 22, 48, 0.08);
+  --sv-ink: #0c1428;
+  --sv-accent: #0f2f79;
+  --sv-accent-2: #d62629;
+}
+
+/* —— Главная: герой —— */
+.home-shell .hero.home-hero--visual {
+  position: relative;
+  aspect-ratio: 21 / 9;
+  min-height: clamp(220px, 32vw, 340px);
+  max-height: 420px;
+  background-color: #0a1628;
+  background-image:
+    linear-gradient(105deg, rgba(8, 18, 38, 0.92) 0%, rgba(12, 36, 78, 0.55) 42%, rgba(20, 55, 110, 0.35) 100%),
+    url("assets/hero-banner-main.png");
+  background-size: cover;
+  background-position: center;
+  border-radius: 0;
+  padding: clamp(20px, 4vw, 40px) clamp(16px, 3vw, 32px);
+  align-items: center;
+}
+
+.home-shell .hero.home-hero--visual .hero-content {
+  max-width: min(560px, 92%);
+  z-index: 1;
+}
+
+.home-shell .hero.home-hero--visual .hero-content h1 {
+  font-size: clamp(22px, 3.4vw, 34px);
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+.home-shell .hero.home-hero--visual .hero-content p {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(13px, 1.35vw, 15px);
+  max-width: 36em;
+}
+
+.home-shell .hero.home-hero--visual .btn-primary {
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(214, 38, 41, 0.35);
+}
+
+.home-shell .hero.home-hero--visual .btn-ghost {
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+}
+
+/* —— Главная: секции и категории —— */
+.home-shell > .section > h2 {
+  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+  letter-spacing: -0.02em;
+  color: var(--sv-ink);
+}
+
+.home-shell .categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 168px), 1fr));
+  gap: clamp(14px, 2vw, 20px);
+}
+
+.home-shell .cat-card {
+  border-radius: var(--sv-radius);
+  overflow: hidden;
+  border: 1px solid var(--line, #d7dbe5);
+  box-shadow: var(--sv-shadow-soft);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.home-shell .cat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sv-shadow);
+}

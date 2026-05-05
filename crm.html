@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(location.search).get("embed") === "admin") {
+          document.documentElement.classList.add("crm-embed-admin");
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+  </script>
+  <title>DP Coatings — CRM</title>
+  <link rel="stylesheet" href="crm.css" />
+  <link rel="stylesheet" href="logo-text.css" />
+  <link rel="stylesheet" href="topbar-shared.css" />
+  <link rel="stylesheet" href="crm-admin-embed.css" />
+  <link rel="stylesheet" href="crm-extras.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+</head>
+<body data-page="crm" class="crm-app">
+  <div class="crm-embed-toolbar" aria-label="Действия CRM">
+    <nav class="crm-embed-toolbar-nav" id="crm-embed-toolbar-nav"></nav>
+    <button
+      type="button"
+      class="crm-embed-toolbar-btn crm-embed-toolbar-btn--primary"
+      id="crm-embed-logout-btn"
+      data-ru="Выйти"
+      data-uk="Вийти"
+    >
+      Выйти
+    </button>
+  </div>
+  <header class="site-header crm-header">
+    <div class="container site-header-inner">
+      <div class="topbar">
+        <a class="logo" href="index.html" aria-label="Reaxon CRM">
+          <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+          <span class="logo-crm-tag">CRM</span>
+        </a>
+        <nav class="topnav" aria-label="Основная навигация">
+          <a href="index.html" data-ru="Главная" data-uk="Головна">Главная</a>
+          <a href="products.html" data-ru="Каталог" data-uk="Каталог">Каталог</a>
+          <a href="price.html" data-ru="Прайс" data-uk="Прайс">Прайс</a>
+          <a href="ral.html" data-ru="Таблица RAL" data-uk="Таблиця RAL">Таблица RAL</a>
+          <a href="delivery.html" data-ru="Доставка" data-uk="Доставка">Доставка</a>
+          <a href="contact.html" data-ru="Контакты" data-uk="Контакти">Контакты</a>
+        </nav>
+        <div class="top-actions">
+          <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+            <label for="language-switcher" class="visually-hidden">
+              <span data-i18n="langLabel">Язык</span>
+            </label>
+            <select id="language-switcher" class="lang-switcher__select">
+              <option value="ru">RU</option>
+              <option value="uk">UA</option>
+            </select>
+          </div>
+          <span class="header-utility-muted topbar-crm-hint" aria-hidden="true">CRM</span>
+          <a href="index.html" class="auth-btn topbar-account-btn" data-ru="Сайт" data-uk="Сайт">Сайт</a>
+          <a
+            href="#"
+            class="auth-btn topbar-account-btn"
+            id="logout-btn"
+            role="button"
+            data-ru="Выйти"
+            data-uk="Вийти"
+            >Выйти</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="crm-main">
+    <div class="container crm-container">
+      <div class="crm-shell">
+        <aside class="crm-sidebar" aria-label="Разделы CRM">
+          <p class="crm-sidebar-title">Разделы</p>
+          <nav class="crm-sidebar-nav">
+            <button type="button" class="crm-sb-item is-active" data-crm-view="leads" id="crm-nav-leads">
+              Заявки
+            </button>
+            <div id="crm-leads-filter-block" class="crm-leads-filter-block">
+              <details class="crm-filter-details" open>
+                <summary class="crm-filter-summary">Фильтры заявок</summary>
+                <div class="crm-filter-fields">
+                  <label class="crm-filter-label">
+                    Статус
+                    <select id="crm-filter-status" class="crm-filter-select">
+                      <option value="all">Все статусы</option>
+                      <option value="new">Новая</option>
+                      <option value="in_progress">В работе</option>
+                      <option value="quoted">КП отправлено</option>
+                      <option value="won">Успешно</option>
+                      <option value="lost">Закрыто</option>
+                    </select>
+                  </label>
+                  <label class="crm-filter-label">
+                    Менеджер
+                    <select id="crm-filter-assignee" class="crm-filter-select">
+                      <option value="all">Все</option>
+                      <option value="none">Не назначен</option>
+                    </select>
+                  </label>
+                  <label class="crm-filter-label">
+                    Приоритет
+                    <select id="crm-filter-priority" class="crm-filter-select">
+                      <option value="all">Любой</option>
+                      <option value="normal">Обычный</option>
+                      <option value="high">Высокий</option>
+                    </select>
+                  </label>
+                  <button type="button" class="btn btn-ghost crm-filter-reset" id="crm-filter-reset">
+                    Сбросить фильтры
+                  </button>
+                </div>
+              </details>
+            </div>
+            <div id="crm-sidebar-admin" class="crm-sidebar-admin crm-panel-hidden">
+              <details class="crm-nav-details" id="crm-admin-details" open>
+                <summary class="crm-nav-summary">Пользователи и профили</summary>
+                <div class="crm-nav-children">
+                  <button type="button" class="crm-sb-sub" data-user-filter="all">Все пользователи</button>
+                  <details class="crm-nav-details crm-nav-details-nested">
+                    <summary class="crm-nav-summary-sub">По роли</summary>
+                    <div class="crm-nav-children-nested">
+                      <button type="button" class="crm-sb-sub" data-user-filter-role="admin">Администраторы</button>
+                      <button type="button" class="crm-sb-sub" data-user-filter-role="moderator">Модераторы</button>
+                      <button type="button" class="crm-sb-sub" data-user-filter-role="accountant">Бухгалтеры</button>
+                      <button type="button" class="crm-sb-sub" data-user-filter-role="manager">Менеджеры</button>
+                      <button type="button" class="crm-sb-sub" data-user-filter-role="client">Клиенты</button>
+                      <button type="button" class="crm-sb-sub" data-user-filter-role="viewer">Наблюдатели</button>
+                    </div>
+                  </details>
+                </div>
+              </details>
+            </div>
+          </nav>
+        </aside>
+
+        <div class="crm-workspace">
+          <header class="crm-workspace-head">
+            <h1 class="crm-workspace-title" id="crm-workspace-title">Заявки</h1>
+            <p class="crm-workspace-lead" id="crm-access-hint">Загрузка…</p>
+            <p class="crm-summary" id="crm-lead-summary" aria-live="polite"></p>
+          </header>
+
+          <div id="crm-view-leads" class="crm-view">
+            <div class="filters crm-filters crm-filters--tight">
+              <input id="crm-search" type="search" placeholder="Поиск: имя, телефон, доставка, способ оплаты…" />
+              <label class="crm-filter-inline">
+                Сортировка
+                <select id="crm-sort" class="crm-filter-select">
+                  <option value="created_desc">Сначала новые</option>
+                  <option value="created_asc">Сначала старые</option>
+                  <option value="total_desc">Сумма: больше</option>
+                  <option value="total_asc">Сумма: меньше</option>
+                </select>
+              </label>
+              <label class="crm-filter-inline">
+                Доставка
+                <select id="crm-filter-delivery" class="crm-filter-select">
+                  <option value="all">Все</option>
+                  <option value="nova_poshta">Новая Почта</option>
+                  <option value="ukrposhta">Укрпочта</option>
+                  <option value="meest">Meest</option>
+                  <option value="autolux">Автолюкс</option>
+                  <option value="pickup">Самовывоз</option>
+                  <option value="courier">Курьер</option>
+                  <option value="none">Не указана</option>
+                  <option value="other">Другое</option>
+                </select>
+              </label>
+              <label class="crm-filter-inline">
+                Оплата
+                <select id="crm-filter-payment" class="crm-filter-select">
+                  <option value="all">Все</option>
+                  <option value="liqpay">LiqPay / карта</option>
+                  <option value="iban">IBAN / счёт</option>
+                  <option value="card_demo">Демо карта (старые)</option>
+                  <option value="cod">Наложенный</option>
+                  <option value="managers">Согласовать с менеджером</option>
+                  <option value="none">Не указан</option>
+                </select>
+              </label>
+              <button id="crm-refresh" class="btn btn-primary" type="button">Обновить</button>
+              <button id="crm-export" class="btn btn-ghost" type="button">Экспорт CSV</button>
+              <button id="crm-groups-open" class="btn btn-ghost" type="button">Развернуть периоды</button>
+              <button id="crm-groups-close" class="btn btn-ghost" type="button">Свернуть периоды</button>
+            </div>
+            <details class="crm-kanban-wrap">
+              <summary class="crm-kanban-summary">Обзор по статусам</summary>
+              <div id="crm-kanban" class="crm-kanban"></div>
+            </details>
+            <p id="crm-status" class="form-status crm-form-status"></p>
+            <div id="crm-list" class="crm-list"></div>
+          </div>
+
+          <div id="crm-view-users" class="crm-view crm-panel-hidden">
+            <div class="crm-users-toolbar">
+              <p class="crm-users-toolbar-text" id="crm-users-filter-label">Все пользователи</p>
+            </div>
+            <div id="crm-users-list" class="crm-users-cards"></div>
+            <p id="crm-users-status" class="form-status crm-form-status" role="status"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="crm.js"></script>
+</body>
+</html>

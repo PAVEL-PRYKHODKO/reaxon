@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DP Coatings — Оформление заказа</title>
+  <meta name="description" content="Оформление заказа: доставка Новой Почтой, оплата картой или по реквизитам." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="redesign-shared.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+  <link rel="stylesheet" href="checkout.css" />
+</head>
+<body data-page="checkout">
+  <div class="page-bg page-bg--site">
+    <div class="site-shell">
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="topbar">
+        <a href="index.html" class="logo" aria-label="Reaxon">
+          <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+        </a>
+        <nav class="topnav" aria-label="Основная навигация">
+          <a href="index.html" data-i18n="navHome">Главная</a>
+          <a href="products.html" data-i18n="navCatalog">Каталог</a>
+          <a href="price.html" data-i18n="navPrice">Прайс</a>
+          <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+          <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
+          <a href="news.html" data-i18n="navNews">Новости</a>
+          <a href="contact.html" data-i18n="navContacts">Контакты</a>
+        </nav>
+        <div class="top-actions">
+          <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+            <label for="language-switcher" class="visually-hidden">
+              <span data-i18n="langLabel">Язык</span>
+            </label>
+            <select id="language-switcher" class="lang-switcher__select">
+              <option value="ru">RU</option>
+              <option value="uk">UA</option>
+            </select>
+          </div>
+          <div class="header-search-inline topbar-search home-site-search">
+            <input
+              id="site-search-input"
+              type="search"
+              data-i18n-placeholder="siteSearchPlaceholderHome"
+              data-i18n-aria-label="siteSearchPlaceholderHome"
+              placeholder="Поиск по названию, артикулу"
+              autocomplete="off"
+            />
+          </div>
+          <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+            🛒
+            <span class="cart-badge" id="cart-count">0</span>
+          </button>
+          <a
+            href="account.html"
+            class="icon-btn header-account-trigger topbar-account-btn"
+            id="home-account-trigger"
+            data-i18n-aria-label="accountDrawerTrigger"
+            aria-label="Личный кабинет"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section section-muted" aria-labelledby="checkout-heading">
+      <div class="container checkout-wrap">
+        <nav class="products-breadcrumbs" aria-label="Навигация по разделу">
+          <a href="index.html" data-i18n="navHome">Главная</a>
+          <span aria-hidden="true">/</span>
+          <span data-i18n="checkoutPageBreadcrumb">Оформление заказа</span>
+        </nav>
+        <h1 class="products-page-title" id="checkout-heading" data-i18n="checkoutPageTitle">Оформление заказа</h1>
+
+        <div class="checkout-grid">
+          <div class="checkout-form-side">
+            <div class="checkout-tabs" role="tablist" aria-label="Тип покупателя">
+              <button type="button" class="checkout-tab" data-mode="new" id="co-tab-new" role="tab" aria-selected="true" data-i18n="checkoutTabNew">
+                Я новый покупатель
+              </button>
+              <button type="button" class="checkout-tab" data-mode="reg" id="co-tab-reg" role="tab" aria-selected="false" data-i18n="checkoutTabRegistered">
+                Я зарегистрированный покупатель
+              </button>
+            </div>
+
+            <form id="checkout-form" novalidate>
+              <h2 class="visually-hidden" data-i18n="checkoutRecipient">Получатель заказа</h2>
+              <div class="checkout-form-rows">
+                <div class="checkout-row checkout-row--split">
+                  <label class="checkout-label" for="co-name" data-i18n="checkoutFullName">ФИО</label>
+                  <input class="checkout-input" id="co-name" name="name" type="text" required autocomplete="name" />
+                </div>
+                <div class="checkout-row checkout-row--split">
+                  <label class="checkout-label" for="co-phone" data-i18n="checkoutPhone">Телефон</label>
+                  <input class="checkout-input" id="co-phone" name="phone" type="tel" required autocomplete="tel" />
+                </div>
+                <div class="checkout-row checkout-row--split">
+                  <label class="checkout-label" for="co-city-select" data-i18n="checkoutCity">Город</label>
+                  <div class="checkout-city-col">
+                    <select class="checkout-select" id="co-city-select" name="citySelect" data-i18n-aria-label="checkoutCity" aria-label="Город">
+                      <option value="" data-i18n="checkoutCityPick">— Выберите город —</option>
+                      <option value="__other__" data-i18n="checkoutCityOther">Другой город (поиск)…</option>
+                    </select>
+                    <div id="co-city-search-wrap" class="checkout-city-wrap is-hidden">
+                      <input
+                        class="checkout-input"
+                        id="co-city"
+                        name="city"
+                        type="text"
+                        data-i18n-placeholder="checkoutCityPlaceholder"
+                        placeholder="название города или индекс"
+                        autocomplete="address-level1"
+                      />
+                      <ul class="checkout-city-suggest is-hidden" id="co-city-suggest" aria-live="polite" role="listbox"></ul>
+                    </div>
+                    <input type="hidden" id="co-city-ref" name="cityRef" value="" />
+                  </div>
+                </div>
+                <p class="checkout-hint" id="co-np-fallback-hint" data-i18n="checkoutHintManualNp">
+                  Укажите населённый пункт (от 2 символов), затем отделение. Справочник Новой Почты на сервере не подключён — адрес введите вручную.
+                </p>
+                <div class="checkout-row checkout-row--split">
+                  <label class="checkout-label" for="co-email" data-i18n="checkoutEmail">E-mail</label>
+                  <input class="checkout-input" id="co-email" name="email" type="email" autocomplete="email" />
+                </div>
+                <div class="checkout-row" id="co-comment-wrap">
+                  <label class="visually-hidden" for="co-comment" data-i18n="formCommentPlaceholder">Комментарий</label>
+                  <textarea class="checkout-textarea" id="co-comment" name="comment" rows="3" data-i18n-placeholder="formCommentPlaceholder" placeholder="Комментарий к заказу"></textarea>
+                </div>
+
+                <div class="checkout-row checkout-row--split" id="co-delivery-block">
+                  <label class="checkout-label" for="co-delivery" data-i18n="checkoutDelivery">Доставка</label>
+                  <select class="checkout-select" id="co-delivery" name="delivery" disabled>
+                    <option value="nova_poshta" data-i18n="checkoutDeliveryNP">Новая Почта</option>
+                    <option value="ukrposhta" data-i18n="checkoutDeliveryUkrposhta">Укрпочта</option>
+                    <option value="meest" data-i18n="checkoutDeliveryMeest">Meest Express</option>
+                    <option value="autolux" data-i18n="checkoutDeliveryAutolux">Автолюкс</option>
+                    <option value="pickup" data-i18n="checkoutDeliveryPickup">Самовывоз</option>
+                    <option value="courier" data-i18n="checkoutDeliveryCourier">Курьер (по городу)</option>
+                    <option value="other" data-i18n="checkoutDeliveryOther">Другое (согласовать)</option>
+                  </select>
+                </div>
+                <div class="checkout-row checkout-row--split" id="co-warehouse-block">
+                  <label class="checkout-label" id="co-warehouse-row-label" for="co-warehouse" data-i18n="checkoutWarehouse">Отделение / адрес</label>
+                  <div class="checkout-warehouse-col">
+                    <div id="co-np-warehouse-wrap" class="is-hidden">
+                      <select
+                        class="checkout-select checkout-select--scroll"
+                        id="co-warehouse"
+                        name="warehouse"
+                        disabled
+                        data-i18n-aria-label="checkoutWarehouse"
+                      >
+                        <option value="" data-i18n="checkoutWarehousePlaceholder">Выберите отделение</option>
+                      </select>
+                      <p id="co-warehouse-np-hint" class="checkout-hint is-hidden" role="status" aria-live="polite"></p>
+                    </div>
+                    <textarea
+                      class="checkout-textarea checkout-warehouse-manual is-hidden"
+                      id="co-warehouse-manual"
+                      name="warehouseManual"
+                      rows="3"
+                      data-i18n-placeholder="checkoutWarehouseManual"
+                      placeholder="Адрес / отделение / комментарий к доставке"
+                      disabled
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div class="checkout-row checkout-row--split" id="co-payment-block">
+                  <label class="checkout-label" for="co-payment" data-i18n="checkoutPayment">Оплата</label>
+                  <select class="checkout-select" id="co-payment" name="payment" disabled>
+                    <option value="liqpay" data-i18n="checkoutPayCard">Картой (LiqPay)</option>
+                    <option value="iban" data-i18n="checkoutPayIban">По реквизитам (IBAN)</option>
+                  </select>
+                </div>
+                <div class="checkout-checkbox-row">
+                  <input type="checkbox" id="co-newsletter" name="newsletter" value="1" />
+                  <label for="co-newsletter" data-i18n="checkoutNewsletter">Новости и акции</label>
+                </div>
+                <p class="checkout-offer-note">
+                  <span data-i18n="checkoutOfferNoteBefore">Оформляя заказ, вы соглашаетесь с</span>
+                  <a href="offer.html" target="_blank" rel="noopener" data-i18n="checkoutOfferLink">Договором оферты</a><span data-i18n="checkoutOfferNoteAfter">.</span>
+                </p>
+                <p class="checkout-hint" id="checkout-form-status" role="status" aria-live="polite"></p>
+                <button type="submit" class="checkout-submit" id="co-submit" data-i18n="checkoutSubmit">Оформить заказ</button>
+              </div>
+            </form>
+          </div>
+          <aside class="checkout-order-side" id="checkout-order" aria-label="Order summary"></aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer footer--site-laconic" aria-label="Подвал">
+    <div class="container footer-site-laconic-inner">
+      <div class="footer-laconic-row footer-laconic-row--brand">
+        <span class="footer-laconic-brand" aria-hidden="true">REAXON</span>
+        <p class="footer-laconic-tagline" data-i18n="footerAbout">Промышленные лакокрасочные материалы</p>
+      </div>
+      <nav class="footer-laconic-nav" aria-label="Разделы сайта">
+        <a href="products.html" data-i18n="navCatalog">Каталог</a>
+        <a href="price.html" data-i18n="navPrice">Прайс</a>
+        <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+        <a href="delivery.html" data-dp-delivery="footerLink" data-i18n="navDelivery">Доставка</a>
+        <a href="contact.html" data-i18n="navContacts">Контакты</a>
+      </nav>
+      <div class="footer-laconic-row footer-laconic-row--meta">
+        <a class="footer-laconic-tel" href="tel:+380676134220">+38 (067) 613-42-20</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="mailto:reaxondh@gmail.com">reaxondh@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+    </div>
+  </div>
+
+  <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
+    <div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-drawer-shell">
+        <header class="cart-header">
+          <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
+          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть">
+            <svg class="cart-close-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="cart-modal-toolbar">
+          <label class="cart-sort-label">
+            <span class="cart-sort-text" data-i18n="cartSortLabel">Сортировка</span>
+            <select id="cart-sort-select" class="cart-sort-select" aria-label="Sort order">
+              <option value="price-asc" data-i18n="cartSortPriceAsc">От дешёвых к дорогим</option>
+              <option value="price-desc" data-i18n="cartSortPriceDesc">От дорогих к дешёвым</option>
+              <option value="name-asc" data-i18n="cartSortNameAsc">По названию</option>
+              <option value="add-order" data-i18n="cartSortAddOrder">Порядок добавления</option>
+            </select>
+          </label>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <footer class="cart-footer">
+          <div class="cart-footer-totals">
+            <div class="cart-grand-row">
+              <span data-i18n="cartGrandTotal">Итого</span>
+              <strong class="cart-grand-value"><span id="cart-total">0</span><span class="cart-currency"> грн</span></strong>
+            </div>
+          </div>
+          <div class="cart-footer-actions">
+            <button type="button" id="cart-pay-btn" class="btn btn-primary cart-pay-btn" data-i18n="payButton">Оформить заказ</button>
+            <button type="button" id="checkout" class="btn btn-ghost" data-i18n="checkoutRequest">Заявка без оплаты</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <div id="product-modal" class="modal" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+      <div class="modal-top">
+        <h3 id="product-modal-title"></h3>
+        <button id="close-product-modal" class="btn btn-ghost" type="button" aria-label="Close">×</button>
+      </div>
+      <div id="product-modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="script.js"></script>
+  <script src="home-auth-ui.js"></script>
+  <script src="checkout.js"></script>
+</body>
+</html>

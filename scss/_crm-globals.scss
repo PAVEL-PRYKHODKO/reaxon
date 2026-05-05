@@ -1,0 +1,319 @@
+// Минимум для crm.html: без фонов главной/каталога и без тяжёлой навигации каталога.
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@700;800&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--body-bg);
+  font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  position: relative;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: max(clamp(12px, 4vw, 24px), env(safe-area-inset-left, 0px));
+  padding-right: max(clamp(12px, 4vw, 24px), env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 140;
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+  background: var(--header-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-utility {
+  background: #e8ecf4;
+  border-bottom: 1px solid rgba(0, 59, 126, 0.12);
+  font-size: 0.7rem;
+}
+
+.header-utility-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+  flex-wrap: wrap;
+}
+
+.header-utility-links {
+  display: flex;
+  align-items: center;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+}
+
+.header-utility-links--end {
+  margin-left: auto;
+}
+
+.header-utility-links a {
+  color: #1a2740;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.header-utility-links a:hover {
+  color: var(--brand-a);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.header-utility-em {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.header-utility-sep {
+  color: rgba(26, 39, 64, 0.28);
+  user-select: none;
+}
+
+.header-utility-muted {
+  color: rgba(26, 39, 64, 0.55);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.header-row {
+  min-height: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 8px;
+  padding-block: 4px;
+}
+
+.nav-wrap {
+  position: relative;
+  z-index: 150;
+  border-top: 1px solid var(--line);
+  background: var(--header-bg);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+}
+
+.top-nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-height: 52px;
+  overflow: visible;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+}
+
+.top-nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 14px 10px 12px;
+  flex: 0 0 auto;
+}
+
+.top-nav a:hover {
+  color: var(--brand-a);
+  border-bottom-color: var(--brand-a);
+  background: transparent;
+}
+
+.logo {
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.logo-mark {
+  width: 48px;
+  height: 48px;
+}
+
+.logo-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+}
+
+.logo-tagline {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  line-height: 1.25;
+  max-width: min(100%, 380px);
+}
+
+.brand-wordmark {
+  font-family: "Outfit", "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-synthesis: none;
+}
+
+.logo-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(100%, 300px);
+  max-height: clamp(28px, min(9.5vw, 7dvh), 46px);
+  object-fit: contain;
+  object-position: left center;
+}
+
+.logo-crm-tag {
+  margin-left: 4px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  align-self: center;
+}
+
+@media (min-width: 900px) {
+  .header-row {
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding-block: 4px;
+    min-height: 62px;
+  }
+
+  .logo {
+    flex: 0 1 auto;
+    max-width: min(520px, 58vw);
+  }
+
+  .logo-img {
+    max-width: min(100%, 380px);
+    max-height: clamp(32px, 4.6vw, 50px);
+  }
+
+  .header-actions {
+    flex-wrap: nowrap;
+  }
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 1 auto;
+  min-width: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.header-actions .btn {
+  padding: 3px 6px;
+  font-size: 0.68rem;
+  border-radius: 8px;
+}
+
+.header-actions a.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.25;
+}
+
+select,
+input,
+textarea {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  color: #f9fcff;
+  background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
+  box-shadow:
+    0 10px 28px rgba(6, 182, 212, 0.28),
+    0 8px 22px rgba(124, 58, 237, 0.24);
+}
+
+.btn-ghost {
+  color: var(--text);
+  border-color: var(--line);
+  background: var(--ghost-bg);
+}
+
+@media (max-width: 900px) {
+  .top-nav {
+    min-height: 46px;
+  }
+}

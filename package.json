@@ -1,0 +1,40 @@
+{
+  "name": "dp-coatings-crm",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "docker:up": "docker compose up -d postgres",
+    "docker:down": "docker compose down",
+    "crm:import-json": "node scripts/import-crm-json-to-pg.mjs",
+    "build:css": "sass scss/styles.scss:styles.css scss/crm.entry.scss:crm.css --style=compressed --no-source-map",
+    "watch:css": "sass --watch scss/styles.scss:styles.css scss/crm.entry.scss:crm.css --no-source-map",
+    "verify": "node scripts/verify.mjs",
+    "lint": "eslint server.js \"lib/**/*.js\" \"lib/**/*.mjs\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\" eslint.config.js",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier \"eslint.config.js\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\" \".github/workflows/*.yml\" --write",
+    "format:check": "prettier \"eslint.config.js\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\" \".github/workflows/*.yml\" --check",
+    "test": "node --test",
+    "ci:check": "npm run verify && npm run lint && npm run format:check && npm test"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.10.1",
+    "pg": "^8.20.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.3.0",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3",
+    "sass": "^1.85.0"
+  }
+}

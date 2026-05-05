@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DP Coatings — оплата (личный кабинет)</title>
+  <meta name="description" content="Онлайн-оплата LiqPay или реквизиты IBAN. Публичная оферта." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="redesign-shared.css" />
+  <link rel="stylesheet" href="account-payment.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+</head>
+<body data-page="account-payment">
+  <div class="page-bg page-bg--site">
+    <div class="site-shell">
+      <header class="site-header">
+        <div class="container site-header-inner">
+          <div class="topbar">
+            <a href="index.html" class="logo" aria-label="Reaxon">
+              <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+            </a>
+            <nav class="topnav" aria-label="Основная навигация">
+              <a href="index.html" data-i18n="navHome">Главная</a>
+              <a href="products.html" data-i18n="navCatalog">Каталог</a>
+              <a href="price.html" data-i18n="navPrice">Прайс</a>
+              <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+              <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
+              <a href="news.html" data-i18n="navNews">Новости</a>
+              <a href="contact.html" data-i18n="navContacts">Контакты</a>
+            </nav>
+            <div class="top-actions">
+              <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+                <label for="language-switcher" class="visually-hidden">
+                  <span data-i18n="langLabel">Язык</span>
+                </label>
+                <select id="language-switcher" class="lang-switcher__select">
+                  <option value="ru">RU</option>
+                  <option value="uk">UA</option>
+                </select>
+              </div>
+              <div class="header-search-inline topbar-search home-site-search">
+                <input
+                  id="site-search-input"
+                  type="search"
+                  data-i18n-placeholder="siteSearchPlaceholderHome"
+                  data-i18n-aria-label="siteSearchPlaceholderHome"
+                  placeholder="Поиск по названию, артикулу"
+                  autocomplete="off"
+                />
+              </div>
+              <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+                🛒
+                <span class="cart-badge" id="cart-count">0</span>
+              </button>
+              <a
+                href="account.html"
+                class="icon-btn header-account-trigger topbar-account-btn"
+                id="home-account-trigger"
+                data-i18n-aria-label="accountDrawerTrigger"
+                aria-label="Личный кабинет"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </a>
+              <a href="index.html" class="auth-btn topbar-account-btn" data-ru="На главную" data-uk="На головну">На главную</a>
+              <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="apay-main">
+        <div class="container apay-grid site-content-card">
+          <nav class="products-breadcrumbs" aria-label="Навигация по разделу">
+            <a href="index.html" data-i18n="navHome">Главная</a>
+            <span aria-hidden="true">/</span>
+            <a href="account.html" data-i18n="accountDrawerTitle">Личный кабинет</a>
+            <span aria-hidden="true">/</span>
+            <span data-i18n="checkoutPayment">Оплата</span>
+          </nav>
+
+          <header class="apay-hero">
+            <p
+              class="apay-eyebrow"
+              data-ru="Личный кабинет клиента"
+              data-uk="Кабінет клієнта"
+            >
+              Кабинет клиента
+            </p>
+            <h1
+              class="products-page-title apay-hero-title"
+              data-ru="Оплата заказа"
+              data-uk="Оплата замовлення"
+            >
+              Оплата заказа
+            </h1>
+            <p
+              class="apay-lead"
+              data-ru="Онлайн — через LiqPay (карта, Apple Pay / Google Pay — в зависимости от банка). Бесплатно для IBAN: перевод по реквизитам ниже."
+              data-uk="Онлайн — через LiqPay (карта Apple Pay / Google Pay — залежно від банку). Безкоштовно для IBAN: переказ за реквізитами нижче."
+            >
+              Онлайн — через LiqPay (карта, Apple Pay / Google Pay — в зависимости от банка). Бесплатно для IBAN: перевод по реквизитам ниже.
+            </p>
+            <p id="apay-status" class="form-status" role="status" aria-live="polite"></p>
+          </header>
+
+          <section class="apay-card" aria-labelledby="apay-offer-title">
+            <h2
+              id="apay-offer-title"
+              class="apay-card-title"
+              data-ru="Публичная оферта"
+              data-uk="Публічна оферта"
+            >
+              Публичная оферта
+            </h2>
+            <div id="apay-offer-body" class="apay-richtext apay-offer">
+              <p data-ru="Загрузка…" data-uk="Завантаження…">Загрузка…</p>
+            </div>
+          </section>
+
+          <section class="apay-card apay-iban" aria-labelledby="apay-iban-title">
+            <h2
+              id="apay-iban-title"
+              class="apay-card-title"
+              data-ru="Реквизиты (IBAN)"
+              data-uk="Реквізити (IBAN)"
+            >
+              Реквизиты (IBAN)
+            </h2>
+            <dl id="apay-iban-list" class="apay-iban-dl">
+              <div><dt data-ru="Получатель" data-uk="Отримувач">Получатель</dt><dd>—</dd></div>
+            </dl>
+            <p
+              class="apay-hint"
+              data-ru="Скопируйте поле кнопкой. В назначении платежа укажите ФИО / название ТОВ и номер счёта или договора."
+              data-uk="Скопіюйте поле кнопкою. У призначенні платежу вкажіть ПІБ / назву ТОВ і номер рахунку або договору."
+            >
+              Скопируйте поле кнопкой. В назначении платежа укажите ФИО / название ТОВ и номер счёта или договора.
+            </p>
+          </section>
+
+          <section class="apay-card apay-liqpay" id="apay-liqpay-block">
+            <h2
+              class="apay-card-title"
+              data-ru="Оплата картой (LiqPay)"
+              data-uk="Оплата карткою (LiqPay)"
+            >
+              Оплата картой (LiqPay)
+            </h2>
+            <p class="apay-muted" id="apay-liqpay-hint"></p>
+            <form id="apay-liqpay-form" class="apay-form" autocomplete="off">
+              <label class="apay-field">
+                <span data-ru="Сумма, UAH" data-uk="Сума, UAH">Сумма, UAH</span>
+                <input name="amount" type="number" min="1" step="0.01" required placeholder="1000" />
+              </label>
+              <label class="apay-field">
+                <span data-ru="Назначение (по согласованию)" data-uk="Призначення (на розсуд)">Назначение (по согласованию)</span>
+                <input
+                  name="description"
+                  type="text"
+                  maxlength="400"
+                  data-ru-placeholder="Предоплата за ЛКМ по счёту №"
+                  data-uk-placeholder="Передоплата за лакофарбу за рах. №"
+                  placeholder="Предоплата за ЛКМ по счёту №"
+                />
+              </label>
+              <label class="apay-check">
+                <input type="checkbox" name="accept" value="1" id="apay-accept" required />
+                <span
+                  data-ru="Ознакомлен(а) с публичной офертой и согласен(а) с условиями оплаты"
+                  data-uk="Ознайомлений(а) з публічною офертою і погоджуюсь з умовами оплати"
+                  >Ознакомлен(а) с публичной офертой и согласен(а) с условиями оплаты</span>
+              </label>
+              <button
+                class="btn btn-primary apay-btn"
+                type="submit"
+                id="apay-liqpay-submit"
+                data-ru="Перейти к LiqPay"
+                data-uk="Перейти до LiqPay"
+              >
+                Перейти к LiqPay
+              </button>
+            </form>
+          </section>
+        </div>
+      </main>
+
+      <footer class="footer footer--site-laconic" aria-label="Подвал">
+        <div class="container footer-site-laconic-inner">
+          <div class="footer-laconic-row footer-laconic-row--brand">
+            <span class="footer-laconic-brand" aria-hidden="true">REAXON</span>
+            <p class="footer-laconic-tagline" data-i18n="footerAbout">
+              Промышленные лакокрасочные материалы: эмали, грунтовки и сопутствующие решения для B2B и розницы.
+            </p>
+          </div>
+          <nav class="footer-laconic-nav" aria-label="Разделы сайта">
+            <a href="products.html" data-i18n="navCatalog">Каталог</a>
+            <a href="price.html" data-i18n="navPrice">Прайс</a>
+            <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+            <a href="delivery.html" data-dp-delivery="footerLink" data-i18n="navDelivery">Доставка и оплата</a>
+            <a href="contact.html" data-i18n="navContacts">Контакты</a>
+          </nav>
+          <div class="footer-laconic-row footer-laconic-row--meta">
+            <a class="footer-laconic-tel" href="tel:+380676134220">+38 (067) 613-42-20</a>
+            <span class="footer-laconic-dot" aria-hidden="true">·</span>
+            <a class="footer-laconic-tel" href="tel:+380676135155">+38 (067) 613-51-55</a>
+            <span class="footer-laconic-dot" aria-hidden="true">·</span>
+            <a class="footer-laconic-tel" href="tel:+380612209445">+38 (061) 220-94-45</a>
+            <span class="footer-laconic-fax-hint footer-phone-hint">т/факс</span>
+            <span class="footer-laconic-dot" aria-hidden="true">·</span>
+            <a class="footer-laconic-mail" href="mailto:reaxondh@gmail.com">reaxondh@gmail.com</a>
+            <span class="footer-laconic-dot footer-laconic-dot--wide" aria-hidden="true">·</span>
+            <span class="footer-laconic-addr">69002, Запорожье, ул. Константина Великого, 20</span>
+            <a class="footer-laconic-all" href="contact.html#contact" data-i18n="footerContactAll">Все реквизиты</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <form id="apay-hidden-liqpay" class="apay-hidden" method="POST" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8" aria-hidden="true">
+    <input type="hidden" name="data" value="" />
+    <input type="hidden" name="signature" value="" />
+  </form>
+
+  <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
+    <div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-drawer-shell">
+        <header class="cart-header">
+          <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
+          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть корзину">
+            <svg class="cart-close-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="cart-modal-toolbar">
+          <label class="cart-sort-label">
+            <span class="cart-sort-text" data-i18n="cartSortLabel">Сортировка</span>
+            <select id="cart-sort-select" class="cart-sort-select" aria-label="Sort order">
+              <option value="price-asc" data-i18n="cartSortPriceAsc">От дешёвых к дорогим</option>
+              <option value="price-desc" data-i18n="cartSortPriceDesc">От дорогих к дешёвым</option>
+              <option value="name-asc" data-i18n="cartSortNameAsc">По названию (А–Я)</option>
+              <option value="add-order" data-i18n="cartSortAddOrder">Порядок добавления</option>
+            </select>
+          </label>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <footer class="cart-footer">
+          <div class="cart-footer-totals">
+            <div class="cart-grand-row">
+              <span data-i18n="cartGrandTotal">Итого по заказу</span>
+              <strong class="cart-grand-value"><span id="cart-total">0</span><span class="cart-currency"> грн</span></strong>
+            </div>
+          </div>
+          <div class="cart-footer-actions">
+            <button type="button" id="cart-pay-btn" class="btn btn-primary cart-pay-btn" data-i18n="payButton">Оплатить</button>
+            <button type="button" id="checkout" class="btn btn-ghost" data-i18n="checkoutRequest">Заявка без оплаты</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="script.js"></script>
+  <script src="home-auth-ui.js"></script>
+  <script src="account-payment.js"></script>
+</body>
+</html>

@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Админ-панель — DP Coatings</title>
+  <link rel="stylesheet" href="admin-panel.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+</head>
+<body data-page="admin">
+  <div class="ap-layout">
+    <aside class="ap-sidebar" aria-label="Разделы админки">
+      <div class="ap-brand" data-ru="Панель" data-uk="Панель">Панель</div>
+      <button
+        type="button"
+        class="ap-nav-btn is-active"
+        data-ap-view="console"
+        data-ru="Консоль"
+        data-uk="Консоль"
+      >
+        Консоль
+      </button>
+      <button type="button" class="ap-nav-btn" data-ap-view="users" data-ru="Пользователи" data-uk="Користувачі">
+        Пользователи
+      </button>
+      <button type="button" class="ap-nav-btn" data-ap-view="permissions" data-ru="Права ролей" data-uk="Права ролей">
+        Права ролей
+      </button>
+      <button type="button" class="ap-nav-btn" data-ap-view="catalog" data-ru="Каталог" data-uk="Каталог">Каталог</button>
+      <button
+        type="button"
+        class="ap-nav-btn"
+        data-ap-view="product-cards"
+        data-ru="Карточки товаров"
+        data-uk="Картки товарів"
+      >
+        Карточки товаров
+      </button>
+      <button type="button" class="ap-nav-btn" data-ap-view="prices" data-ru="Прайс-лист" data-uk="Прайс-лист">Прайс-лист</button>
+      <button type="button" class="ap-nav-btn" data-ap-view="analytics" data-ru="Аналитика" data-uk="Аналітика">Аналитика</button>
+      <button type="button" class="ap-nav-btn" data-ap-view="delivery" data-ru="Доставка" data-uk="Доставка">Доставка</button>
+      <button type="button" class="ap-nav-btn" data-ap-view="crm" data-ru="CRM" data-uk="CRM">CRM</button>
+      <div class="ap-sidebar-foot">
+        <div class="lang-switcher" role="navigation" style="padding: 0 0 10px" aria-label="Переключение языка">
+          <label for="language-switcher" class="visually-hidden">
+            <span data-i18n="langLabel">Язык</span>
+          </label>
+          <select id="language-switcher" class="lang-switcher__select" style="width: 100%; max-width: 100%; box-sizing: border-box">
+            <option value="ru">RU</option>
+            <option value="uk">UA</option>
+          </select>
+        </div>
+        <a
+          class="ap-nav-btn ap-btn-ghost"
+          href="index.html"
+          style="text-decoration: none; display: block"
+          data-ru="На сайт"
+          data-uk="На сайт"
+          >На сайт</a>
+      </div>
+    </aside>
+    <main class="ap-main">
+      <div id="ap-shared-products-draft" class="ap-panel-hidden" aria-label="Черновик каталога и карточек">
+        <div id="ap-products-draft-bar" class="ap-draft-bar">
+          <p id="ap-draft-hint" class="ap-draft-hint ap-muted"></p>
+          <div class="ap-draft-bar-actions">
+            <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-draft-publish" disabled>Сохранить на сайт</button>
+            <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-draft-discard" disabled>Отменить черновик</button>
+          </div>
+          <p id="ap-products-publish-status" class="ap-draft-publish-status ap-status" role="status"></p>
+        </div>
+      </div>
+
+      <section id="ap-view-console" class="ap-view">
+        <h1>Консоль</h1>
+        <p class="ap-muted">Краткий обзор заявок, пользователей и посещений за 7 дней.</p>
+        <div id="ap-dashboard-cards" class="ap-cards"></div>
+        <h2 style="font-size: 1rem; margin: 0 0 0.5rem">Популярные страницы (7 дн.)</h2>
+        <div class="ap-table-wrap">
+          <table class="ap-table" id="ap-dashboard-paths">
+            <thead><tr><th>Путь</th><th>Просмотры</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="ap-view-users" class="ap-view ap-panel-hidden">
+        <h1>Пользователи сайта</h1>
+        <p class="ap-muted">
+          Регистрация и правки профиля хранятся на сервере в базе приложения (файл <code>crm-db.json</code> рядом с API или, при переходе на БД, в PostgreSQL/MySQL). В браузере у посетителя только токен входа и кэш данных для формы.
+        </p>
+        <div class="ap-users-toolbar" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem">
+          <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-users-refresh">Обновить список</button>
+          <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-users-csv">Скачать CSV (Excel)</button>
+          <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-users-clients-xls">Скачать таблицу клиентов (Excel)</button>
+          <span id="ap-users-status" class="ap-status ap-text-compact" role="status"></span>
+        </div>
+        <form id="ap-user-create-form" class="ap-user-create-form" autocomplete="off">
+          <h2 class="ap-h2-compact">Добавить пользователя</h2>
+          <input type="text" id="ap-user-new-name" class="ap-search" placeholder="Имя" required />
+          <input type="email" id="ap-user-new-email" class="ap-search" placeholder="Email" required />
+          <input type="password" id="ap-user-new-password" class="ap-search" placeholder="Пароль от 10 символов" required minlength="10" />
+          <select id="ap-user-new-role" class="ap-search" aria-label="Роль нового пользователя"></select>
+          <button type="submit" class="ap-btn ap-btn-primary ap-btn-sm">Добавить</button>
+        </form>
+        <div class="ap-users-client-toolbar">
+          <input type="search" id="ap-users-client-search" class="ap-search" placeholder="Поиск клиентов: имя, email, телефон, компания…" />
+          <select id="ap-users-client-sort" class="ap-search" aria-label="Сортировка клиентов">
+            <option value="created_desc">Сначала новые</option>
+            <option value="created_asc">Сначала старые</option>
+            <option value="name_asc">Имя А-Я</option>
+            <option value="company_asc">Компания А-Я</option>
+            <option value="updated_desc">Профиль обновлён недавно</option>
+          </select>
+        </div>
+        <div id="ap-users-root" class="ap-users-role-sections" aria-label="Пользователи по ролям">
+          <p class="ap-muted">Загрузка пользователей…</p>
+        </div>
+      </section>
+
+      <section id="ap-view-permissions" class="ap-view ap-panel-hidden">
+        <h1>Права доступа ролей</h1>
+        <p class="ap-muted">
+          Настройте, какие роли могут просматривать, редактировать, удалять и назначать данные. Роль администратора защищена и всегда имеет полный доступ.
+        </p>
+        <div class="ap-users-toolbar" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem">
+          <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-permissions-save">Сохранить права</button>
+          <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-permissions-refresh">Обновить</button>
+          <span id="ap-permissions-status" class="ap-status ap-text-compact" role="status"></span>
+        </div>
+        <div id="ap-permissions-root" class="ap-permissions-root">
+          <p class="ap-muted">Загрузка прав…</p>
+        </div>
+      </section>
+
+      <section id="ap-view-products" class="ap-view ap-panel-hidden">
+        <h1>Каталог</h1>
+        <p class="ap-muted ap-products-lead">Фильтры как на <a href="products.html" target="_blank" rel="noopener noreferrer">странице каталога</a>: тип покрытия, назначение, тип ЛКМ, артикул прайса / серия, позиция и поиск. Черновик фото — «Сохранить на сайт». На мини-карточке: заменить или сбросить фото; массово — отметки, артикул или текущая выборка.</p>
+
+        <div id="ap-products-panel-catalog" class="ap-products-panel">
+          <div class="ap-catalog-admin-layout">
+            <aside class="ap-catalog-filters" aria-label="Фильтры каталога">
+              <h2 class="ap-catalog-filters-title">Фильтры</h2>
+              <label class="ap-field-label" for="ap-cat-filter-family" data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</label>
+              <select id="ap-cat-filter-family" class="ap-search ap-catalog-filter-select"></select>
+              <div id="ap-catalog-purpose-block" class="ap-catalog-purpose-block">
+                <span class="ap-field-label">Назначение</span>
+                <ul class="ap-catalog-purpose-list">
+                  <li><label class="ap-inline-check"><input type="checkbox" name="ap-catalog-purpose" value="interior" /> Интерьер</label></li>
+                  <li><label class="ap-inline-check"><input type="checkbox" name="ap-catalog-purpose" value="facade" /> Фасад</label></li>
+                  <li><label class="ap-inline-check"><input type="checkbox" name="ap-catalog-purpose" value="industrial" /> Промышленное</label></li>
+                  <li>
+                    <label class="ap-inline-check"
+                      ><input type="checkbox" name="ap-catalog-purpose" value="wd-dispersion" /> Краски
+                      водно-дисперсионные</label
+                    >
+                  </li>
+                  <li>
+                    <label class="ap-inline-check"
+                      ><input type="checkbox" name="ap-catalog-purpose" value="wood-protection" /> Средства для защиты
+                      древесины</label
+                    >
+                  </li>
+                  <li>
+                    <label class="ap-inline-check"
+                      ><input type="checkbox" name="ap-catalog-purpose" value="fire-retardant" /> Огнезащитные
+                      препараты</label
+                    >
+                  </li>
+                  <li>
+                    <label class="ap-inline-check"
+                      ><input type="checkbox" name="ap-catalog-purpose" value="surface-prep" /> Средства подготовки
+                      поверхности</label
+                    >
+                  </li>
+                  <li>
+                    <label class="ap-inline-check"
+                      ><input type="checkbox" name="ap-catalog-purpose" value="disinfectant" /> Дезинфицирующие
+                      средства</label
+                    >
+                  </li>
+                  <li>
+                    <label class="ap-inline-check"><input type="checkbox" name="ap-catalog-purpose" value="solvents" /> Растворители</label>
+                  </li>
+                </ul>
+              </div>
+              <label class="ap-field-label" for="ap-cat-filter-typeword">Тип ЛКМ (как в данных)</label>
+              <select id="ap-cat-filter-typeword" class="ap-search ap-catalog-filter-select"></select>
+              <label class="ap-field-label" for="ap-cat-filter-code">Артикул / серия в прайсе</label>
+              <select id="ap-cat-filter-code" class="ap-search ap-catalog-filter-select"></select>
+              <label class="ap-field-label" for="ap-cat-filter-position">Наименование / id</label>
+              <select id="ap-cat-filter-position" class="ap-search ap-catalog-filter-select"></select>
+              <label class="ap-field-label" for="ap-product-search">Поиск по строке</label>
+              <input type="search" id="ap-product-search" class="ap-search ap-search--products" placeholder="Артикул, название, id, family…" autocomplete="off" />
+              <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm ap-catalog-filters-reset" id="ap-catalog-filters-reset">Сбросить фильтры</button>
+              <p id="ap-catalog-filter-count" class="ap-muted ap-catalog-filter-count" role="status"></p>
+            </aside>
+            <div class="ap-catalog-admin-main">
+              <div class="ap-card-bulk-bar ap-card-bulk-bar--top">
+                <p id="ap-bulk-selection-count" class="ap-card-bulk-count ap-muted" role="status"></p>
+                <div class="ap-card-bulk-bar-btns">
+                  <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-select-visible">Отметить видимые</button>
+                  <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-clear-selection">Снять отметки</button>
+                </div>
+              </div>
+              <div class="ap-bulk-panel ap-bulk-panel--compact" aria-labelledby="ap-bulk-heading">
+                <div class="ap-bulk-panel-head">
+                  <strong id="ap-bulk-heading">Массовое фото (черновик)</strong>
+                </div>
+                <div class="ap-bulk-panel-row">
+                  <label class="ap-bulk-label ap-bulk-label--inline">
+                    Артикул или серия
+                    <input type="text" id="ap-bulk-code" class="ap-bulk-input" placeholder="ПФ-115" autocomplete="off" />
+                  </label>
+                  <label class="ap-bulk-label ap-bulk-label--inline">
+                    Режим
+                    <select id="ap-bulk-match" class="ap-bulk-select">
+                      <option value="exact">Точно</option>
+                      <option value="contains">Содержит</option>
+                    </select>
+                  </label>
+                  <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-scan">Счёт</button>
+                  <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-filter-grid">Показать в сетке</button>
+                  <label class="ap-bulk-label ap-bulk-label--inline ap-bulk-label--file-inline">
+                    Файл
+                    <input type="file" id="ap-bulk-file" accept="image/jpeg,image/png,image/webp" />
+                  </label>
+                  <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-bulk-apply">Одно фото в черновик</button>
+                  <button type="button" class="ap-btn ap-btn-danger ap-btn-sm" id="ap-bulk-clear-photos">Сбросить фото</button>
+                </div>
+                <div class="ap-bulk-panel-row ap-bulk-panel-row--card-title">
+                  <label class="ap-bulk-label ap-bulk-label--inline ap-bulk-label--grow">
+                    Заголовок на карточке (каталог)
+                    <input type="text" id="ap-bulk-card-title" class="ap-bulk-input ap-bulk-card-title-input" maxlength="320" placeholder="Например: Эмаль ХВ-16 Красная, оранжевая" autocomplete="off" />
+                  </label>
+                  <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-bulk-apply-card-title">Заголовок в черновик</button>
+                </div>
+                <p class="ap-bulk-card-title-hint ap-muted ap-text-compact">Те же правила отбора, что у фото: сначала отмеченные чекбоксами, иначе артикул/серию в поле выше, иначе текущие фильтры, иначе <strong>все</strong> позиции. Пустое поле + кнопка — сброс своего заголовка (останется название из прайса).</p>
+                <p class="ap-muted ap-text-compact">Массовые фасовки — в разделе <strong>Каталог</strong>, блок «Фасовки для сайта и каталога» (по умолчанию свёрнут). Цели массовых операций — как у фото: чекбоксы → артикул/серия → фильтры → все.</p>
+                <p id="ap-bulk-summary" class="ap-bulk-summary ap-muted" role="status"></p>
+                <p id="ap-bulk-status" class="ap-status ap-bulk-status-line" role="status"></p>
+              </div>
+
+              <details id="ap-catalog-pack-wrap" class="ap-catalog-pack-wrap">
+                <summary class="ap-catalog-pack-wrap__summary">
+                  <span class="ap-catalog-pack-wrap__title">Фасовки для сайта и каталога</span>
+                </summary>
+                <div class="ap-catalog-pack-wrap__body">
+                  <div id="ap-bulk-pack-panel" class="ap-bulk-pack-panel ap-bulk-pack-mass">
+                    <div class="ap-product-editor-section">
+                      <h2 class="ap-product-editor-h2 ap-bulk-pack-subhead">Фасовки для сайта и каталога (массово)</h2>
+                      <p class="ap-muted ap-text-compact">
+                        Редактирование и удаление строк в таблице сначала только на экране; «Таблицу фасовок в черновик» сохраняет состав в черновик для целей массовых операций; «Отменить правки таблицы» возвращает вид к сохранённому черновику. «Сохранить на сайт» вверху применено к сайту только после вашего подтверждения. Базовый список строится по прайсу: веса розницы, ведро/барабан при заданном массаже в каталоге. После смены прайса можно нажать «Как из прайса», затем снова «Таблицу фасовок в черновик», затем «Сохранить на сайт».
+                      </p>
+                      <div class="ap-table-wrap ap-pack-table-wrap">
+                        <table class="ap-table ap-pack-options-table" aria-label="Фасовки массово">
+                          <thead>
+                            <tr>
+                              <th class="ap-pack-drag-th" title="Порядок">↕</th>
+                              <th>Тип</th>
+                              <th>Кг (банка)</th>
+                              <th>Подпись</th>
+                              <th>Подзаголовок</th>
+                              <th>Скрыть</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody id="ap-bulk-pack-options-body"></tbody>
+                        </table>
+                      </div>
+                      <div class="ap-pack-options-actions">
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-options-add">Добавить строку</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-options-fill-template">Как из прайса (шаблон)</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-revert-table">Отменить правки таблицы</button>
+                        <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-bulk-pack-apply-table">Таблицу фасовок в черновик</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-reset-table">Сбросить свои фасовки у целей</button>
+                      </div>
+                      <p id="ap-bulk-pack-options-hint" class="ap-muted ap-text-compact" role="status"></p>
+                    </div>
+                  </div>
+
+                  <div id="ap-picker-pack-panel" class="ap-picker-pack-panel ap-panel-hidden">
+                    <div class="ap-product-editor-section" id="ap-pack-options-section">
+                      <h2 class="ap-product-editor-h2">Фасовки для сайта и каталога (выбранная позиция)</h2>
+                      <p class="ap-muted ap-text-compact">
+                        Добавление, изменение порядка и удаление строк — для выбранной позиции. Чипы на <a href="product.html" target="_blank" rel="noopener noreferrer">карточке товара</a> и в
+                        <a href="products.html" target="_blank" rel="noopener noreferrer">каталоге</a>. «Записать в черновик» — правки в админке; «Опубликовать на сайте» — то же, что кнопка «Сохранить на сайт» вверху (для всех изменений черновика).
+                      </p>
+                      <div class="ap-table-wrap ap-pack-table-wrap">
+                        <table class="ap-table ap-pack-options-table" aria-label="Фасовки">
+                          <thead>
+                            <tr>
+                              <th class="ap-pack-drag-th" title="Порядок">↕</th>
+                              <th>Тип</th>
+                              <th>Кг (банка)</th>
+                              <th>Подпись</th>
+                              <th>Подзаголовок</th>
+                              <th>Скрыть</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody id="ap-pack-options-body"></tbody>
+                        </table>
+                      </div>
+                      <div class="ap-pack-options-actions">
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-pack-options-add">Добавить строку</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-pack-options-reset">Как по умолчанию из прайса</button>
+                      </div>
+                      <p id="ap-pack-options-hint" class="ap-muted ap-text-compact" role="status"></p>
+                      <div class="ap-pack-publish-row">
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-pack-save-draft">Записать фасовки в черновик</button>
+                        <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-pack-publish-site">Опубликовать на сайте</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ap-page-editor-toolbar ap-panel-hidden" id="ap-page-editor-toolbar">
+                    <p class="ap-muted ap-text-compact">
+                      Массовая подстановка: фасовки — таблица выше; остальные поля — в форме ниже во вкладке «Карточки товаров». По отмеченным на сетке каталога, артикулу/серии, фильтрам или всем позициям.
+                    </p>
+                    <div class="ap-page-editor-toolbar-btns">
+                      <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-copy-card-title">Заголовок карточки (поле ниже) → массово</button>
+                      <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-copy-detail">Остальные поля карточки → массово</button>
+                      <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-apply-toolbar">Фасовки (таблица выше) → массово</button>
+                      <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-reset-toolbar">Сбросить фасовки → массово</button>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <div id="ap-product-catalog" class="ap-product-catalog ap-product-catalog--wide" role="region" aria-label="Каталог позиций"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ap-view-product-cards" class="ap-view ap-panel-hidden">
+        <h1>Карточки товаров</h1>
+        <p class="ap-muted ap-products-lead">
+          Выберите позицию из прайса и редактируйте одну карточку для <a href="products.html" target="_blank" rel="noopener noreferrer">products.html</a>.
+        </p>
+        <div class="ap-card-surface">
+          <div class="ap-form-grid ap-product-page-editor" id="ap-cards-editor-root">
+            <div class="ap-product-editor-section">
+              <h2 class="ap-product-editor-h2">Выбор карточки</h2>
+              <div class="ap-card-product-picker-row">
+                <input type="search" id="ap-cards-search" class="ap-search" placeholder="Поиск: артикул, серия, название, id…" autocomplete="off" />
+                <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-cards-reload">Обновить список</button>
+              </div>
+              <label class="ap-field-label" for="ap-cards-select">Позиция (артикул + наименование)</label>
+              <select id="ap-cards-select" class="ap-search"><option value="">— Выберите позицию —</option></select>
+              <label>Артикул
+                <input type="text" id="ap-cards-article" readonly />
+              </label>
+              <p id="ap-cards-selected-meta" class="ap-muted ap-text-compact"></p>
+            </div>
+
+            <div class="ap-product-editor-section">
+              <h2 class="ap-product-editor-h2">Данные карточки</h2>
+              <label>Заголовок в каталоге
+                <input type="text" id="ap-cards-title" maxlength="320" />
+              </label>
+              <label>Подзаголовок в карточке товара
+                <input type="text" id="ap-cards-subtitle" maxlength="600" />
+              </label>
+              <label>Описание в карточке товара
+                <textarea id="ap-cards-description" rows="5" maxlength="8000"></textarea>
+              </label>
+              <label>Пункты карточки в каталоге (по одному в строке)
+                <textarea id="ap-cards-features" rows="6" maxlength="4000"></textarea>
+              </label>
+              <div class="ap-actions ap-actions--compact">
+                <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-cards-save">Сохранить на сайт</button>
+              </div>
+              <p id="ap-cards-status" class="ap-status ap-text-compact" role="status"></p>
+            </div>
+
+            <div class="ap-product-editor-section">
+              <h2 class="ap-product-editor-h2">Фото карточки и фасовки</h2>
+              <label>Фасовка для фото
+                <select id="ap-cards-photo-pack">
+                  <option value="">Общее фото (по умолчанию)</option>
+                </select>
+              </label>
+              <label>Фото (JPEG, PNG, WebP, до 2,3 МБ)
+                <input type="file" id="ap-cards-photo-file" accept="image/jpeg,image/png,image/webp" />
+              </label>
+              <div class="ap-actions ap-actions--compact">
+                <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-cards-photo-save">Сохранить фото</button>
+                <button type="button" class="ap-btn ap-btn-danger ap-btn-sm" id="ap-cards-photo-delete">Удалить фото</button>
+              </div>
+              <p id="ap-cards-photo-status" class="ap-status ap-text-compact" role="status"></p>
+              <div class="ap-cards-photo-preview-wrap">
+                <img id="ap-cards-photo-preview" alt="Предпросмотр фото карточки" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ap-view-prices" class="ap-view ap-panel-hidden">
+        <h1>Прайс-лист и цены</h1>
+        <p class="ap-muted">Каталог хранится в <code>products-catalog.json</code> на сервере. После сохранения сайт подхватывает данные через API (главная, прайс, карточки, корзина). Цены за 1 / 2,8 / 20 / 50 кг считаются автоматически от поля «грн/кг с НДС».</p>
+        <div class="ap-draft-bar ap-price-draft-bar" id="ap-price-draft-bar">
+          <p id="ap-price-draft-hint" class="ap-draft-hint ap-muted">Изменения только в браузере, пока не нажмёте «Сохранить каталог».</p>
+          <div class="ap-draft-bar-actions">
+            <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-price-save" disabled>Сохранить каталог на сервер</button>
+            <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-price-reload">Перечитать с сервера</button>
+            <button
+              type="button"
+              class="ap-btn ap-btn-danger ap-btn-sm"
+              id="ap-price-clear-catalog"
+              title="Удалить все позиции в этом окне и сбросить историю импорта; затем можно загрузить новый файл"
+            >
+              Очистить все позиции
+            </button>
+          </div>
+          <p id="ap-price-save-status" class="ap-draft-publish-status ap-status" role="status"></p>
+        </div>
+        <div class="ap-price-toolbar">
+          <label class="ap-bulk-label ap-bulk-label--inline ap-bulk-label--file-inline">
+            Импорт CSV / Excel
+            <input type="file" id="ap-price-csv-file" accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          </label>
+          <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-price-csv-template">Скачать шаблон CSV</button>
+          <div class="ap-price-search-block">
+            <label class="ap-field-label ap-price-search-label" for="ap-price-admin-search">Поиск позиции</label>
+            <div class="ap-price-search-controls">
+              <input type="search" id="ap-price-admin-search" class="ap-search ap-search--products" placeholder="Артикул, линия, название, id…" autocomplete="off" />
+              <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-price-find-btn" title="Прокрутить к строке и открыть поле для правки">Найти позицию</button>
+            </div>
+            <p id="ap-price-find-hint" class="ap-muted ap-price-find-hint" aria-live="polite"></p>
+          </div>
+        </div>
+        <p id="ap-price-csv-hint" class="ap-muted ap-price-csv-hint">Формат колонок: <code>id,family,code,name,bucketKg,drumKg,priceNoNdsPerKg,priceNdsPerKg</code>. Можно загрузить CSV, XLS или XLSX; новые строки без id будут добавлены как новые позиции. При импорте лишние пробелы, неразрывные пробелы и переносы строк в ячейках убираются, текст приводится к единому виду.</p>
+        <p id="ap-price-last-file" class="ap-muted ap-price-last-file">Файл ещё не загружался.</p>
+        <details class="ap-price-import-history" id="ap-price-import-history-wrap">
+          <summary>История загрузок прайса</summary>
+          <div id="ap-price-import-history" class="ap-price-import-history-list"></div>
+        </details>
+        <details class="ap-price-import-history" id="ap-price-server-backups-wrap">
+          <summary>Рабочие версии на сервере</summary>
+          <div class="ap-price-backup-actions">
+            <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-price-backups-refresh">Обновить список версий</button>
+          </div>
+          <div id="ap-price-server-backups" class="ap-price-import-history-list"></div>
+        </details>
+        <div class="ap-table-wrap ap-price-table-wrap">
+          <table class="ap-table ap-price-edit-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</th>
+                <th title="Числовой артикул, единый с каталогом и прайсом на сайте">Артикул</th>
+                <th>Наименование</th>
+                <th>Без НДС / кг</th>
+                <th>С НДС / кг</th>
+                <th>2,8 кг</th>
+                <th>20 кг</th>
+                <th>50 кг</th>
+                <th>От фасовки → /кг</th>
+              </tr>
+            </thead>
+            <tbody id="ap-price-catalog-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="ap-view-crm" class="ap-view ap-panel-hidden ap-view-crm">
+        <h1>CRM</h1>
+        <p class="ap-muted ap-delivery-lead">
+          Заявки, склад, прайс и «Фото SKU» по фасовкам — в полной CRM
+          (<a href="crm-sales.html" target="_blank" rel="noopener noreferrer">crm-sales.html</a>). Классическая витрина заявок совпадает с
+          <a href="crm.html" target="_blank" rel="noopener noreferrer">crm.html</a>.
+          Ниже встроена полная версия со складом и фото позиций; для работы можно открыть ссылку в отдельной вкладке.
+        </p>
+        <div class="ap-card-surface ap-crm-embed-wrap">
+          <h2 class="ap-h2-compact">Интерфейс CRM</h2>
+          <p class="ap-muted ap-text-compact">
+            Загрузка при первом переходе на вкладку «CRM». Если сессия истекла — авторизуйтесь внутри фрейма или откройте вкладку выше.
+          </p>
+          <div class="ap-dl-actions">
+            <a class="ap-btn ap-btn-ghost ap-btn-sm" href="crm-sales.html#warehouse/catalog-pack-photos" target="_blank" rel="noopener noreferrer">Открыть CRM (склад, фото SKU)</a>
+            <a class="ap-btn ap-btn-ghost ap-btn-sm" href="crm.html" target="_blank" rel="noopener noreferrer">crm.html (заявки)</a>
+          </div>
+          <div class="ap-crm-frame-wrap">
+            <iframe id="ap-crm-iframe" class="ap-crm-iframe" title="CRM — склад, прайс, фото SKU" src="about:blank"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <section id="ap-view-analytics" class="ap-view ap-panel-hidden">
+        <h1>Аналитика</h1>
+        <p class="ap-muted">Просмотры страниц и уникальные посетители по дням (упрощённо, без сторонних сервисов).</p>
+        <label class="ap-muted" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem">
+          Период (дней)
+          <input type="number" id="ap-analytics-days" min="1" max="90" value="14" style="width: 4rem; padding: 0.35rem; border-radius: 6px; border: 1px solid var(--ap-border); background: #0f172a; color: var(--ap-text)" />
+          <button type="button" class="ap-btn ap-btn-primary" id="ap-analytics-refresh">Обновить</button>
+        </label>
+        <div class="ap-two-col">
+          <div>
+            <strong>Просмотры по дням</strong>
+            <div id="ap-analytics-chart" class="ap-chart"></div>
+          </div>
+          <div>
+            <strong>Сводка</strong>
+            <ul class="ap-muted" id="ap-analytics-summary" style="list-style: none; padding: 0; line-height: 1.6"></ul>
+          </div>
+        </div>
+        <h2 style="font-size: 1rem; margin: 1.25rem 0 0.5rem">Пользовательские события</h2>
+        <p class="ap-muted" style="font-size: 0.8rem; margin: 0 0 0.5rem">
+          Отправка из кода: <code style="color: #cbd5e1">dpTrackEvent(&quot;cart_open&quot;)</code>
+        </p>
+        <div id="ap-analytics-events" class="ap-muted" style="margin-bottom: 1rem"></div>
+        <h2 style="font-size: 1rem; margin: 1.25rem 0 0.5rem">Страницы</h2>
+        <div class="ap-table-wrap" style="max-height: 36vh">
+          <table class="ap-table" id="ap-analytics-paths">
+            <thead><tr><th>Путь</th><th>Просмотры</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="ap-view-delivery" class="ap-view ap-panel-hidden">
+        <h1>Доставка по Украине</h1>
+        <p class="ap-muted ap-delivery-lead">
+          Тексты для
+          <a href="delivery.html" target="_blank" rel="noopener noreferrer">delivery.html</a>
+          в актуальном макете v2 (две колонки, карточки слева, три строки справа, FAQ). Шапка сайта, подвал, H1 и лид — в языковых вкладках; основной контент страницы — в блоках «Макет v2» ниже. Сохранение —
+          <code class="ap-delivery-code">site-content.json</code>
+          (поле <code>pageV2</code> внутри <code>deliveryUkraine</code>).
+        </p>
+        <p id="ap-delivery-status" class="ap-status" role="status"></p>
+        <div class="ap-delivery-stack">
+          <details class="ap-delivery-details" open>
+            <summary class="ap-delivery-summary">Русский</summary>
+            <div class="ap-delivery-lang-body">
+              <div class="ap-delivery-edit-col">
+                <div class="ap-delivery-fields ap-delivery-fields--compact">
+                  <label class="ap-field-label">Шапка <input type="text" id="ap-delivery-ru-navUtility" class="ap-search ap-delivery-input" maxlength="200" /></label>
+                  <label class="ap-field-label">Подвал <input type="text" id="ap-delivery-ru-footerLink" class="ap-search ap-delivery-input" maxlength="200" /></label>
+                  <label class="ap-field-label">H1 <input type="text" id="ap-delivery-ru-pageH1" class="ap-search ap-delivery-input" maxlength="240" /></label>
+                  <label class="ap-field-label">Лид <textarea id="ap-delivery-ru-pageLead" class="ap-delivery-textarea" rows="2" maxlength="12000"></textarea></label>
+                  <p class="ap-muted ap-delivery-cards-title" style="margin-top: 0.75rem">Макет страницы v2</p>
+                  <div id="ap-delivery-v2-mount-ru" class="ap-delivery-v2-mount"></div>
+                </div>
+              </div>
+              <aside class="ap-delivery-preview-col" aria-label="Текущий текст на сайте для русского">
+                <p class="ap-delivery-preview-title">На сайте (delivery.html)</p>
+                <div class="ap-delivery-preview-scroll" id="ap-delivery-preview-ru"></div>
+              </aside>
+            </div>
+          </details>
+          <details class="ap-delivery-details">
+            <summary class="ap-delivery-summary">Українська</summary>
+            <div class="ap-delivery-lang-body">
+              <div class="ap-delivery-edit-col">
+                <div class="ap-delivery-fields ap-delivery-fields--compact">
+                  <label class="ap-field-label">Шапка <input type="text" id="ap-delivery-uk-navUtility" class="ap-search ap-delivery-input" maxlength="200" /></label>
+                  <label class="ap-field-label">Підвал <input type="text" id="ap-delivery-uk-footerLink" class="ap-search ap-delivery-input" maxlength="200" /></label>
+                  <label class="ap-field-label">H1 <input type="text" id="ap-delivery-uk-pageH1" class="ap-search ap-delivery-input" maxlength="240" /></label>
+                  <label class="ap-field-label">Лід <textarea id="ap-delivery-uk-pageLead" class="ap-delivery-textarea" rows="2" maxlength="12000"></textarea></label>
+                  <p class="ap-muted ap-delivery-cards-title" style="margin-top: 0.75rem">Макет сторінки v2</p>
+                  <div id="ap-delivery-v2-mount-uk" class="ap-delivery-v2-mount"></div>
+                </div>
+              </div>
+              <aside class="ap-delivery-preview-col" aria-label="Текущий текст на сайте для української">
+                <p class="ap-delivery-preview-title">На сайті (delivery.html)</p>
+                <div class="ap-delivery-preview-scroll" id="ap-delivery-preview-uk"></div>
+              </aside>
+            </div>
+          </details>
+          <details class="ap-delivery-details">
+            <summary class="ap-delivery-summary">English</summary>
+            <div class="ap-delivery-lang-body">
+              <div class="ap-delivery-edit-col">
+                <div class="ap-delivery-fields ap-delivery-fields--compact">
+                  <label class="ap-field-label">Utility bar <input type="text" id="ap-delivery-en-navUtility" class="ap-search ap-delivery-input" maxlength="200" /></label>
+                  <label class="ap-field-label">Footer <input type="text" id="ap-delivery-en-footerLink" class="ap-search ap-delivery-input" maxlength="200" /></label>
+                  <label class="ap-field-label">H1 <input type="text" id="ap-delivery-en-pageH1" class="ap-search ap-delivery-input" maxlength="240" /></label>
+                  <label class="ap-field-label">Lead <textarea id="ap-delivery-en-pageLead" class="ap-delivery-textarea" rows="2" maxlength="12000"></textarea></label>
+                  <p class="ap-muted ap-delivery-cards-title" style="margin-top: 0.75rem">Page layout v2</p>
+                  <div id="ap-delivery-v2-mount-en" class="ap-delivery-v2-mount"></div>
+                </div>
+              </div>
+              <aside class="ap-delivery-preview-col" aria-label="Current site copy for English">
+                <p class="ap-delivery-preview-title">On site (delivery.html)</p>
+                <div class="ap-delivery-preview-scroll" id="ap-delivery-preview-en"></div>
+              </aside>
+            </div>
+          </details>
+        </div>
+        <div class="ap-delivery-actions">
+          <button type="button" class="ap-btn ap-btn-primary" id="ap-delivery-save">Сохранить на сайт</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="catalog-pricing.js"></script>
+  <script src="product-detail-defaults.js"></script>
+  <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="admin-runtime-loader.js"></script>
+</body>
+</html>

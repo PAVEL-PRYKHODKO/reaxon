@@ -1,0 +1,742 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Павел",
+      "email": "pavel@dp-coatings.local",
+      "passwordHash": "$2a$10$qxzLRDmoYW2sUyUJtPrV4u0K6q0v3y0age5mbrBTuasFJqFCATowO",
+      "role": "admin",
+      "createdAt": "2026-03-28T09:25:32.958Z",
+      "profile": {
+        "age": null,
+        "gender": "",
+        "countryRegion": "",
+        "companyName": "",
+        "phone": "",
+        "legalAddress": "",
+        "deliveryAddress": "",
+        "avatarUrl": "/uploads/avatars/1.png",
+        "privacy": {
+          "hideEmail": false,
+          "hidePhone": false,
+          "hideLegalAddress": false,
+          "hideDeliveryAddress": false
+        },
+        "accountManagerId": null,
+        "lastName": "",
+        "city": "",
+        "website": "",
+        "isLegalEntity": false,
+        "siteInbox": [],
+        "edrpou": "",
+        "invoiceEmail": "",
+        "billingIban": ""
+      },
+      "profileUpdatedAt": "2026-04-25T14:47:27.397Z"
+    },
+    {
+      "id": 2,
+      "name": "Модератор",
+      "email": "moderator@dp-coatings.local",
+      "passwordHash": "$2a$10$SPLF8LqgmenPpGOzbhG.JeHHtFnPFtgvl8qlBI/8Bfjl9Ig.DwEf2",
+      "role": "moderator",
+      "createdAt": "2026-03-28T09:40:40.258Z",
+      "profile": {
+        "age": null,
+        "gender": "",
+        "countryRegion": "",
+        "companyName": "",
+        "phone": "",
+        "legalAddress": "",
+        "deliveryAddress": "",
+        "avatarUrl": null,
+        "privacy": {
+          "hideEmail": false,
+          "hidePhone": false,
+          "hideLegalAddress": false,
+          "hideDeliveryAddress": false
+        },
+        "accountManagerId": null,
+        "lastName": "",
+        "city": "",
+        "website": "",
+        "isLegalEntity": false,
+        "siteInbox": [],
+        "edrpou": "",
+        "invoiceEmail": "",
+        "billingIban": ""
+      }
+    },
+    {
+      "id": 3,
+      "name": "Бухгалтер",
+      "email": "buh@dp-coatings.local",
+      "passwordHash": "$2a$10$Qx2VmacIBEyYtrCFf20H4OjaK.mbrEQU0Jw5XD8kF2mcVD5YkaWwK",
+      "role": "accountant",
+      "createdAt": "2026-03-28T09:40:40.358Z",
+      "profile": {
+        "age": null,
+        "gender": "",
+        "countryRegion": "",
+        "companyName": "",
+        "phone": "",
+        "legalAddress": "",
+        "deliveryAddress": "",
+        "avatarUrl": null,
+        "privacy": {
+          "hideEmail": false,
+          "hidePhone": false,
+          "hideLegalAddress": false,
+          "hideDeliveryAddress": false
+        },
+        "accountManagerId": null,
+        "lastName": "",
+        "city": "",
+        "website": "",
+        "isLegalEntity": false,
+        "siteInbox": [],
+        "edrpou": "",
+        "invoiceEmail": "",
+        "billingIban": ""
+      }
+    },
+    {
+      "id": 4,
+      "name": "Клиент",
+      "email": "klient@dp-coatings.local",
+      "passwordHash": "$2a$10$kJKMpJhVtCYmhX40lPFjVeKO8kYjZiQ/L.P7dXwUmEBKDzmUUy/Rm",
+      "role": "client",
+      "createdAt": "2026-03-28T09:40:40.457Z",
+      "profile": {
+        "age": null,
+        "gender": "",
+        "countryRegion": "",
+        "companyName": "",
+        "phone": "",
+        "legalAddress": "",
+        "deliveryAddress": "",
+        "avatarUrl": null,
+        "privacy": {
+          "hideEmail": false,
+          "hidePhone": false,
+          "hideLegalAddress": false,
+          "hideDeliveryAddress": false
+        },
+        "accountManagerId": null,
+        "lastName": "",
+        "city": "",
+        "website": "",
+        "isLegalEntity": false,
+        "siteInbox": [],
+        "edrpou": "",
+        "invoiceEmail": "",
+        "billingIban": ""
+      }
+    },
+    {
+      "id": 6,
+      "name": "1",
+      "email": "as@gmail.com",
+      "passwordHash": "$2a$10$kO4cTI75ccAS8oOxH2TNfudMvPOH6p0JuFmmRk6cuCnM.AK.HJyS.",
+      "role": "client",
+      "createdAt": "2026-03-28T10:03:04.583Z",
+      "profile": {
+        "age": null,
+        "gender": "",
+        "countryRegion": "",
+        "companyName": "",
+        "phone": "",
+        "legalAddress": "",
+        "deliveryAddress": "",
+        "avatarUrl": null,
+        "privacy": {
+          "hideEmail": false,
+          "hidePhone": false,
+          "hideLegalAddress": false,
+          "hideDeliveryAddress": false
+        },
+        "accountManagerId": null,
+        "lastName": "",
+        "city": "",
+        "website": "",
+        "isLegalEntity": false,
+        "siteInbox": [],
+        "edrpou": "",
+        "invoiceEmail": "",
+        "billingIban": ""
+      }
+    },
+    {
+      "id": 7,
+      "name": "adsa",
+      "email": "adsa@gmail.com",
+      "passwordHash": "$2a$10$jM9crlQxE0NLmfKKP7kXXuDXWGZDwm4HKj7vOi0F2o26IOU4VVeyK",
+      "role": "client",
+      "createdAt": "2026-03-30T18:57:25.716Z",
+      "profile": {
+        "age": null,
+        "gender": "",
+        "countryRegion": "",
+        "companyName": "",
+        "phone": "",
+        "legalAddress": "",
+        "deliveryAddress": "",
+        "avatarUrl": null,
+        "privacy": {
+          "hideEmail": false,
+          "hidePhone": false,
+          "hideLegalAddress": false,
+          "hideDeliveryAddress": false
+        },
+        "accountManagerId": null,
+        "lastName": "",
+        "city": "",
+        "website": "",
+        "isLegalEntity": false,
+        "siteInbox": [],
+        "edrpou": "",
+        "invoiceEmail": "",
+        "billingIban": ""
+      },
+      "profileUpdatedAt": null
+    },
+    {
+      "id": 8,
+      "name": "anna",
+      "email": "anna@gmail.com",
+      "passwordHash": "$2a$10$dwzw/s6WdsCaKdp9jG/A5eq3ehSZuzz6b6RMvMFYl1ZFIHUIITkia",
+      "role": "accountant",
+      "createdAt": "2026-04-27T19:17:38.630Z",
+      "profile": {
+        "age": null,
+        "gender": "",
+        "countryRegion": "",
+        "companyName": "",
+        "phone": "+380667223475",
+        "legalAddress": "",
+        "deliveryAddress": "",
+        "accountManagerId": null,
+        "avatarUrl": null,
+        "privacy": {
+          "hideEmail": false,
+          "hidePhone": false,
+          "hideLegalAddress": false,
+          "hideDeliveryAddress": false
+        },
+        "lastName": "",
+        "city": "",
+        "website": "",
+        "isLegalEntity": false,
+        "siteInbox": [],
+        "edrpou": "",
+        "invoiceEmail": "",
+        "billingIban": ""
+      },
+      "profileUpdatedAt": "2026-04-27T20:54:25.670Z"
+    }
+  ],
+  "leads": [
+    {
+      "id": 5,
+      "status": "new",
+      "priority": "normal",
+      "customerName": "anna",
+      "phone": "+380667223475",
+      "email": "anna@gmail.com",
+      "comment": "Просьба перезвонить по кнопке «Заказать звонок» на странице контактов.\n\nИсточник: кнопка «Заказать звонок» (баннер внизу страницы контактов).",
+      "source": "site_callback_banner",
+      "customerType": "retail",
+      "cart": [],
+      "orderTotal": null,
+      "cartSnapshot": [],
+      "deliveryMethod": null,
+      "paymentMethod": null,
+      "paymentNote": null,
+      "topic": "Заказ обратного звонка",
+      "deliveryCity": null,
+      "deliveryPoint": null,
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "crm": {
+        "stage": "new",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "accountUserId": 8,
+        "interactions": []
+      },
+      "createdAt": "2026-04-28T09:34:23.941Z",
+      "updatedAt": "2026-04-28T09:34:23.941Z"
+    },
+    {
+      "id": 4,
+      "status": "new",
+      "priority": "normal",
+      "customerName": "anna",
+      "phone": "+380667223475",
+      "email": "anna@gmail.com",
+      "comment": "Запрос расчёта по кнопке «Получить расчёт» на главной странице.",
+      "source": "site_home_calc_banner",
+      "customerType": "retail",
+      "cart": [],
+      "orderTotal": null,
+      "cartSnapshot": [],
+      "deliveryMethod": null,
+      "paymentMethod": null,
+      "paymentNote": null,
+      "topic": "Расчёт покрытия под проект (главная)",
+      "deliveryCity": null,
+      "deliveryPoint": null,
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "crm": {
+        "stage": "new",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 2,
+        "assigneeName": "Модератор",
+        "accountUserId": 8,
+        "interactions": []
+      },
+      "createdAt": "2026-04-27T20:54:29.071Z",
+      "updatedAt": "2026-04-27T20:54:29.071Z"
+    },
+    {
+      "id": 3,
+      "status": "new",
+      "priority": "normal",
+      "customerName": "pavlo prykhodko",
+      "phone": "+380667223475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 55.80 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "p-66-63",
+          "packType": "jar",
+          "customKg": 1,
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 55.8,
+      "cartSnapshot": [
+        {
+          "title": "Олифа Олифа",
+          "details": "\"Оксоль\" · Банка 1 кг · Розница × 1",
+          "qty": 1,
+          "lineTotal": 55.8
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "Автозаводская\n12",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "crm": {
+        "stage": "new",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "interactions": [],
+        "clientMessages": []
+      },
+      "createdAt": "2026-04-27T18:38:10.419Z",
+      "updatedAt": "2026-04-27T18:38:10.419Z"
+    },
+    {
+      "id": 2,
+      "status": "new",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+380667223475",
+      "email": "pavel@dp-coatings.local",
+      "comment": "при\nИтого: 55.80 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "p-66-63",
+          "packType": "jar",
+          "customKg": 1,
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 55.8,
+      "cartSnapshot": [
+        {
+          "title": "Олифа Олифа",
+          "details": "\"Оксоль\" · Банка 1 кг · Розница × 1",
+          "qty": 1,
+          "lineTotal": 55.8
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "deliveryCity": "Харьков",
+      "deliveryPoint": "35",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": true,
+      "crm": {
+        "stage": "new",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "interactions": [],
+        "clientMessages": []
+      },
+      "createdAt": "2026-04-27T11:11:40.617Z",
+      "updatedAt": "2026-04-27T11:12:49.333Z"
+    },
+    {
+      "id": 1,
+      "status": "new",
+      "priority": "normal",
+      "customerName": "Amber",
+      "phone": "+38 066 722 34 75",
+      "email": "markalison751@gmail.com",
+      "comment": "привет хочу купить краску",
+      "source": "site_form",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "p-35-32",
+          "packType": "bucket",
+          "qty": 2,
+          "mode": "retail"
+        },
+        {
+          "productId": "p-43-40",
+          "packType": "drum",
+          "qty": 2,
+          "mode": "retail"
+        },
+        {
+          "productId": "p-43-40",
+          "packType": "bucket",
+          "qty": 2,
+          "mode": "retail"
+        },
+        {
+          "productId": "p-41-38",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "p-45-42",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "p-45-42",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "p-44-41",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "p-44-41",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "p-76-73",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "crm": {
+        "stage": "new",
+        "tags": [],
+        "managerNote": "",
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "managerNotes": [
+          {
+            "text": "Новая заметка которая работает",
+            "authorName": "Ранее",
+            "authorId": null,
+            "createdAt": "2026-03-28T11:15:52.886Z",
+            "id": "9c2a1a80-8108-43f7-b24f-8c26625c9e40",
+            "editedAt": "2026-03-28T11:30:26.482Z",
+            "editedById": 1,
+            "editedByName": "Павел"
+          }
+        ],
+        "interactions": [],
+        "clientMessages": []
+      },
+      "createdAt": "2026-03-28T10:03:23.717Z",
+      "updatedAt": "2026-03-28T11:30:26.482Z"
+    }
+  ],
+  "meta": {
+    "nextLeadId": 6,
+    "nextUserId": 9,
+    "assignCursor": 1,
+    "rolePermissions": {
+      "admin": {
+        "adminPanel.view": true,
+        "users.view": true,
+        "users.create": true,
+        "users.editRole": true,
+        "users.delete": true,
+        "users.export": true,
+        "leads.view": true,
+        "leads.edit": true,
+        "leads.assign": true,
+        "leads.deleteNotes": true,
+        "leads.export": true,
+        "catalog.view": true,
+        "catalog.edit": true,
+        "catalog.restore": true,
+        "siteContent.edit": true,
+        "media.edit": true,
+        "analytics.view": true
+      },
+      "moderator": {
+        "adminPanel.view": false,
+        "users.view": true,
+        "users.create": false,
+        "users.editRole": false,
+        "users.delete": false,
+        "users.export": true,
+        "leads.view": true,
+        "leads.edit": true,
+        "leads.assign": true,
+        "leads.deleteNotes": false,
+        "leads.export": false,
+        "catalog.view": false,
+        "catalog.edit": false,
+        "catalog.restore": false,
+        "siteContent.edit": false,
+        "media.edit": false,
+        "analytics.view": false
+      },
+      "accountant": {
+        "adminPanel.view": false,
+        "users.view": true,
+        "users.create": false,
+        "users.editRole": false,
+        "users.delete": false,
+        "users.export": true,
+        "leads.view": true,
+        "leads.edit": false,
+        "leads.assign": false,
+        "leads.deleteNotes": false,
+        "leads.export": true,
+        "catalog.view": false,
+        "catalog.edit": false,
+        "catalog.restore": false,
+        "siteContent.edit": false,
+        "media.edit": false,
+        "analytics.view": false
+      },
+      "manager": {
+        "adminPanel.view": false,
+        "users.view": false,
+        "users.create": false,
+        "users.editRole": false,
+        "users.delete": false,
+        "users.export": false,
+        "leads.view": true,
+        "leads.edit": true,
+        "leads.assign": true,
+        "leads.deleteNotes": false,
+        "leads.export": false,
+        "catalog.view": false,
+        "catalog.edit": false,
+        "catalog.restore": false,
+        "siteContent.edit": false,
+        "media.edit": false,
+        "analytics.view": false
+      },
+      "viewer": {
+        "adminPanel.view": false,
+        "users.view": false,
+        "users.create": false,
+        "users.editRole": false,
+        "users.delete": false,
+        "users.export": false,
+        "leads.view": false,
+        "leads.edit": false,
+        "leads.assign": false,
+        "leads.deleteNotes": false,
+        "leads.export": false,
+        "catalog.view": false,
+        "catalog.edit": false,
+        "catalog.restore": false,
+        "siteContent.edit": false,
+        "media.edit": false,
+        "analytics.view": false
+      },
+      "client": {
+        "adminPanel.view": false,
+        "users.view": false,
+        "users.create": false,
+        "users.editRole": false,
+        "users.delete": false,
+        "users.export": false,
+        "leads.view": false,
+        "leads.edit": false,
+        "leads.assign": false,
+        "leads.deleteNotes": false,
+        "leads.export": false,
+        "catalog.view": false,
+        "catalog.edit": false,
+        "catalog.restore": false,
+        "siteContent.edit": false,
+        "media.edit": false,
+        "analytics.view": false
+      }
+    },
+    "nextCrmEntityId": 13
+  },
+  "modules": {
+    "tasks": [
+      {
+        "id": 12,
+        "title": "позвонить лакхимпром",
+        "value": "2026-04-26",
+        "meta": "task",
+        "status": "in_progress",
+        "assigneeId": 2,
+        "authorId": 1,
+        "createdAt": "2026-04-25T19:29:05.212Z",
+        "updatedAt": "2026-04-25T20:28:10.442Z",
+        "comment": "task",
+        "priority": "medium"
+      },
+      {
+        "id": 11,
+        "title": "позвонить лакхимпром",
+        "value": "2026-04-26",
+        "meta": "task",
+        "status": "done",
+        "assigneeId": 1,
+        "authorId": 1,
+        "createdAt": "2026-04-25T19:26:57.116Z",
+        "updatedAt": "2026-04-25T20:50:16.991Z",
+        "completedAt": "2026-04-25T20:50:16.983Z"
+      },
+      {
+        "id": 10,
+        "title": "позвонить лакхимпром",
+        "value": "2026-04-26",
+        "meta": "task",
+        "status": "todo",
+        "assigneeId": null,
+        "authorId": 1,
+        "createdAt": "2026-04-25T19:21:42.533Z",
+        "updatedAt": "2026-04-25T19:21:42.533Z"
+      },
+      {
+        "id": 9,
+        "title": "позвонить лакхимпром",
+        "value": "2026-04-26",
+        "meta": "task",
+        "status": "todo",
+        "assigneeId": 1,
+        "authorId": 1,
+        "createdAt": "2026-04-25T19:21:29.050Z",
+        "updatedAt": "2026-04-25T19:21:29.050Z"
+      }
+    ],
+    "inventory": [
+      {
+        "id": 8,
+        "title": "КО-785",
+        "category": "lacquer",
+        "containerType": "",
+        "value": 20,
+        "unit": "кг",
+        "action": "in",
+        "meta": "2026-04-25",
+        "authorId": 1,
+        "createdAt": "2026-04-25T19:07:20.645Z",
+        "updatedAt": "2026-04-25T19:07:20.645Z"
+      },
+      {
+        "id": 7,
+        "title": "Ведро Металическое",
+        "category": "containers",
+        "containerType": "bucket",
+        "value": 100,
+        "unit": "шт",
+        "action": "in",
+        "meta": "2026-04-25",
+        "authorId": 1,
+        "createdAt": "2026-04-25T18:57:59.897Z",
+        "updatedAt": "2026-04-25T18:57:59.897Z"
+      },
+      {
+        "id": 6,
+        "title": "КО-785",
+        "category": "lacquer",
+        "value": 50,
+        "unit": "кг",
+        "action": "out",
+        "meta": "2026-04-25",
+        "authorId": 1,
+        "createdAt": "2026-04-25T18:46:30.060Z",
+        "updatedAt": "2026-04-25T18:46:30.060Z"
+      },
+      {
+        "id": 5,
+        "title": "Пигмент Синий",
+        "category": "pigments",
+        "value": 500,
+        "unit": "кг",
+        "meta": "2026-04-24",
+        "authorId": 1,
+        "createdAt": "2026-04-25T18:30:19.412Z",
+        "updatedAt": "2026-04-25T18:30:19.412Z"
+      },
+      {
+        "id": 4,
+        "title": "КО-785",
+        "category": "lacquer",
+        "value": 100,
+        "unit": "кг",
+        "meta": "2026-04-25",
+        "authorId": 1,
+        "createdAt": "2026-04-25T18:29:54.101Z",
+        "updatedAt": "2026-04-25T18:29:54.101Z"
+      }
+    ],
+    "documents": [],
+    "dropshippers": [],
+    "campaigns": [],
+    "finance": [],
+    "integrations": [],
+    "inventoryMovements": [],
+    "calendarEvents": []
+  }
+}

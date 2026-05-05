@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reaxon - Главная</title>
+  <meta
+    name="description"
+    content="Главная в стиле макета: лакокрасочные решения, категории, популярные товары и преимущества."
+  />
+  <link rel="stylesheet" href="styles.css?v=1" />
+  <link rel="stylesheet" href="redesign-shared.css?v=topbar-search-1" />
+  <link rel="stylesheet" href="home-mockup.css?v=topbar-search-1" />
+  <link rel="stylesheet" href="site-lang.css" />
+</head>
+<body data-page="home">
+  <div class="page-bg">
+    <main class="home-shell" aria-label="Главная">
+      <header class="topbar">
+        <a href="index.html" class="logo" aria-label="Reaxon">
+          <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+        </a>
+
+        <nav class="topnav" aria-label="Основная навигация">
+          <a href="index.html" data-i18n="navHome" aria-current="page">Главная</a>
+          <a href="products.html" data-i18n="navCatalog">Каталог</a>
+          <a href="price.html" data-i18n="navPrice">Прайс</a>
+          <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+          <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
+          <a href="news.html" data-i18n="navNews">Новости</a>
+          <a href="contact.html" data-i18n="navContacts">Контакты</a>
+        </nav>
+
+        <div class="top-actions">
+          <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+            <label for="language-switcher" class="visually-hidden">
+              <span data-i18n="langLabel">Язык</span>
+            </label>
+            <select id="language-switcher" class="lang-switcher__select">
+              <option value="ru">RU</option>
+              <option value="uk">UA</option>
+            </select>
+          </div>
+          <div class="header-search-inline topbar-search home-site-search">
+            <input
+              id="site-search-input"
+              type="search"
+              data-i18n-placeholder="siteSearchPlaceholderHome"
+              data-i18n-aria-label="siteSearchPlaceholderHome"
+              placeholder="Поиск по названию, артикулу"
+              autocomplete="off"
+            />
+          </div>
+          <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+            🛒
+            <span class="cart-badge" id="cart-count">0</span>
+          </button>
+          <a
+            href="account.html"
+            class="icon-btn header-account-trigger topbar-account-btn"
+            id="home-account-trigger"
+            data-i18n-aria-label="accountDrawerTrigger"
+            aria-label="Личный кабинет"
+          >            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+        </div>
+      </header>
+
+      <section class="hero home-hero--visual">
+        <div class="hero-content">
+          <h1
+            data-ru="Современные лакокрасочные решения для бизнеса"
+            data-uk="Сучасні лакофарбові рішення для бізнесу"
+          >
+            Современные лакокрасочные решения для бизнеса
+          </h1>
+          <p
+            data-ru="Надёжные покрытия для бетона, промышленности и строительства. Доставка Новой Почтой и Укрпоштой по городам Украины — Запорожье и Запорожская область, Харьков, Одесса, Днепр, Львов и другие регионы."
+            data-uk="Надійні покриття для бетону, промисловості та будівництва. Доставка Новою Поштою та Укрпоштою містами України — Запоріжжя та Запорізька область, Харків, Одеса, Дніпро, Львів та інші регіони."
+          >
+            Надёжные покрытия для бетона, промышленности и строительства. Доставка Новой Почтой и Укрпоштой по городам Украины — Запорожье и Запорожская область, Харьков, Одесса, Днепр, Львов и другие регионы.
+          </p>
+          <div class="hero-cta">
+            <a
+              href="products.html"
+              class="btn btn-primary"
+              data-ru="В каталог"
+              data-uk="У каталог"
+              >В каталог</a
+            >
+            <div class="dp-price-download-wrap hero-download-wrap">
+              <button
+                type="button"
+                id="hero-download-price"
+                class="btn btn-ghost dp-price-download-trigger"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-controls="hero-download-dropdown"
+                data-ru="Скачать прайс"
+                data-uk="Завантажити прайс"
+              >
+                Скачать прайс
+              </button>
+              <div
+                id="hero-download-dropdown"
+                class="dp-price-download-dropdown is-hidden"
+                role="menu"
+                aria-label="Формат выгрузки прайса"
+              >
+                <button type="button" id="hero-download-csv" class="dp-price-download-item" role="menuitem">
+                  Скачать Excel (.xlsx)
+                </button>
+                <button type="button" id="hero-download-pdf" class="dp-price-download-item" role="menuitem">
+                  Скачать PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 data-ru="Наши категории" data-uk="Наші категорії">Наши категории</h2>
+        <div class="categories">
+          <article class="cat-card">
+            <div class="cat-image">
+              <img
+                class="cat-image-photo"
+                src="assets/category-interior.png"
+                alt="Интерьерные краски"
+                data-i18n-alt="indexCat1Alt"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="cat-body">
+              <h3 data-ru="Интерьерные краски" data-uk="Інтер'єрні фарби">Интерьерные краски</h3>
+              <a href="products.html?q=интерьер" class="mini-btn" data-ru="Смотреть" data-uk="Дивитись">Смотреть</a>
+            </div>
+          </article>
+          <article class="cat-card">
+            <div class="cat-image">
+              <img
+                class="cat-image-photo"
+                src="assets/category-facade.png"
+                alt="Фасадные покрытия"
+                data-i18n-alt="indexCat2Alt"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="cat-body">
+              <h3 data-ru="Фасадные покрытия" data-uk="Фасадні покриття">Фасадные покрытия</h3>
+              <a href="products.html?q=фасад" class="mini-btn" data-ru="Смотреть" data-uk="Дивитись">Смотреть</a>
+            </div>
+          </article>
+          <article class="cat-card">
+            <div class="cat-image">
+              <img
+                class="cat-image-photo"
+                src="assets/category-industrial-enamel.png"
+                alt="Промышленные эмали"
+                data-i18n-alt="indexCat3Alt"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="cat-body">
+              <h3 data-ru="Промышленные эмали" data-uk="Промислові емалі">Промышленные эмали</h3>
+              <a href="products.html?q=эмаль" class="mini-btn" data-ru="Смотреть" data-uk="Дивитись">Смотреть</a>
+            </div>
+          </article>
+          <article class="cat-card">
+            <div class="cat-image">
+              <img
+                class="cat-image-photo"
+                src="assets/category-primer.png"
+                alt="Грунтовки"
+                data-i18n-alt="indexCat4Alt"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="cat-body">
+              <h3 data-ru="Грунтовки" data-uk="Ґрунтовки">Грунтовки</h3>
+              <a href="products.html?q=грунт" class="mini-btn" data-ru="Смотреть" data-uk="Дивитись">Смотреть</a>
+            </div>
+          </article>
+          <article class="cat-card">
+            <div class="cat-image">
+              <img
+                class="cat-image-photo"
+                src="assets/category-lacquer.png"
+                alt="Лаки"
+                data-i18n-alt="indexCat5Alt"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="cat-body">
+              <h3 data-ru="Лаки" data-uk="Лаки">Лаки</h3>
+              <a href="products.html?q=лак" class="mini-btn" data-ru="Смотреть" data-uk="Дивитись">Смотреть</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 data-ru="Популярные товары" data-uk="Популярні товари">Популярные товары</h2>
+        <div class="products" id="home-popular-products"></div>
+      </section>
+
+      <section class="section section-why">
+        <h2 data-ru="Почему выбирают нас" data-uk="Чому обирають нас">Почему выбирают нас</h2>
+        <div class="why-grid">
+          <article class="why-item">
+            <div
+              class="why-icon why-icon-img"
+              role="img"
+              data-i18n-aria-label="indexWhy1Aria"
+              aria-label="Надёжность и гарантия сроков"
+            >
+              <img
+                src="assets/why-choose-reliability.png"
+                alt=""
+                width="58"
+                height="58"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p data-ru="Собственное производство" data-uk="Власне виробництво">Собственное производство</p>
+          </article>
+          <article class="why-item">
+            <div
+              class="why-icon why-icon-img"
+              role="img"
+              data-i18n-aria-label="indexWhy2Aria"
+              aria-label="Контроль качества продукции"
+            >
+              <img
+                src="assets/why-choose-quality.png"
+                alt=""
+                width="58"
+                height="58"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p data-ru="Контроль качества" data-uk="Контроль якості">Контроль качества</p>
+          </article>
+          <article class="why-item">
+            <div
+              class="why-icon why-icon-img"
+              role="img"
+              data-i18n-aria-label="indexWhy3Aria"
+              aria-label="Доставка по Украине"
+            >
+              <img
+                src="assets/why-choose-delivery.png"
+                alt=""
+                width="58"
+                height="58"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p data-ru="Поставка по всей Украине" data-uk="Постачання по всій Україні">Поставка по всей Украине</p>
+          </article>
+          <article class="why-item">
+            <div
+              class="why-icon why-icon-img"
+              role="img"
+              data-i18n-aria-label="indexWhy4Aria"
+              aria-label="Индивидуальный подход и партнёрство"
+            >
+              <img
+                src="assets/why-choose-partnership.png"
+                alt=""
+                width="58"
+                height="58"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p data-ru="Индивидуальный подход" data-uk="Індивідуальний підхід">Индивидуальный подход</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section info-section" id="delivery-info">
+        <h2 data-ru="Доставка и оплата" data-uk="Доставка та оплата">Доставка и оплата</h2>
+        <div class="info-grid">
+          <article class="info-card">
+            <h3 data-ru="Как доставляем" data-uk="Як доставляємо">Как доставляем</h3>
+            <ul>
+              <li
+                data-ru="Отправляем эмали, грунтовки и сопутствующие ЛКМ по всей Украине."
+                data-uk="Відправляємо емалі, грунтовки та супутні ЛФМ по всій Україні."
+              >
+                Отправляем эмали, грунтовки и сопутствующие ЛКМ по всей Украине.
+              </li>
+              <li
+                data-ru="Доступны самовывоз, курьер, Новая Почта и Укрпошта."
+                data-uk="Доступні самовивіз, кур’єр, Нова Пошта та Укрпошта."
+              >
+                Доступны самовывоз, курьер, Новая Почта и Укрпошта.
+              </li>
+              <li
+                data-ru="Точные сроки и тарифы согласуем после подтверждения состава заказа и адреса."
+                data-uk="Точні строки та тарифи погодимо після підтвердження складу замовлення та адреси."
+              >
+                Точные сроки и тарифы согласуем после подтверждения состава заказа и адреса.
+              </li>
+            </ul>
+            <a
+              href="delivery.html"
+              class="info-link"
+              data-ru="Открыть полный раздел доставки"
+              data-uk="Відкрити повний розділ доставки"
+              >Открыть полный раздел доставки</a
+            >
+          </article>
+          <article class="info-card">
+            <h3 data-ru="Оплата" data-uk="Оплата">Оплата</h3>
+            <ul>
+              <li
+                data-ru="Розница и опт оформляются через корзину и онлайн-заявку."
+                data-uk="Роздріб і гурт оформлюються через кошик і онлайн-заявку."
+              >
+                Розница и опт оформляются через корзину и онлайн-заявку.
+              </li>
+              <li
+                data-ru="Карта: LiqPay (в кабинете). Перевод: IBAN — реквизиты в личном кабинете на странице «Оплата»."
+                data-uk="Карта: LiqPay (у кабінеті). Переказ: IBAN — реквізити в особистому кабінеті на сторінці «Оплата»."
+              >
+                Карта: LiqPay (в кабинете). Перевод: IBAN — реквизиты в личном кабинете на странице «Оплата».
+              </li>
+              <li
+                data-ru="Менеджер подтверждает состав, доставку и итог перед отгрузкой."
+                data-uk="Менеджер підтверджує склад, доставку та підсумок перед відвантаженням."
+              >
+                Менеджер подтверждает состав, доставку и итог перед отгрузкой.
+              </li>
+            </ul>
+            <a
+              href="price.html"
+              class="info-link"
+              data-ru="Смотреть прайс и цены"
+              data-uk="Переглянути прайс і ціни"
+              >Смотреть прайс и цены</a
+            >
+          </article>
+        </div>
+
+        <div class="footer-cta delivery-info-cta">
+          <div>
+            <h2
+              data-ru="Подберем покрытие под ваш проект за 15 минут"
+              data-uk="Підберемо покриття під ваш проєкт за 15 хвилин"
+            >
+              Подберем покрытие под ваш проект за 15 минут
+            </h2>
+          </div>
+          <div class="home-calc-cta-action">
+            <button type="button" class="btn btn-primary" id="home-cta-calc" data-i18n="homeCalcButton">
+              Получить расчет
+            </button>
+            <p id="home-cta-calc-status" class="home-cta-calc-status" role="status" hidden></p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
+    <div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-drawer-shell">
+        <header class="cart-header">
+          <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
+          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть корзину">×</button>
+        </header>
+        <div class="cart-modal-toolbar">
+          <label class="cart-sort-label">
+            <span class="cart-sort-text" data-i18n="cartSortLabel">Сортировка</span>
+            <select id="cart-sort-select" class="cart-sort-select" aria-label="Sort order">
+              <option value="price-asc" data-i18n="cartSortPriceAsc">От дешёвых к дорогим</option>
+              <option value="price-desc" data-i18n="cartSortPriceDesc">От дорогих к дешёвым</option>
+              <option value="name-asc" data-i18n="cartSortNameAsc">По названию (А–Я)</option>
+              <option value="add-order" data-i18n="cartSortAddOrder">Порядок добавления</option>
+            </select>
+          </label>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <footer class="cart-footer">
+          <div class="cart-footer-totals">
+            <div class="cart-grand-row">
+              <span data-i18n="cartGrandTotal">Итого по заказу</span>
+              <strong class="cart-grand-value"><span id="cart-total">0</span><span class="cart-currency"> грн</span></strong>
+            </div>
+          </div>
+          <div class="cart-footer-actions">
+            <button type="button" id="cart-pay-btn" class="btn btn-primary cart-pay-btn" data-i18n="payButton">Оплатить</button>
+            <button type="button" id="checkout" class="btn btn-ghost" data-i18n="checkoutRequest">Заявка без оплаты</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <div id="product-modal" class="modal" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+      <div class="modal-top">
+        <h3 id="product-modal-title"></h3>
+        <button id="close-product-modal" class="btn btn-ghost" type="button" aria-label="Close">×</button>
+      </div>
+      <div id="product-modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="catalog-pricing.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="script.js"></script>
+  <script src="home-popular.js"></script>
+  <script src="price-page.js"></script>
+  <script src="home-hero-actions.js"></script>
+  <script src="home-auth-ui.js"></script>
+</body>
+</html>

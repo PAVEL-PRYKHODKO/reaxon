@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DP Coatings — Каталог</title>
+  <meta name="description" content="Каталог лакокрасочной продукции DP Coatings: фильтры, цены и заказ." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="redesign-shared.css" />
+  <link rel="stylesheet" href="products-catalog.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+</head>
+<body data-page="products">
+  <div class="page-bg page-bg--site">
+    <div class="site-shell">
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="topbar">
+        <a href="index.html" class="logo" aria-label="Reaxon">
+          <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+        </a>
+        <nav class="topnav" aria-label="Основная навигация">
+          <a href="index.html" data-i18n="navHome">Главная</a>
+          <a href="products.html" data-i18n="navCatalog" aria-current="page">Каталог</a>
+          <a href="price.html" data-i18n="navPrice">Прайс</a>
+          <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+          <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
+          <a href="news.html" data-i18n="navNews">Новости</a>
+          <a href="contact.html" data-i18n="navContacts">Контакты</a>
+        </nav>
+        <div class="top-actions">
+          <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+            <label for="language-switcher" class="visually-hidden">
+              <span data-i18n="langLabel">Язык</span>
+            </label>
+            <select id="language-switcher" class="lang-switcher__select">
+              <option value="ru">RU</option>
+              <option value="uk">UA</option>
+            </select>
+          </div>
+          <div class="header-search-inline topbar-search home-site-search">
+            <input
+              id="site-search-input"
+              type="search"
+              data-i18n-placeholder="siteSearchPlaceholderHome"
+              data-i18n-aria-label="siteSearchPlaceholderHome"
+              placeholder="Поиск по названию, артикулу"
+              autocomplete="off"
+            />
+          </div>
+          <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+            🛒
+            <span class="cart-badge" id="cart-count">0</span>
+          </button>
+          <a
+            href="account.html"
+            class="icon-btn header-account-trigger topbar-account-btn"
+            id="home-account-trigger"
+            data-i18n-aria-label="accountDrawerTrigger"
+            aria-label="Личный кабинет"
+          >            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section section-solid products-page-shell">
+      <div class="container">
+        <nav class="products-breadcrumbs" aria-label="Навигация по разделу">
+          <a href="index.html">Главная</a>
+          <span aria-hidden="true">/</span>
+          <span>Каталог</span>
+        </nav>
+        <div class="products-portal products-portal--page catalog-page-shell" data-products-portal="page" data-catalog-layout="1">
+          <div class="catalog-layout">
+            <aside class="catalog-sidebar products-portal-sidebar" aria-label="Фильтры каталога">
+              <div class="catalog-sidebar-head">
+                <h2>Фильтры</h2>
+              </div>
+
+              <details class="catalog-filter-details catalog-filter-details--name-search" open>
+                <summary>Поиск по названию</summary>
+                <div class="catalog-filter-body">
+                  <label class="catalog-name-search-label">
+                    <span class="products-filter-label">Название товара</span>
+                    <input
+                      type="search"
+                      id="catalog-name-search"
+                      class="catalog-name-search-input"
+                      placeholder="Например, эмаль или грунт"
+                      autocomplete="off"
+                      aria-label="Поиск по названию товара в каталоге"
+                    />
+                  </label>
+                </div>
+              </details>
+
+              <details class="catalog-filter-details" open>
+                <summary>Тип покрытия</summary>
+                <div class="catalog-filter-body">
+                  <label class="products-filter-field" style="display:block;margin:0">
+                    <span class="products-filter-label visually-hidden">Тип материала</span>
+                    <select id="pp-select-family" class="products-filter-select catalog-sidebar-select" aria-label="Тип материала" style="width:100%"></select>
+                  </label>
+                  <div class="products-family-series-block" id="pp-family-series-block" hidden style="margin-top:0.65rem">
+                    <label class="products-filter-field" style="display:block;margin:0 0 0.5rem">
+                      <span class="products-filter-label">Артикул в прайсе (серия)</span>
+                      <select id="pp-select-series-code" class="products-filter-select catalog-sidebar-select" style="width:100%" aria-label="Артикул / серия в выбранной группе"></select>
+                    </label>
+                    <label class="products-filter-field" style="display:block;margin:0">
+                      <span class="products-filter-label">Наименование</span>
+                      <select id="pp-select-series-product" class="products-filter-select catalog-sidebar-select" style="width:100%" aria-label="Позиция по наименованию"></select>
+                    </label>
+                  </div>
+                </div>
+              </details>
+
+              <details class="catalog-filter-details" open>
+                <summary>Назначение</summary>
+                <div class="catalog-filter-body">
+                  <ul class="catalog-purpose-list">
+                    <li>
+                      <label><input type="checkbox" name="catalog-purpose" value="interior" /> Интерьер</label>
+                    </li>
+                    <li>
+                      <label><input type="checkbox" name="catalog-purpose" value="facade" /> Фасад</label>
+                    </li>
+                    <li>
+                      <label><input type="checkbox" name="catalog-purpose" value="industrial" /> Промышленное</label>
+                    </li>
+                    <li>
+                      <label
+                        ><input type="checkbox" name="catalog-purpose" value="wd-dispersion" /> Краски
+                        водно-дисперсионные</label
+                      >
+                    </li>
+                    <li>
+                      <label
+                        ><input type="checkbox" name="catalog-purpose" value="wood-protection" /> Средства для защиты
+                        древесины</label
+                      >
+                    </li>
+                    <li>
+                      <label><input type="checkbox" name="catalog-purpose" value="fire-retardant" /> Огнезащитные препараты</label>
+                    </li>
+                    <li>
+                      <label
+                        ><input type="checkbox" name="catalog-purpose" value="surface-prep" /> Средства подготовки
+                        поверхности</label
+                      >
+                    </li>
+                    <li>
+                      <label
+                        ><input type="checkbox" name="catalog-purpose" value="disinfectant" /> Дезинфицирующие
+                        средства</label
+                      >
+                    </li>
+                    <li>
+                      <label><input type="checkbox" name="catalog-purpose" value="solvents" /> Растворители</label>
+                    </li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="catalog-filter-details">
+                <summary>Фасовка</summary>
+                <div class="catalog-filter-body">
+                  <p class="catalog-placeholder">Фильтр по фасовке появится при расширении каталога. Сейчас выбор фасовки — в карточке товара.</p>
+                </div>
+              </details>
+
+              <details class="catalog-filter-details">
+                <summary>Производитель</summary>
+                <div class="catalog-filter-body">
+                  <p class="catalog-placeholder">Список производителей будет доступен позже.</p>
+                </div>
+              </details>
+
+              <label class="products-filter-field products-filter-field--bycode" style="display:block;margin-top:0.5rem">
+                <span class="products-filter-label">По артикулу прайса</span>
+                <input
+                  type="search"
+                  id="catalog-price-code-input"
+                  class="catalog-name-search-input catalog-code-input"
+                  placeholder="Например, ГФ-021"
+                  autocomplete="off"
+                  aria-label="Поиск по артикулу из прайса"
+                />
+              </label>
+
+              <button type="button" id="catalog-filters-reset" class="catalog-reset-filters">Сбросить фильтры</button>
+
+              <div class="catalog-sidebar-pagination" aria-label="Страницы каталога">
+                <div class="catalog-pagination-btns" id="catalog-pagination-sidebar"></div>
+                <button type="button" id="catalog-load-more-sidebar" class="catalog-load-more-btn" hidden>
+                  Показать ещё
+                </button>
+              </div>
+            </aside>
+
+            <div class="catalog-main products-portal-main">
+              <div id="pp-panel-catalog" class="products-tab-panel is-active" role="region" aria-label="Каталог">
+                <h1 class="catalog-main-title">Каталог лакокрасочной продукции</h1>
+                <div id="products-catalog-search-banner" class="catalog-search-banner" hidden role="status">
+                  <span id="products-catalog-search-banner-text"></span>
+                  <button type="button" id="products-catalog-search-reset" class="btn btn-ghost" style="margin-left:0.5rem;font-size:0.8rem;padding:0.2rem 0.5rem">Сбросить поиск</button>
+                </div>
+                <div class="catalog-toolbar">
+                  <div class="catalog-toolbar-counts">
+                    <span class="catalog-count" id="catalog-count-left" aria-live="polite"></span>
+                    <span class="catalog-count-sub" id="catalog-shown-sub" hidden aria-live="polite"></span>
+                  </div>
+                  <div class="catalog-toolbar-tools">
+                    <span class="catalog-count" id="catalog-count-right" aria-hidden="true"></span>
+                    <div class="catalog-view-toggle" role="group" aria-label="Вид списка">
+                      <button type="button" id="catalog-view-list" class="is-active" aria-pressed="true" title="Список">☰</button>
+                      <button type="button" id="catalog-view-grid" aria-pressed="false" title="Плитка">▦</button>
+                    </div>
+                    <label class="visually-hidden" for="pp-select-sort">Сортировка</label>
+                    <select id="pp-select-sort" class="catalog-sort-select" aria-label="Сортировка">
+                      <option value="code-asc" selected>По артикулу (А→Я)</option>
+                      <option value="code-desc">По артикулу (Я→А)</option>
+                      <option value="name-asc">По названию</option>
+                      <option value="retail-asc">По цене розницы ↑</option>
+                      <option value="retail-desc">По цене розницы ↓</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="catalog-grid-shell">
+                  <div
+                    class="catalog-grid-scroll catalog-grid-scroll--collapsed"
+                    id="catalog-grid-scroll"
+                  >
+                    <div id="popular-products-grid" class="products-popular-grid catalog-grid--list"></div>
+                  </div>
+                  <div class="catalog-grid-expand-actions">
+                    <button
+                      type="button"
+                      id="catalog-expand-toggle"
+                      class="btn btn-ghost catalog-expand-toggle-btn"
+                      hidden
+                      aria-expanded="false"
+                      aria-controls="catalog-grid-scroll"
+                    >
+                      Показать ещё
+                    </button>
+                  </div>
+                </div>
+                <nav class="catalog-bottom-pagination" aria-label="Страницы каталога">
+                  <button type="button" id="catalog-load-more-bottom" class="catalog-load-more-btn" hidden>
+                    Показать ещё
+                  </button>
+                  <div class="catalog-pagination-btns catalog-pagination-btns--main" id="catalog-pagination-bottom"></div>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer footer--site-laconic" aria-label="Подвал">
+    <div class="container footer-site-laconic-inner">
+      <div class="footer-laconic-row footer-laconic-row--brand">
+        <span class="footer-laconic-brand" aria-hidden="true">REAXON</span>
+        <p class="footer-laconic-tagline" data-i18n="footerAbout">
+          Промышленные лакокрасочные материалы: эмали, грунтовки и сопутствующие решения для B2B и розницы.
+        </p>
+      </div>
+      <nav class="footer-laconic-nav" aria-label="Разделы сайта">
+        <a href="products.html" data-i18n="navCatalog" aria-current="page">Каталог</a>
+        <a href="price.html" data-i18n="navPrice">Прайс</a>
+        <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+        <a href="delivery.html" data-dp-delivery="footerLink" data-i18n="navDelivery">Доставка и оплата</a>
+        <a href="contact.html" data-i18n="navContacts">Контакты</a>
+      </nav>
+      <div class="footer-laconic-row footer-laconic-row--meta">
+        <a class="footer-laconic-tel" href="tel:+380676134220">+38 (067) 613-42-20</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="tel:+380676135155">+38 (067) 613-51-55</a>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-tel" href="tel:+380612209445">+38 (061) 220-94-45</a>
+        <span class="footer-laconic-fax-hint footer-phone-hint">т/факс</span>
+        <span class="footer-laconic-dot" aria-hidden="true">·</span>
+        <a class="footer-laconic-mail" href="mailto:reaxondh@gmail.com">reaxondh@gmail.com</a>
+        <span class="footer-laconic-dot footer-laconic-dot--wide" aria-hidden="true">·</span>
+        <span class="footer-laconic-addr">69002, Запорожье, ул. Константина Великого, 20</span>
+        <a class="footer-laconic-all" href="contact.html#contact" data-i18n="footerContactAll">Все реквизиты</a>
+      </div>
+    </div>
+  </footer>
+    </div>
+  </div>
+
+  <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
+    <div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-drawer-shell">
+        <header class="cart-header">
+          <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
+          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть корзину">
+            <svg class="cart-close-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="cart-modal-toolbar">
+          <label class="cart-sort-label">
+            <span class="cart-sort-text" data-i18n="cartSortLabel">Сортировка</span>
+            <select id="cart-sort-select" class="cart-sort-select" aria-label="Sort order">
+              <option value="price-asc" data-i18n="cartSortPriceAsc">От дешёвых к дорогим</option>
+              <option value="price-desc" data-i18n="cartSortPriceDesc">От дорогих к дешёвым</option>
+              <option value="name-asc" data-i18n="cartSortNameAsc">По названию (А–Я)</option>
+              <option value="add-order" data-i18n="cartSortAddOrder">Порядок добавления</option>
+            </select>
+          </label>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <footer class="cart-footer">
+          <div class="cart-footer-totals">
+            <div class="cart-grand-row">
+              <span data-i18n="cartGrandTotal">Итого по заказу</span>
+              <strong class="cart-grand-value"><span id="cart-total">0</span><span class="cart-currency"> грн</span></strong>
+            </div>
+          </div>
+          <div class="cart-footer-actions">
+            <button type="button" id="cart-pay-btn" class="btn btn-primary cart-pay-btn" data-i18n="payButton">Оплатить</button>
+            <button type="button" id="checkout" class="btn btn-ghost" data-i18n="checkoutRequest">Заявка без оплаты</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="catalog-pricing.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="script.js"></script>
+  <script src="home-auth-ui.js"></script>
+  <script src="products-page.js"></script>
+</body>
+</html>

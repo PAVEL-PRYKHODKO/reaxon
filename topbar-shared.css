@@ -1,0 +1,391 @@
+/* Верхняя панель как на главной (.topbar): лого | навигация | действия */
+.site-header {
+  background: #fff;
+  border-bottom: 1px solid var(--rd-line, #d7dce7);
+  box-shadow: var(--rd-shadow, 0 10px 24px rgba(12, 18, 34, 0.08));
+}
+
+.site-header-inner {
+  max-width: 100%;
+}
+
+.site-header .topbar {
+  /* Двухстрочная сетка. Верхняя строка: логотип | поле поиска | язык | корзина |
+     аккаунт | админка. Нижняя строка: навигация на всю ширину.
+     Поле поиска занимает «1fr» — реально центрируется между логотипом и
+     блоком языковых/иконных действий. */
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto auto;
+  grid-template-areas:
+    "logo search lang cart account admin"
+    "nav  nav    nav  nav  nav     nav";
+  align-items: center;
+  column-gap: clamp(8px, 1.4vw, 16px);
+  row-gap: clamp(8px, 1.2vw, 14px);
+  padding: clamp(10px, 1.6vw, 14px) 0;
+  border-bottom: none;
+}
+
+.site-header .topbar > .logo {
+  grid-area: logo;
+  justify-self: start;
+}
+
+.site-header .topbar > .topnav {
+  grid-area: nav;
+}
+
+/* .top-actions «растворяется» в гриде шапки — её дети становятся
+   самостоятельными грид-элементами и могут занять разные грид-области.
+   Это позволяет вынуть поле поиска вперёд (между логотипом и языком)
+   без изменения HTML-структуры. Селектор намеренно более специфичен,
+   чем общий `.site-header .top-actions { display: flex; ... }` ниже,
+   чтобы перебивать его на десктопе. */
+.site-header .topbar > .top-actions {
+  display: contents;
+}
+
+.site-header .top-actions > .header-search-inline,
+.site-header .top-actions > .topbar-search,
+.site-header .top-actions > .home-site-search {
+  grid-area: search;
+  justify-self: center;
+  align-self: center;
+}
+
+.site-header .top-actions > .lang-switcher {
+  grid-area: lang;
+  justify-self: end;
+}
+
+.site-header .top-actions > .cart-btn,
+.site-header .top-actions > .icon-btn.cart-btn {
+  grid-area: cart;
+}
+
+.site-header .top-actions > .header-account-trigger,
+.site-header .top-actions > a.icon-btn.header-account-trigger {
+  grid-area: account;
+}
+
+.site-header .top-actions > .admin-btn {
+  grid-area: admin;
+  justify-self: end;
+}
+
+.site-header .topnav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.6vw, 22px);
+  min-width: 0;
+  width: 100%;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 2px;
+}
+
+.site-header .topnav::-webkit-scrollbar {
+  height: 4px;
+}
+
+.site-header .topnav::-webkit-scrollbar-thumb {
+  background: rgba(42, 51, 71, 0.25);
+  border-radius: 4px;
+}
+
+.site-header .topnav a {
+  font-size: clamp(12px, 1.1vw, 13px);
+  font-weight: 700;
+  color: #2a3347;
+  white-space: nowrap;
+}
+
+.site-header .topnav a:hover {
+  color: var(--rd-blue, #153f97);
+}
+
+.site-header .topnav a[aria-current="page"] {
+  color: var(--rd-blue, #153f97);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-header .top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.site-header .icon-btn {
+  width: calc(34px * 0.95);
+  height: calc(34px * 0.95);
+  border: 1px solid var(--rd-line, #d7dce7);
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  font-size: calc(15px * 0.95);
+  line-height: 1;
+  color: var(--rd-text, #172033);
+}
+
+.site-header .icon-btn:hover {
+  border-color: rgba(21, 63, 151, 0.35);
+  background: #f8f9fc;
+}
+
+.site-header .icon-btn.header-account-trigger svg {
+  display: block;
+  width: calc(18px * 0.95);
+  height: calc(18px * 0.95);
+}
+
+/* Ссылка на account.html: те же визуальные стили, что у кнопки */
+.site-header a.icon-btn.header-account-trigger {
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header .cart-btn {
+  position: relative;
+}
+
+.site-header .cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -3px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--rd-red, #d62629);
+  display: grid;
+  place-items: center;
+}
+
+/* Поиск: нужен родитель .header-search-inline для script.js (оформление поля — styles.css / #site-search-input) */
+.site-header .topbar-search {
+  flex: 1 1 140px;
+  max-width: min(220px, 36vw);
+  min-width: 0;
+}
+
+.site-header .topbar-search .site-search-form {
+  width: 100%;
+}
+
+/* Поле поиска в шапке: всегда раскрыто, занимает доступную ширину между
+   логотипом и блоком действий. Переопределяем прежнее «коллапсируемое»
+   поведение (max-width: 0 → раскрытие по клику) — теперь поле всегда видно
+   и показывает placeholder. */
+.site-header .top-actions .home-site-search {
+  width: 100%;
+  max-width: clamp(220px, 32vw, 460px);
+  min-width: 0;
+}
+
+.site-header .top-actions .home-site-search .site-search-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: stretch;
+  gap: 6px;
+  width: 100%;
+}
+
+.site-header .top-actions .home-site-search .home-site-search-input-wrap,
+.site-header .top-actions .home-site-search.is-open .home-site-search-input-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  opacity: 1;
+  overflow: visible;
+  pointer-events: auto;
+  transition: none;
+}
+
+.site-header .top-actions .home-site-search .site-search-form input[type="search"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 26px;
+  padding: 0 12px;
+  border: 1px solid var(--rd-line, #d7dce7);
+  border-radius: 20px;
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--rd-text, #172033);
+  box-sizing: border-box;
+}
+
+.site-header .top-actions .home-site-search .site-search-submit--icon {
+  flex-shrink: 0;
+  width: auto;
+  height: auto;
+  min-width: 26px;
+  min-height: 26px;
+  margin: 0;
+  padding: 4px;
+  display: inline-grid;
+  place-items: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--rd-text, #172033);
+  cursor: pointer;
+  line-height: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.site-header .top-actions .home-site-search .site-search-submit--icon:hover {
+  color: var(--rd-blue, #153f97);
+}
+
+.site-header .top-actions .home-site-search .site-search-submit--icon:focus-visible {
+  outline: 2px solid var(--rd-blue, #153f97);
+  outline-offset: 2px;
+}
+
+.site-header .top-actions .home-site-search .site-search-submit-svg {
+  display: block;
+}
+
+.site-header .topbar-lang {
+  min-height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--rd-line, #d7dce7);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #fff;
+  color: var(--rd-text, #172033);
+  cursor: pointer;
+}
+
+.site-header .header-account-trigger.topbar-account-btn:not(.icon-btn),
+.site-header .auth-btn.topbar-account-btn:not(.icon-btn) {
+  min-height: 34px;
+  padding: 8px 10px;
+  border-radius: 2px;
+  border: 1px solid var(--rd-line, #d7dce7);
+  font-size: 12px;
+  font-weight: 700;
+  background: #fff;
+  color: var(--rd-blue-dark, #1f2d52);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.site-header a.auth-btn.topbar-account-btn:not(.icon-btn) {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.site-header .admin-btn {
+  min-height: 34px;
+  padding: 8px 10px;
+  border-radius: 2px;
+  border: 1px solid var(--rd-blue-dark, #1f2d52);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--rd-blue-dark, #1f2d52);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.site-header .admin-btn[hidden] {
+  display: none;
+}
+
+.site-header .header-account-trigger.topbar-account-btn:not(.icon-btn):hover,
+.site-header .auth-btn.topbar-account-btn:not(.icon-btn):hover {
+  border-color: rgba(21, 63, 151, 0.35);
+  background: #f8f9fc;
+}
+
+.site-header .admin-btn:hover {
+  filter: brightness(1.06);
+}
+
+@media (max-width: 900px) {
+  .site-header .topbar {
+    /* На узких экранах укладываем элементы вертикально: логотип → поиск →
+       действия → навигация. */
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "logo"
+      "search"
+      "actions"
+      "nav";
+  }
+
+  /* На мобильных возвращаем .top-actions к flex-режиму, чтобы язык + кнопки
+     ушли в одну строку. Поле поиска при этом «выпадает» из .top-actions и
+     занимает собственную грид-область. Селектор намеренно отзеркаливает
+     специфичность десктопного `.site-header .topbar > .top-actions`. */
+  .site-header .topbar > .top-actions {
+    display: flex;
+    grid-area: actions;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .site-header .topbar > .top-actions > .lang-switcher,
+  .site-header .topbar > .top-actions > .cart-btn,
+  .site-header .topbar > .top-actions > .icon-btn.cart-btn,
+  .site-header .topbar > .top-actions > .header-account-trigger,
+  .site-header .topbar > .top-actions > a.icon-btn.header-account-trigger,
+  .site-header .topbar > .top-actions > .admin-btn {
+    grid-area: auto;
+    justify-self: auto;
+    align-self: auto;
+  }
+
+  .site-header .topbar > .logo,
+  .site-header .topbar > .topnav,
+  .site-header .topbar > .top-actions > .header-search-inline,
+  .site-header .topbar > .top-actions > .topbar-search,
+  .site-header .topbar > .top-actions > .home-site-search {
+    justify-self: stretch;
+  }
+
+  .site-header .topnav {
+    justify-content: flex-start;
+  }
+
+  .site-header .topbar-search,
+  .site-header .topbar > .top-actions > .home-site-search {
+    width: 100%;
+    max-width: none;
+    flex: 1 1 100%;
+  }
+}

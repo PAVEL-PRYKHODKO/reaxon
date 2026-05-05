@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DP Coatings CRM Workspace</title>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(location.search).get("embed") === "admin") {
+          document.documentElement.classList.add("crm-embed-admin");
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="crm-sales.css" />
+</head>
+<body>
+  <div class="crm-workspace">
+    <aside class="crm-left">
+      <div class="crm-left-brand">
+        <strong>DP CRM</strong>
+        <span id="crm-role-hint">Проверка доступа…</span>
+      </div>
+      <nav class="crm-left-menu">
+        <button class="crm-left-item is-active" data-section="pipeline" type="button">Входящие</button>
+        <div class="crm-left-group" id="crm-contacts-menu-group">
+          <button class="crm-left-item" data-section="contacts" data-contacts-toggle="true" type="button">Контакты</button>
+          <div class="crm-left-submenu" id="crm-contacts-submenu">
+            <button class="crm-left-subitem crm-contact-subitem" data-contacts-category="admin" type="button">Администратор</button>
+            <button class="crm-left-subitem crm-contact-subitem" data-contacts-category="moderator" type="button">Модератор</button>
+            <button class="crm-left-subitem crm-contact-subitem" data-contacts-category="accountant" type="button">Бухгалтер</button>
+            <button class="crm-left-subitem crm-contact-subitem" data-contacts-category="workers" type="button">Работники</button>
+            <button class="crm-left-subitem crm-contact-subitem" data-contacts-category="client" type="button">Клиенты</button>
+            <button class="crm-left-subitem crm-contact-subitem" data-contacts-category="blacklist" type="button">Черный список</button>
+          </div>
+        </div>
+        <div class="crm-left-group" id="crm-tasks-menu-group">
+          <button class="crm-left-item" data-section="tasks" data-tasks-toggle="true" type="button">Задачи</button>
+          <div class="crm-left-submenu" id="crm-tasks-submenu">
+            <button class="crm-left-subitem crm-task-subitem" data-task-subsection="form" type="button">Поставить задачу</button>
+            <button class="crm-left-subitem crm-task-subitem" data-task-subsection="tasklist" type="button">Список задач</button>
+            <button class="crm-left-subitem crm-task-subitem" data-task-subsection="list" type="button">Архив Задач</button>
+          </div>
+        </div>
+        <button class="crm-left-item" data-section="calendar" type="button">Календарь</button>
+        <button class="crm-left-item" data-section="marketing" type="button">Маркетинг</button>
+        <button class="crm-left-item" data-section="integrations" type="button">Интеграции</button>
+        <div class="crm-left-group" id="crm-warehouse-menu-group">
+          <button class="crm-left-item" data-section="warehouse" data-warehouse-toggle="true" type="button">Склад</button>
+          <div class="crm-left-submenu" id="crm-warehouse-submenu">
+            <button class="crm-left-subitem" data-warehouse-subsection="form" type="button">Форма добавления товара</button>
+            <button class="crm-left-subitem" data-warehouse-subsection="history" type="button">История добавления</button>
+            <button class="crm-left-subitem" data-warehouse-subsection="movements" type="button">Журнал движения</button>
+            <button class="crm-left-subitem" data-warehouse-subsection="flows" type="button">Приход/Уход</button>
+            <button class="crm-left-subitem" data-warehouse-subsection="pricelist" type="button">Прайс-лист</button>
+            <button class="crm-left-subitem" data-warehouse-subsection="catalog-pack-photos" type="button">Фото SKU</button>
+          </div>
+        </div>
+        <button class="crm-left-item" data-section="reports" type="button">Отчеты</button>
+      </nav>
+      <div class="crm-left-foot">
+        <a href="index.html" class="crm-btn crm-btn-ghost">На сайт</a>
+        <button id="crm-logout-btn" class="crm-btn crm-btn-ghost" type="button">Выйти</button>
+      </div>
+    </aside>
+
+    <main class="crm-center">
+      <header class="crm-top">
+        <h1 id="crm-section-title">Основная воронка</h1>
+        <div class="crm-top-meta" id="crm-top-meta">...</div>
+      </header>
+
+      <section class="crm-content crm-screen is-active" id="crm-section-pipeline">
+        <section class="crm-stages" id="crm-stages"></section>
+
+        <section class="crm-subtabs" id="crm-subtabs">
+          <button class="is-active" data-subtab="general" type="button">Общие</button>
+          <button data-subtab="products" type="button">Товары</button>
+          <button data-subtab="invoices" type="button">Счета</button>
+          <button data-subtab="relations" type="button">Связи</button>
+          <button data-subtab="history" type="button">История</button>
+        </section>
+        <section id="crm-subtab-content" class="crm-subtab-content"></section>
+
+        <div class="crm-deals-strip-wrap">
+          <div class="crm-toolbar">
+            <input id="crm-lead-search" type="search" placeholder="Фильтр сделок" />
+            <button id="crm-leads-refresh" class="crm-btn" type="button">Обновить</button>
+            <button id="crm-add-deal" class="crm-btn crm-btn-primary" type="button">Добавить сделку</button>
+          </div>
+          <div id="crm-deals-strip" class="crm-deals-strip"></div>
+        </div>
+
+        <div class="crm-grid">
+          <section class="crm-panel">
+            <header class="crm-panel-head">
+              <h2>О сделке</h2>
+              <button id="crm-open-editor" class="crm-link" type="button">изменить</button>
+            </header>
+            <div id="crm-deal-info" class="crm-info"></div>
+            <div class="crm-panel-head">
+              <h3>Сквозная аналитика</h3>
+              <button id="crm-generate-report" class="crm-link" type="button">отчет CSV</button>
+            </div>
+            <div id="crm-analytics-kpi" class="crm-kpi"></div>
+          </section>
+
+          <section class="crm-panel">
+            <header class="crm-panel-head">
+              <h2>Активности</h2>
+              <span class="crm-small">таймлайн</span>
+            </header>
+            <form id="crm-comm-form" class="crm-form-inline">
+              <select id="crm-comm-channel">
+                <option value="email">Email</option>
+                <option value="facebook-messenger">Messenger</option>
+                <option value="telegram">Telegram</option>
+                <option value="whatsapp">WhatsApp</option>
+              </select>
+              <input id="crm-comm-message" type="text" placeholder="Что нужно сделать/отправить..." required />
+              <button class="crm-btn crm-btn-primary" type="submit">Добавить</button>
+            </form>
+            <form id="crm-reply-lk-form" class="crm-reply-lk-form">
+              <label class="crm-reply-lk-form-label" for="crm-reply-lk-message">Сообщение в личный кабинет</label>
+              <textarea
+                id="crm-reply-lk-message"
+                rows="3"
+                placeholder="Клиент увидит на сайте в кабинете; копия уйдёт на email"
+                required
+              ></textarea>
+              <button class="crm-btn crm-btn-primary" type="submit">Отправить в ЛК</button>
+            </form>
+            <p id="crm-reply-lk-hint" class="crm-small crm-reply-lk-hint" aria-live="polite"></p>
+            <p id="crm-pipeline-status" class="crm-status"></p>
+            <div id="crm-timeline" class="crm-timeline"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="crm-bottom crm-screen" id="crm-section-contacts-screen">
+        <div class="crm-bottom-col" id="crm-section-contacts">
+          <h3>Контакты и дубликаты</h3>
+          <div class="crm-toolbar">
+            <input id="crm-contacts-search" type="search" placeholder="Поиск контактов" />
+            <select id="crm-contacts-category">
+              <option value="all">Все</option>
+              <option value="admin">Администратор</option>
+              <option value="moderator">Модератор</option>
+              <option value="accountant">Бухгалтер</option>
+              <option value="workers">Работники</option>
+              <option value="client">Клиенты</option>
+              <option value="blacklist">Черный список</option>
+            </select>
+            <button id="crm-dedupe-contacts" class="crm-btn" type="button">Объединить дубликаты</button>
+            <button id="crm-export-contacts" class="crm-btn" type="button">Экспорт базы клиентов CSV</button>
+          </div>
+          <div class="crm-contacts-layout">
+            <section class="crm-warehouse-section">
+              <h4>Контакты</h4>
+              <div id="crm-contacts-list" class="crm-warehouse-table-wrap"></div>
+            </section>
+            <section class="crm-warehouse-section">
+              <h4>Карточка</h4>
+              <aside id="crm-contact-profile" class="crm-subtab-content"></aside>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="crm-bottom crm-screen" id="crm-section-tasks-screen">
+        <div class="crm-bottom-col">
+          <h3>Задачи менеджеров</h3>
+          <section class="crm-task-pane" data-task-pane="form">
+            <div class="crm-warehouse-section">
+              <h4>Поставить задачу</h4>
+              <div class="crm-warehouse-block">
+                <form id="crm-task-form" class="crm-toolbar">
+                  <input id="crm-task-title" type="text" placeholder="Название задачи" required />
+                  <select id="crm-task-target-role" required>
+                    <option value="manager">Менеджер</option>
+                    <option value="accountant">Бухгалтер</option>
+                    <option value="moderator">Модератор</option>
+                    <option value="admin">Администратор</option>
+                  </select>
+                  <select id="crm-task-assignee" required><option value="">Выбрать сотрудника</option></select>
+                  <select id="crm-task-priority">
+                    <option value="low">Низкий приоритет</option>
+                    <option value="medium" selected>Средний приоритет</option>
+                    <option value="high">Высокий приоритет</option>
+                  </select>
+                  <input id="crm-task-date" type="date" readonly />
+                  <input id="crm-task-deadline" type="date" />
+                  <textarea id="crm-task-comment" placeholder="Комментарий к задаче" rows="3"></textarea>
+                  <button class="crm-btn crm-btn-primary" type="submit">Поставить задачу</button>
+                </form>
+              </div>
+            </div>
+          </section>
+          <section class="crm-task-pane is-active" data-task-pane="list">
+            <div class="crm-warehouse-section">
+              <h4>Архив выполненных задач</h4>
+              <div class="crm-warehouse-block">
+                <div class="crm-toolbar">
+                  <input id="crm-task-search" type="search" placeholder="Поиск по названию задачи" />
+                  <select id="crm-task-filter-assignee"><option value="">Все исполнители</option></select>
+                  <select id="crm-task-filter-deadline">
+                    <option value="all">Все сроки</option>
+                    <option value="today">Только сегодня</option>
+                    <option value="week">Ближайшие 7 дней</option>
+                    <option value="overdue">Просроченные</option>
+                    <option value="none">Без срока</option>
+                  </select>
+                  <select id="crm-task-archive-period">
+                    <option value="all">Архив: весь период</option>
+                    <option value="week">Архив: 7 дней</option>
+                    <option value="month">Архив: 30 дней</option>
+                    <option value="quarter">Архив: 90 дней</option>
+                  </select>
+                  <button id="crm-task-filters-reset" class="crm-btn" type="button">Сбросить фильтры</button>
+                </div>
+                <div id="crm-tasks-list" class="crm-warehouse-table-wrap"></div>
+              </div>
+            </div>
+          </section>
+          <section class="crm-task-pane" data-task-pane="tasklist">
+            <div class="crm-warehouse-section">
+              <h4>Список задач</h4>
+              <div class="crm-warehouse-block">
+                <div class="crm-toolbar">
+                  <input id="crm-task-plain-search" type="search" placeholder="Поиск задачи" />
+                  <select id="crm-task-plain-assignee"><option value="">Все исполнители</option></select>
+                  <input id="crm-task-plain-date-from" type="date" />
+                  <input id="crm-task-plain-date-to" type="date" />
+                  <select id="crm-task-plain-sort-deadline">
+                    <option value="none">Дедлайн: без сортировки</option>
+                    <option value="asc">Дедлайн: ближайшие</option>
+                    <option value="desc">Дедлайн: дальние</option>
+                  </select>
+                  <select id="crm-task-plain-status">
+                    <option value="">Статус: все</option>
+                    <option value="todo">В Работе</option>
+                    <option value="in_progress">В процессе</option>
+                    <option value="done">Завершена</option>
+                  </select>
+                </div>
+                <div id="crm-task-plain-list" class="crm-warehouse-table-wrap"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="crm-bottom crm-screen" id="crm-section-calendar-screen">
+        <div class="crm-bottom-col">
+          <h3>Календарь событий и дедлайнов</h3>
+          <div class="crm-calendar-layout">
+            <div class="crm-calendar-left">
+              <div class="crm-toolbar">
+                <button id="crm-calendar-prev" class="crm-btn" type="button">← Пред. месяц</button>
+                <input id="crm-calendar-month" type="month" />
+                <button id="crm-calendar-next" class="crm-btn" type="button">След. месяц →</button>
+                <button id="crm-calendar-today" class="crm-btn" type="button">Сегодня</button>
+              </div>
+              <div id="crm-calendar-grid" class="crm-calendar-grid"></div>
+              <form id="crm-calendar-form" class="crm-toolbar">
+                <input id="crm-calendar-title" type="text" placeholder="Событие / встреча / звонок" required />
+                <input id="crm-calendar-date" type="date" required />
+                <input id="crm-calendar-time" type="time" />
+                <select id="crm-calendar-type">
+                  <option value="meeting">Встреча</option>
+                  <option value="call">Звонок</option>
+                  <option value="delivery">Доставка</option>
+                  <option value="deadline">Дедлайн</option>
+                  <option value="other">Другое</option>
+                </select>
+                <button class="crm-btn crm-btn-primary" type="submit">Добавить событие</button>
+              </form>
+              <div class="crm-toolbar">
+                <button id="crm-calendar-sync" class="crm-btn" type="button">Синхронизировать локальные события в API</button>
+              </div>
+              <p id="crm-calendar-status" class="crm-status"></p>
+            </div>
+            <aside class="crm-calendar-right">
+              <h4 style="margin:0.1rem 0 0.35rem">События выбранного дня</h4>
+              <div id="crm-calendar-day-list" class="crm-mini-list"></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="crm-bottom crm-screen" id="crm-section-marketing-screen">
+        <div class="crm-bottom-col">
+          <h3>Маркетинговые кампании</h3>
+          <form id="crm-marketing-form" class="crm-toolbar">
+            <input id="crm-marketing-title" type="text" placeholder="Название кампании" required />
+            <input id="crm-marketing-budget" type="text" placeholder="Бюджет" />
+            <button class="crm-btn crm-btn-primary" type="submit">Создать кампанию</button>
+          </form>
+          <div id="crm-marketing-list" class="crm-mini-list"></div>
+        </div>
+      </section>
+
+      <section class="crm-bottom crm-screen" id="crm-section-integrations-screen">
+        <div class="crm-bottom-col" id="crm-section-integrations">
+          <h3>Интеграции</h3>
+          <div class="crm-toolbar">
+            <button id="crm-gmail-connect" class="crm-btn" type="button">Gmail OAuth</button>
+            <button id="crm-binotel-test" class="crm-btn" type="button">Binotel test</button>
+          </div>
+          <div id="crm-integrations-list" class="crm-mini-list"></div>
+        </div>
+      </section>
+
+      <section class="crm-bottom crm-screen" id="crm-section-warehouse-screen">
+        <div class="crm-bottom-col">
+          <h3>Склад: товары и остатки</h3>
+          <section class="crm-warehouse-pane is-active" data-warehouse-pane="form">
+            <h4>Форма добавления товара</h4>
+            <form id="crm-warehouse-form" class="crm-warehouse-table-wrap">
+              <table class="crm-warehouse-table">
+                <thead>
+                  <tr><th>Номенклатура</th><th>Категория</th><th>Операция</th><th>Количество</th><th>Ед. изм.</th><th>Дата</th><th>Действие</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input id="crm-warehouse-name" type="text" placeholder="Товар/позиция" required /></td>
+                    <td>
+                      <select id="crm-warehouse-category">
+                        <option value="components">Компоненты</option>
+                        <option value="pigments">Пигменты</option>
+                        <option value="lacquer">Лак</option>
+                        <optgroup label="Тара">
+                          <option value="containers:bucket">Ведро</option>
+                          <option value="containers:jar">Банка</option>
+                          <option value="containers:drum">Барабан</option>
+                        </optgroup>
+                        <option value="solvents">Растворители</option>
+                        <option value="additives">Добавки</option>
+                        <option value="other">Прочее</option>
+                      </select>
+                    </td>
+                    <td><select id="crm-warehouse-action"><option value="in">Поступление (+)</option><option value="out">Списание (-)</option></select></td>
+                    <td><input id="crm-warehouse-qty" type="number" min="0" step="1" placeholder="Количество" /></td>
+                    <td><select id="crm-warehouse-unit"><option value="kg">кг</option><option value="l">л</option><option value="pcs">шт</option></select></td>
+                    <td><input id="crm-warehouse-date" type="date" /></td>
+                    <td><button class="crm-btn crm-btn-primary" type="submit">Добавить</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+          </section>
+
+          <section class="crm-warehouse-pane" data-warehouse-pane="flows">
+            <h4>Приход / Уход (остатки и фильтры)</h4>
+            <div class="crm-toolbar">
+              <input id="crm-warehouse-filter" type="search" placeholder="Фильтр по категории или названию" />
+              <select id="crm-warehouse-filter-category"><option value="">Все категории</option><option value="components">Компоненты</option><option value="pigments">Пигменты</option><option value="lacquer">Лак</option><option value="containers">Тара</option><option value="solvents">Растворители</option><option value="additives">Добавки</option><option value="other">Прочее</option></select>
+              <input id="crm-warehouse-flow-date-from" type="date" />
+              <input id="crm-warehouse-flow-date-to" type="date" />
+              <select id="crm-warehouse-sort"><option value="name_asc">Сортировка: Название А-Я</option><option value="name_desc">Сортировка: Название Я-А</option><option value="qty_desc">Сортировка: Остаток ↓</option><option value="qty_asc">Сортировка: Остаток ↑</option><option value="date_desc">Сортировка: Новые сверху</option><option value="date_asc">Сортировка: Старые сверху</option></select>
+              <select id="crm-warehouse-export-period">
+                <option value="day">Разбивка: по дням</option>
+                <option value="month">Разбивка: по месяцам</option>
+                <option value="quarter">Разбивка: по кварталам</option>
+              </select>
+              <button id="crm-warehouse-export-excel" class="crm-btn" type="button">Экспорт в Excel</button>
+              <button id="crm-warehouse-export-movements-excel" class="crm-btn" type="button">Экспорт журнала Excel</button>
+            </div>
+            <div id="crm-warehouse-stats" class="crm-kpi"></div>
+            <div id="crm-warehouse-list" class="crm-warehouse-table-wrap"></div>
+          </section>
+
+          <section class="crm-warehouse-pane" data-warehouse-pane="history">
+            <h4>История добавления</h4>
+            <div class="crm-toolbar">
+              <input id="crm-warehouse-history-search" type="search" placeholder="Поиск: название/категория/дата" />
+              <select id="crm-warehouse-history-category">
+                <option value="">Все категории</option>
+                <option value="components">Компоненты</option>
+                <option value="pigments">Пигменты</option>
+                <option value="lacquer">Лак</option>
+                <option value="containers">Тара</option>
+                <option value="solvents">Растворители</option>
+                <option value="additives">Добавки</option>
+                <option value="other">Прочее</option>
+              </select>
+              <input id="crm-warehouse-history-date" type="date" />
+              <select id="crm-warehouse-history-sort">
+                <option value="category_asc">Сортировка: Категория А-Я</option>
+                <option value="date_desc">Сортировка: Новые сверху</option>
+                <option value="date_asc">Сортировка: Старые сверху</option>
+                <option value="name_asc">Сортировка: Название А-Я</option>
+                <option value="name_desc">Сортировка: Название Я-А</option>
+              </select>
+            </div>
+            <div id="crm-warehouse-history" class="crm-warehouse-table-wrap"></div>
+          </section>
+
+          <section class="crm-warehouse-pane" data-warehouse-pane="pricelist">
+            <div class="crm-price-site-block">
+              <h4>Прайс-лист каталога (как на сайте)</h4>
+              <p class="crm-small">
+                Те же данные, что после загрузки CSV в админ-панели: цены за кг с НДС и без, суммы по опорным фасовкам 2,8 / 19,4 / 46,6&nbsp;кг. Фильтры и экспорт в Excel (.xlsx) или PDF совпадают со страницей прайса.
+              </p>
+              <div class="crm-price-site-toolbar filters">
+                <select id="crm-price-family-filter">
+                  <option value="all">Все типы покрытия</option>
+                </select>
+                <input
+                  id="crm-price-search"
+                  type="search"
+                  data-ru-placeholder="Поиск по названию, артикулу или типу покрытия"
+                  data-uk-placeholder="Пошук за назвою, артикулом або типом покриття"
+                  placeholder="Поиск по названию, артикулу или типу покрытия"
+                />
+                <div class="crm-price-download-wrap dp-price-download-wrap">
+                  <button
+                    type="button"
+                    id="crm-price-download"
+                    class="crm-btn crm-btn-primary dp-price-download-trigger"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    aria-controls="crm-price-download-dropdown"
+                  >
+                    Скачать прайс
+                  </button>
+                  <div
+                    id="crm-price-download-dropdown"
+                    class="crm-price-download-dropdown dp-price-download-dropdown is-hidden"
+                    role="menu"
+                    aria-label="Формат выгрузки прайса"
+                  >
+                    <button type="button" class="crm-btn dp-price-download-item" id="crm-price-download-csv" role="menuitem">
+                      Excel (.xlsx)
+                    </button>
+                    <button type="button" class="crm-btn dp-price-download-item" id="crm-price-download-pdf" role="menuitem">
+                      Скачать PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="crm-price-table-scroll-wrap price-table-scroll price-table-scroll--collapsed" id="crm-price-table-scroll">
+                <table class="crm-warehouse-table crm-price-site-table price-table" id="crm-price-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</th>
+                      <th>Артикул</th>
+                      <th>Наименование</th>
+                      <th>Без НДС /<br />кг</th>
+                      <th>С НДС /<br />кг</th>
+                      <th scope="col">2,8&nbsp;кг<br /><span class="price-th-sub">без НДС</span></th>
+                      <th scope="col">≈19,4&nbsp;кг<br /><span class="price-th-sub">без НДС</span></th>
+                      <th scope="col">≈46,6&nbsp;кг<br /><span class="price-th-sub">без НДС</span></th>
+                      <th scope="col">2,8&nbsp;кг<br /><span class="price-th-sub">с НДС</span></th>
+                      <th scope="col">≈19,4&nbsp;кг<br /><span class="price-th-sub">с НДС</span></th>
+                      <th scope="col">≈46,6&nbsp;кг<br /><span class="price-th-sub">с НДС</span></th>
+                    </tr>
+                  </thead>
+                  <tbody id="crm-price-table-body"></tbody>
+                </table>
+              </div>
+              <div class="crm-price-table-expand-actions">
+                <button type="button" class="crm-btn" id="crm-price-show-more" hidden aria-expanded="false" aria-controls="crm-price-table-scroll">
+                  Показать ещё
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="crm-warehouse-pane" data-warehouse-pane="catalog-pack-photos">
+            <h4>Фото каталога по фасовкам</h4>
+            <p class="crm-small">
+              Те же URL, что в <code>site-content.json</code> для карточек на сайте. Загрузка и удаление — через API медиа (как в админке → Карточка товара). Обновление списка после публикаций на сайте.
+            </p>
+            <div class="crm-toolbar">
+              <input
+                id="crm-catalog-pack-photos-filter"
+                type="search"
+                class="crm-catalog-pack-photos-filter"
+                placeholder="Фильтр: артикул, название или id…"
+              />
+              <button type="button" class="crm-btn crm-btn-primary" id="crm-catalog-pack-photos-refresh">Обновить</button>
+              <a class="crm-btn crm-btn-ghost" href="admin-panel.html#product-card" target="_blank" rel="noopener">Админ: карточка товара</a>
+            </div>
+            <p id="crm-catalog-pack-photos-status" class="crm-status" role="status"></p>
+            <div id="crm-catalog-pack-photos-root" class="crm-catalog-pack-photos-root"></div>
+          </section>
+
+          <section class="crm-warehouse-pane" data-warehouse-pane="movements">
+            <h4>Журнал движения</h4>
+            <div class="crm-toolbar">
+              <input id="crm-warehouse-movements-search" type="search" placeholder="Поиск: название/категория/дата" />
+              <select id="crm-warehouse-movements-category">
+                <option value="">Все категории</option>
+                <option value="components">Компоненты</option>
+                <option value="pigments">Пигменты</option>
+                <option value="lacquer">Лак</option>
+                <option value="containers">Тара</option>
+                <option value="solvents">Растворители</option>
+                <option value="additives">Добавки</option>
+                <option value="other">Прочее</option>
+              </select>
+              <input id="crm-warehouse-movements-date" type="date" />
+              <select id="crm-warehouse-movements-sort">
+                <option value="category_asc">Сортировка: Категория А-Я</option>
+                <option value="date_desc">Сортировка: Новые сверху</option>
+                <option value="date_asc">Сортировка: Старые сверху</option>
+                <option value="name_asc">Сортировка: Название А-Я</option>
+                <option value="name_desc">Сортировка: Название Я-А</option>
+              </select>
+            </div>
+            <div id="crm-warehouse-movements" class="crm-warehouse-table-wrap"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="crm-bottom crm-screen" id="crm-section-reports-screen">
+        <div class="crm-bottom-col">
+          <h3>Отчеты</h3>
+          <div class="crm-toolbar">
+            <button id="crm-generate-report-side" class="crm-btn crm-btn-primary" type="button">Сформировать отчет CSV</button>
+          </div>
+          <div id="crm-reports-list" class="crm-mini-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="crm-deal-modal" class="crm-modal">
+    <form method="dialog" class="crm-modal-card" id="crm-deal-form">
+      <h3>Редактирование сделки</h3>
+      <input type="hidden" id="crm-deal-id" />
+      <label>Клиент<input id="crm-deal-customer" type="text" required /></label>
+      <label>Телефон<input id="crm-deal-phone" type="text" required /></label>
+      <label>Email<input id="crm-deal-email" type="email" /></label>
+      <label>Статус
+        <select id="crm-deal-status">
+          <option value="new">Входящие</option>
+          <option value="in_progress">Согласование</option>
+          <option value="quoted">На производстве</option>
+          <option value="won">Проверка</option>
+          <option value="lost">Завершить сделку</option>
+        </select>
+      </label>
+      <label>Приоритет
+        <select id="crm-deal-priority">
+          <option value="normal">Обычный</option>
+          <option value="high">Высокий</option>
+        </select>
+      </label>
+      <label>Ответственный
+        <select id="crm-deal-assignee">
+          <option value="">Не назначен</option>
+        </select>
+      </label>
+      <label>Тема<input id="crm-deal-topic" type="text" maxlength="200" placeholder="как в форме на сайте" /></label>
+      <label>Комментарий<textarea id="crm-deal-comment" rows="3"></textarea></label>
+      <div class="crm-modal-actions">
+        <button class="crm-btn crm-btn-primary" id="crm-deal-save" type="submit" value="save">Сохранить</button>
+        <button class="crm-btn" type="submit" value="cancel">Закрыть</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="products-data.js"></script>
+  <script src="catalog-pricing.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script>
+    window.DP_PRICE_TABLE_IDS = {
+      tbodyId: "crm-price-table-body",
+      tableId: "crm-price-table",
+      scrollId: "crm-price-table-scroll",
+      showMoreBtnId: "crm-price-show-more",
+      familyFilterId: "crm-price-family-filter",
+      searchInputId: "crm-price-search",
+      downloadBtnId: "crm-price-download",
+      downloadDropdownId: "crm-price-download-dropdown",
+      downloadCsvBtnId: "crm-price-download-csv",
+      downloadPdfBtnId: "crm-price-download-pdf",
+      adminBarId: "",
+      adminLeadId: "",
+      confirmChangesBtnId: "",
+      discardChangesBtnId: "",
+    };
+    document.body.dataset.crmEmbeddedPriceTable = "1";
+  </script>
+  <script src="price-page.js"></script>
+  <script src="crm-sales-runtime-loader.js"></script>
+</body>
+</html>
