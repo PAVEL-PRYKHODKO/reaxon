@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { randomUUID } from "crypto";
+import { randomUUID, randomBytes, createHash, timingSafeEqual } from "crypto";
 import { fileURLToPath } from "url";
 import { DEFAULT_DELIVERY_PAGE_V2 } from "./delivery-v2-defaults.js";
 import { initCrmBackend, crmSnapshot, crmUpdate, crmUsesPostgres } from "./lib/crm-backend.js";
@@ -18,6 +18,7 @@ import {
   sendLeadCreatedMails,
   sendWelcomeMail,
   sendSiteInboxMessageMail,
+  sendPasswordResetMail,
 } from "./lib/transactional-mail.mjs";
 import { notifyTelegramBannerLead } from "./lib/telegram-banner-notify.mjs";
 
@@ -1210,10 +1211,21 @@ function sanitizeCatalogPackImages(raw) {
     const uRaw = String(v0 || "").trim().slice(0, 520);
     const pathOnly = uRaw.split(/[?\s]/)[0];
     if (!/^\/uploads\/products\/[^/?]+\.(png|jpg|jpeg|webp)$/i.test(pathOnly)) continue;
-    out[k] = pathOnly;
+    let safeUrl = pathOnly;
+    const qIdx = uRaw.indexOf("?");
+    if (qIdx >= 0) {
+      const q = uRaw.slice(qIdx + 1).trim();
+      if (/^_=\d{6,}$/.test(q)) safeUrl = `${pathOnly}?${q}`;
+    }
+    out[k] = safeUrl;
     n += 1;
   }
   return out;
+}
+
+function sanitizeCatalogPackImageKey(rawKey) {
+  const k = String(rawKey || "").replace(/[^\w.:_-]/g, "").slice(0, 48);
+  return k || "";
 }
 
 function sanitizeProductOverride(raw) {
@@ -1523,6 +1535,8 @@ const loginAttemptState = new Map();
 const LOGIN_ATTEMPT_TTL_MS = 15 * 60 * 1000;
 const LOGIN_MAX_FAILED = isProd ? 8 : 30;
 const LOGIN_LOCK_MS = isProd ? 15 * 60 * 1000 : 2 * 60 * 1000;
+const PASSWORD_RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
+const PASSWORD_RESET_TOKEN_BYTES = 32;
 
 function pruneLoginAttemptState(now = Date.now()) {
   for (const [k, v] of loginAttemptState.entries()) {
@@ -1563,6 +1577,23 @@ function registerLoginFailure(req, identifier) {
 
 function clearLoginFailures(req, identifier) {
   loginAttemptState.delete(loginAttemptKey(req, identifier));
+}
+
+function hashPasswordResetToken(rawToken) {
+  return createHash("sha256").update(String(rawToken || ""), "utf8").digest("hex");
+}
+
+function equalHashSafe(a, b) {
+  const sa = String(a || "");
+  const sb = String(b || "");
+  const ba = Buffer.from(sa, "utf8");
+  const bb = Buffer.from(sb, "utf8");
+  if (ba.length !== bb.length) return false;
+  try {
+    return timingSafeEqual(ba, bb);
+  } catch {
+    return false;
+  }
 }
 
 function authMiddleware(req, res, next) {
@@ -1804,6 +1835,15 @@ const authRegisterLimiter = rateLimit({
   message: { error: "rate_limited", message: "Слишком много регистраций с этого адреса. Попробуйте позже." },
   standardHeaders: true,
   legacyHeaders: false,
+});
+
+const authForgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isProd ? 8 : 120,
+  message: { error: "rate_limited", message: "Слишком много запросов на восстановление пароля. Попробуйте позже." },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false,
 });
 
 const leadsPostLimiter = rateLimit({
@@ -2265,6 +2305,85 @@ app.post("/api/auth/login", authLoginLimiter, async (req, res) => {
     token,
     user: publicUser(user),
   });
+});
+
+app.post("/api/auth/forgot-password", authForgotPasswordLimiter, async (req, res) => {
+  const body = req.body || {};
+  const cleanEmail = String(body.email || "").trim().toLowerCase();
+  if (!cleanEmail || !cleanEmail.includes("@")) {
+    return res.json({ ok: true, message: "Если аккаунт с таким email существует, мы отправили ссылку для восстановления." });
+  }
+  const now = Date.now();
+  let targetUser = null;
+  let resetUrl = "";
+  await crmUpdate(async (db) => {
+    const user = db.users.find((u) => String(u.email || "").toLowerCase() === cleanEmail);
+    if (!user) return;
+    const rawToken = randomBytes(PASSWORD_RESET_TOKEN_BYTES).toString("hex");
+    const tokenHash = hashPasswordResetToken(rawToken);
+    user.passwordResetTokenHash = tokenHash;
+    user.passwordResetExpiresAt = new Date(now + PASSWORD_RESET_TOKEN_TTL_MS).toISOString();
+    user.updatedAt = new Date().toISOString();
+    targetUser = user;
+    const baseForLinks = PUBLIC_BASE_URL || `${req.protocol}://${req.get("host") || "localhost"}`;
+    resetUrl = `${baseForLinks.replace(/\/+$/, "")}/auth.html?reset_token=${encodeURIComponent(rawToken)}`;
+  });
+  if (targetUser && resetUrl && isTransactionalMailConfigured()) {
+    void sendPasswordResetMail({
+      toEmail: targetUser.email,
+      customerName: targetUser.name || "",
+      resetUrl,
+      ttlMinutes: Math.round(PASSWORD_RESET_TOKEN_TTL_MS / 60000),
+    }).catch((err) => console.error("[mail] password reset failed:", err?.message || err));
+  }
+  return res.json({ ok: true, message: "Если аккаунт с таким email существует, мы отправили ссылку для восстановления." });
+});
+
+app.post("/api/auth/reset-password", authForgotPasswordLimiter, async (req, res) => {
+  const body = req.body || {};
+  const rawToken = String(body.token || "").trim();
+  const newPassword = String(body.newPassword || "");
+  const resetPasswordError = passwordPolicyError(newPassword);
+  if (!rawToken || rawToken.length < 32) {
+    return res.status(400).json({ error: "invalid_token", message: "Ссылка восстановления недействительна." });
+  }
+  if (resetPasswordError) {
+    return res.status(400).json({ error: "invalid_new_password", message: resetPasswordError });
+  }
+  const tokenHash = hashPasswordResetToken(rawToken);
+  let userOut = null;
+  let newToken = null;
+  let notFound = false;
+  let expired = false;
+  await crmUpdate(async (db) => {
+    const user = db.users.find((u) => {
+      const h = String(u.passwordResetTokenHash || "");
+      if (!h) return false;
+      return equalHashSafe(h, tokenHash);
+    });
+    if (!user) {
+      notFound = true;
+      return;
+    }
+    const exp = new Date(user.passwordResetExpiresAt || 0).getTime();
+    if (!Number.isFinite(exp) || exp < Date.now()) {
+      expired = true;
+      delete user.passwordResetTokenHash;
+      delete user.passwordResetExpiresAt;
+      user.updatedAt = new Date().toISOString();
+      return;
+    }
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    delete user.passwordResetTokenHash;
+    delete user.passwordResetExpiresAt;
+    user.updatedAt = new Date().toISOString();
+    userOut = publicUser(user);
+    newToken = signToken(user);
+  });
+  if (notFound || expired || !userOut || !newToken) {
+    return res.status(400).json({ error: "invalid_or_expired_token", message: "Ссылка восстановления устарела или недействительна." });
+  }
+  return res.json({ ok: true, token: newToken, user: userOut });
 });
 
 app.get("/api/auth/me", authMiddleware, async (req, res) => {
@@ -3642,6 +3761,12 @@ function productImageBaseFromUrl(urlRaw) {
   return m && m[1] ? m[1] : "";
 }
 
+function sameProductImageAsset(a, b) {
+  const pa = String(a || "").trim().split("?")[0];
+  const pb = String(b || "").trim().split("?")[0];
+  return Boolean(pa && pb && pa === pb);
+}
+
 app.post("/api/admin/products/:id/image", authMiddleware, permissionMiddleware("siteContent.edit"), (req, res) => {
   const parsed = parseAdminImageBase64(req.body || {});
   if (parsed.error) {
@@ -3672,6 +3797,11 @@ app.post("/api/admin/products/:id/image", authMiddleware, permissionMiddleware("
     const next = { ...(ov.catalogPackImages || {}) };
     next[k] = relUrl;
     ov.catalogPackImages = sanitizeCatalogPackImages(next);
+    const packUrls = Object.values(ov.catalogPackImages || {}).map((x) => String(x || "").trim());
+    const cardUrl = String(ov.cardImageUrl || "").trim();
+    const heroUrl = String(ov.heroImageUrl || "").trim();
+    if (cardUrl && packUrls.some((u) => sameProductImageAsset(u, cardUrl))) delete ov.cardImageUrl;
+    if (heroUrl && packUrls.some((u) => sameProductImageAsset(u, heroUrl))) delete ov.heroImageUrl;
     catalogPackKey = k;
   } else {
     relUrl = applyProductImageBuffer(pid, parsed.buf, parsed.ext);
@@ -3803,7 +3933,15 @@ app.get("/api/admin/analytics/summary", authMiddleware, permissionMiddleware("an
 });
 
 ensureUploadDirs();
-app.use("/uploads", express.static(UPLOADS_ROOT));
+app.use(
+  "/uploads",
+  express.static(UPLOADS_ROOT, {
+    setHeaders(res) {
+      /* Разрешаем встраивание картинок /uploads в админку даже при отличающемся origin (file://, другой порт/домен). */
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
 
 app.use(express.static(__dirname));
 
@@ -3817,13 +3955,37 @@ app.use(express.static(__dirname));
       "[security] Production: сиды демо-пользователей и тестового админа отключены. Первый зарегистрированный пользователь получит роль admin."
     );
   }
-  app.listen(PORT, () => {
-    const mode = isProd ? "production" : "development";
-    console.log(`DP Coatings API (${mode}) on http://localhost:${PORT}`);
-    if (isTransactionalMailConfigured()) {
-      console.log("[mail] Transactional SMTP enabled (Gmail: set SMTP_USER + SMTP_PASS in .env).");
-    } else {
-      console.log("[mail] Transactional mail disabled — add SMTP_USER, SMTP_PASS to .env (App Password) to enable.");
-    }
-  });
+  const MAX_DEV_PORT_RETRIES = 20;
+  function startServer(preferredPort, attempt = 0) {
+    const port = Number(preferredPort) || 3000;
+    const server = app
+      .listen(port, () => {
+        const mode = isProd ? "production" : "development";
+        console.log(`DP Coatings API (${mode}) on http://localhost:${port}`);
+        if (isTransactionalMailConfigured()) {
+          console.log("[mail] Transactional SMTP enabled (Gmail: set SMTP_USER + SMTP_PASS in .env).");
+        } else {
+          console.log("[mail] Transactional mail disabled — add SMTP_USER, SMTP_PASS to .env (App Password) to enable.");
+        }
+      })
+      .on("error", (err) => {
+        if (err && err.code === "EADDRINUSE") {
+          if (isProd) {
+            console.error(`[server] Port ${port} is already in use in production. Set a valid PORT in environment.`);
+            process.exit(1);
+          }
+          if (attempt >= MAX_DEV_PORT_RETRIES) {
+            console.error(`[server] Failed to find a free port after ${MAX_DEV_PORT_RETRIES + 1} attempts.`);
+            process.exit(1);
+          }
+          const nextPort = port + 1;
+          console.warn(`[server] Port ${port} is busy, retrying on ${nextPort}...`);
+          startServer(nextPort, attempt + 1);
+          return;
+        }
+        throw err;
+      });
+    return server;
+  }
+  startServer(PORT);
 })();

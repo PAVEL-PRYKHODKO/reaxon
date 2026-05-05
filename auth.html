@@ -53,9 +53,22 @@
         <h1 class="auth-page-title" id="auth-heading-login">Вход</h1>
 
         <form id="login-form" class="lead-form" autocomplete="on" data-auth-mode="login">
-          <input name="email" type="text" required placeholder="Email" data-ru-placeholder="Email" data-uk-placeholder="Email" autocomplete="username" inputmode="email" />
+          <input name="email" type="email" required placeholder="Email" data-ru-placeholder="Email" data-uk-placeholder="Email" autocomplete="username" inputmode="email" />
           <input name="password" type="password" required placeholder="Пароль" data-ru-placeholder="Пароль" data-uk-placeholder="Пароль" autocomplete="current-password" />
           <button class="btn btn-primary" type="submit">Войти</button>
+        </form>
+        <div class="auth-switch">
+          <span id="auth-forgot-hint">Забыли пароль?</span>
+          <button type="button" class="auth-switch-btn" id="auth-forgot-password" aria-label="Восстановить пароль по email">Восстановить</button>
+        </div>
+        <form id="forgot-form" class="lead-form" autocomplete="on" hidden aria-hidden="true">
+          <input name="email" type="email" required placeholder="Email для восстановления" autocomplete="email" inputmode="email" />
+          <button class="btn btn-primary" type="submit">Отправить ссылку</button>
+        </form>
+        <form id="reset-form" class="lead-form" autocomplete="on" hidden aria-hidden="true">
+          <input name="newPassword" type="password" minlength="10" maxlength="200" required placeholder="Новый пароль" autocomplete="new-password" />
+          <input name="newPasswordConfirm" type="password" minlength="10" maxlength="200" required placeholder="Повторите пароль" autocomplete="new-password" />
+          <button class="btn btn-primary" type="submit">Сбросить пароль</button>
         </form>
 
         <div class="auth-switch">

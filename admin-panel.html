@@ -369,6 +369,41 @@
               <label>Пункты карточки в каталоге (по одному в строке)
                 <textarea id="ap-cards-features" rows="6" maxlength="4000"></textarea>
               </label>
+              <h3 class="ap-product-editor-h3">Расширенный контент карточки товара</h3>
+              <label>Таблица характеристик (строки: <code>Название | Значение</code>)
+                <textarea id="ap-cards-detail-spec-rows" rows="7" maxlength="12000"></textarea>
+              </label>
+              <label>Вступление «Характеристики»
+                <textarea id="ap-cards-detail-characteristics-intro" rows="5" maxlength="12000"></textarea>
+              </label>
+              <label>Текст «Применение»
+                <textarea id="ap-cards-detail-application" rows="5" maxlength="12000"></textarea>
+              </label>
+              <label>Подготовка основания (по одному пункту в строке)
+                <textarea id="ap-cards-detail-prep-base" rows="5" maxlength="12000"></textarea>
+              </label>
+              <label>Подготовка материала (по одному пункту в строке)
+                <textarea id="ap-cards-detail-prep-product" rows="5" maxlength="12000"></textarea>
+              </label>
+              <label>Нанесение / окрашивание (по одному пункту в строке)
+                <textarea id="ap-cards-detail-painting" rows="5" maxlength="12000"></textarea>
+              </label>
+              <label>Верхние бейджи (по одному пункту в строке)
+                <textarea id="ap-cards-detail-top-badges" rows="4" maxlength="4000"></textarea>
+              </label>
+              <label>Советы эксперта (строки: <code>Заголовок | URL | Источник</code>)
+                <textarea id="ap-cards-detail-expert-tips" rows="6" maxlength="16000"></textarea>
+              </label>
+              <label>Файлы/документы (строки: <code>Название | Ссылка | Размер/тип</code>)
+                <textarea id="ap-cards-detail-files" rows="6" maxlength="16000"></textarea>
+              </label>
+              <label>Расширенный override (JSON: все поля карточки, включая detail*)
+                <textarea id="ap-cards-override-json" rows="14" spellcheck="false"></textarea>
+              </label>
+              <p class="ap-muted ap-text-compact">
+                Здесь можно редактировать полное содержимое карточки: <code>detailSpecRows</code>, <code>detailApplication</code>,
+                <code>detailPrepBase</code>, <code>detailExpertTips</code>, <code>detailFiles</code>, <code>detailPackOptions</code> и другие поля.
+              </p>
               <div class="ap-actions ap-actions--compact">
                 <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-cards-save">Сохранить на сайт</button>
               </div>
@@ -385,9 +420,26 @@
               <label>Фото (JPEG, PNG, WebP, до 2,3 МБ)
                 <input type="file" id="ap-cards-photo-file" accept="image/jpeg,image/png,image/webp" />
               </label>
+              <div id="ap-cards-photo-editor" class="ap-cards-photo-editor" hidden aria-hidden="true">
+                <p class="ap-muted ap-text-compact">Предпросмотр перед сохранением: масштаб и сдвиг кадра.</p>
+                <div class="ap-cards-photo-editor-controls">
+                  <label>Масштаб
+                    <input type="range" id="ap-cards-photo-zoom" min="1" max="3" step="0.01" value="1" />
+                  </label>
+                  <label>Сдвиг X
+                    <input type="range" id="ap-cards-photo-offset-x" min="-1" max="1" step="0.01" value="0" />
+                  </label>
+                  <label>Сдвиг Y
+                    <input type="range" id="ap-cards-photo-offset-y" min="-1" max="1" step="0.01" value="0" />
+                  </label>
+                  <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-cards-photo-reset-crop">Сбросить кадр</button>
+                </div>
+                <canvas id="ap-cards-photo-canvas" width="900" height="900" aria-label="Предпросмотр обрезки фото"></canvas>
+              </div>
               <div class="ap-actions ap-actions--compact">
                 <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-cards-photo-save">Сохранить фото</button>
-                <button type="button" class="ap-btn ap-btn-danger ap-btn-sm" id="ap-cards-photo-delete">Удалить фото</button>
+                <button type="button" class="ap-btn ap-btn-danger ap-btn-sm" id="ap-cards-photo-delete">Удалить фото фасовки</button>
+                <button type="button" class="ap-btn ap-btn-danger ap-btn-sm" id="ap-cards-photo-delete-common">Удалить общее фото</button>
               </div>
               <p id="ap-cards-photo-status" class="ap-status ap-text-compact" role="status"></p>
               <div class="ap-cards-photo-preview-wrap">

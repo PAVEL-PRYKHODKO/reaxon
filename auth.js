@@ -13,7 +13,7 @@ const AUTH_ST = {
     btnSubmitLogin: "Войти",
     btnSubmitRegister: "Создать аккаунт",
     errNeedEmail: "Для регистрации укажите email в первом поле.",
-    errPassShort: "Пароль не короче 6 символов.",
+    errPassShort: "Пароль — минимум 10 символов.",
     errPassMatch: "Пароль и подтверждение не совпадают.",
     errNeedCompany: "Для юридического лица укажите название предприятия.",
     errNeedPhone: "Укажите номер телефона.",
@@ -23,6 +23,18 @@ const AUTH_ST = {
     loginOk: "Вход выполнен…",
     loginErr: "Ошибка входа",
     userFallback: "Пользователь",
+    forgotHint: "Забыли пароль?",
+    forgotBtn: "Восстановить",
+    forgotEmailPlaceholder: "Email для восстановления",
+    forgotSubmit: "Отправить ссылку",
+    forgotMissingEmail: "Введите email для восстановления.",
+    forgotSent: "Если аккаунт найден, письмо со ссылкой уже отправлено.",
+    resetTitle: "Сброс пароля",
+    resetBtn: "Сбросить пароль",
+    resetPassNew: "Новый пароль",
+    resetPassRepeat: "Повторите пароль",
+    resetTokenBad: "Ссылка восстановления недействительна.",
+    resetOk: "Пароль обновлен…",
   },
   uk: {
     hLogin: "Вхід",
@@ -38,7 +50,7 @@ const AUTH_ST = {
     btnSubmitLogin: "Увійти",
     btnSubmitRegister: "Створити акаунт",
     errNeedEmail: "Для реєстрації вкажіть email у першому полі.",
-    errPassShort: "Пароль — не менше 6 символів.",
+    errPassShort: "Пароль — щонайменше 10 символів.",
     errPassMatch: "Пароль і підтвердження не збігаються.",
     errNeedCompany: "Для юридичної особи вкажіть назву підприємства.",
     errNeedPhone: "Вкажіть номер телефону.",
@@ -48,6 +60,18 @@ const AUTH_ST = {
     loginOk: "Вхід виконано…",
     loginErr: "Помилка входу",
     userFallback: "Користувач",
+    forgotHint: "Забули пароль?",
+    forgotBtn: "Відновити",
+    forgotEmailPlaceholder: "Email для відновлення",
+    forgotSubmit: "Надіслати посилання",
+    forgotMissingEmail: "Введіть email для відновлення.",
+    forgotSent: "Якщо акаунт знайдено, лист із посиланням уже надіслано.",
+    resetTitle: "Скидання пароля",
+    resetBtn: "Скинути пароль",
+    resetPassNew: "Новий пароль",
+    resetPassRepeat: "Повторіть пароль",
+    resetTokenBad: "Посилання для відновлення недійсне.",
+    resetOk: "Пароль оновлено…",
   },
 };
 
@@ -74,6 +98,42 @@ function setSession(data) {
   localStorage.setItem("authUser", JSON.stringify(data.user));
 }
 
+function canUsePasswordManager() {
+  return typeof window !== "undefined" && "credentials" in navigator;
+}
+
+async function prefillSavedLogin(loginForm) {
+  if (!loginForm || !canUsePasswordManager()) return;
+  try {
+    const cred = await navigator.credentials.get({ password: true, mediation: "optional" });
+    if (!cred) return;
+    const emailInput = loginForm.querySelector('input[name="email"]');
+    const passInput = loginForm.querySelector('input[name="password"]');
+    if (emailInput && !String(emailInput.value || "").trim()) emailInput.value = String(cred.id || "");
+    if (passInput && !String(passInput.value || "").trim()) passInput.value = String(cred.password || "");
+  } catch {
+    /* ignore */
+  }
+}
+
+async function rememberLoginCredentials(identifier, password) {
+  if (!canUsePasswordManager()) return;
+  if (!window.PasswordCredential) return;
+  const id = String(identifier || "").trim();
+  const pass = String(password || "");
+  if (!id || !pass) return;
+  try {
+    const cred = new window.PasswordCredential({
+      id,
+      password: pass,
+      name: id,
+    });
+    await navigator.credentials.store(cred);
+  } catch {
+    /* ignore */
+  }
+}
+
 function authRedirectUrl() {
   try {
     const raw = new URL(location.href).searchParams.get("next");
@@ -84,6 +144,14 @@ function authRedirectUrl() {
     return next.replace(/^\//, "");
   } catch {
     return "index.html";
+  }
+}
+
+function resetTokenFromUrl() {
+  try {
+    return String(new URL(location.href).searchParams.get("reset_token") || "").trim();
+  } catch {
+    return "";
   }
 }
 
@@ -118,7 +186,8 @@ function setStatus(msg, kind) {
   if (kind === "err") s.classList.add("auth-status--err");
 }
 
-const skipAuthForms = document.body?.dataset?.page === "auth" && localStorage.getItem("authToken");
+const skipAuthForms =
+  document.body?.dataset?.page === "auth" && localStorage.getItem("authToken") && !resetTokenFromUrl();
 if (skipAuthForms) {
   window.location.replace(authRedirectUrl());
 } else {
@@ -131,16 +200,25 @@ if (skipAuthForms) {
   const hReg = document.getElementById("auth-heading-register");
   const hintLogin = document.getElementById("auth-switch-hint-login");
   const hintReg = document.getElementById("auth-switch-hint-reg");
+  const forgotHint = document.getElementById("auth-forgot-hint");
   const authOpenRegister = document.getElementById("auth-open-register");
   const authBackLogin = document.getElementById("auth-back-login");
+  const authForgotPassword = document.getElementById("auth-forgot-password");
+  const forgotForm = document.getElementById("forgot-form");
+  const resetForm = document.getElementById("reset-form");
   const idInput = loginForm?.querySelector('input[name="email"]');
   const passwordInput = loginForm?.querySelector('input[name="password"]');
+  const forgotEmailInput = forgotForm?.querySelector('input[name="email"]');
+  const resetPassInput = resetForm?.querySelector('input[name="newPassword"]');
+  const resetPassConfirmInput = resetForm?.querySelector('input[name="newPasswordConfirm"]');
   const regLegal = document.getElementById("reg-legal");
   const regCompany = document.getElementById("reg-company");
   const regCompanyLabel = document.getElementById("reg-company-label");
   const regLegalBlock = document.getElementById("reg-legal-block");
 
   let authUiMode = "login";
+  const resetToken = resetTokenFromUrl();
+  let resetModeOn = Boolean(resetToken);
 
   function updateLegalBlockVisibility() {
     if (!regLegal || !regLegalBlock) return;
@@ -202,13 +280,36 @@ if (skipAuthForms) {
       authBackLogin.textContent = at("btnToLogin");
       authBackLogin.setAttribute("aria-label", at("ariaToLogin"));
     }
+    if (forgotHint) forgotHint.textContent = at("forgotHint");
+    if (authForgotPassword) {
+      authForgotPassword.textContent = at("forgotBtn");
+      authForgotPassword.setAttribute("aria-label", at("forgotBtn"));
+    }
+    if (forgotEmailInput) forgotEmailInput.setAttribute("placeholder", at("forgotEmailPlaceholder"));
+    const forgotSubmit = forgotForm?.querySelector('button[type="submit"]');
+    if (forgotSubmit) forgotSubmit.textContent = at("forgotSubmit");
+    if (resetPassInput) resetPassInput.setAttribute("placeholder", at("resetPassNew"));
+    if (resetPassConfirmInput) resetPassConfirmInput.setAttribute("placeholder", at("resetPassRepeat"));
+    const resetSubmit = resetForm?.querySelector('button[type="submit"]');
+    if (resetSubmit) resetSubmit.textContent = at("resetBtn");
     setStatus("", null);
     if (!isLogin) {
       updateLegalBlockVisibility();
+    } else {
+      void prefillSavedLogin(loginForm);
     }
   }
 
   function goRegister() {
+    resetModeOn = false;
+    if (resetForm) {
+      resetForm.hidden = true;
+      resetForm.setAttribute("aria-hidden", "true");
+    }
+    if (forgotForm) {
+      forgotForm.hidden = true;
+      forgotForm.setAttribute("aria-hidden", "true");
+    }
     setAuthMode("register");
     const base = `${location.pathname}${location.search}`;
     history.replaceState(null, "", `${base}#register`);
@@ -221,6 +322,10 @@ if (skipAuthForms) {
     if (regLegal) regLegal.checked = false;
     updateLegalBlockVisibility();
     setAuthMode("login");
+    if (forgotForm) {
+      forgotForm.hidden = true;
+      forgotForm.setAttribute("aria-hidden", "true");
+    }
     const base = `${location.pathname}${location.search}`;
     history.replaceState(null, "", base);
     requestAnimationFrame(() => {
@@ -238,8 +343,58 @@ if (skipAuthForms) {
 
   authOpenRegister?.addEventListener("click", goRegister);
   authBackLogin?.addEventListener("click", goLogin);
+  authForgotPassword?.addEventListener("click", async () => {
+    if (resetModeOn) return;
+    const willOpen = Boolean(forgotForm?.hidden);
+    if (forgotForm) {
+      forgotForm.hidden = !willOpen ? true : false;
+      forgotForm.setAttribute("aria-hidden", willOpen ? "false" : "true");
+    }
+    if (willOpen) {
+      if (forgotEmailInput && !String(forgotEmailInput.value || "").trim() && idInput?.value) {
+        forgotEmailInput.value = String(idInput.value || "").trim();
+      }
+      requestAnimationFrame(() => {
+        forgotEmailInput?.focus();
+      });
+    }
+  });
 
-  if (location.hash === "#register") {
+  forgotForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = String(forgotEmailInput?.value || "").trim().toLowerCase();
+    if (!email || !email.includes("@")) {
+      setStatus(at("forgotMissingEmail"), "err");
+      forgotEmailInput?.focus();
+      return;
+    }
+    try {
+      await apiPost(apiPath("/api/auth/forgot-password"), { email });
+      setStatus(at("forgotSent"), "ok");
+      forgotForm.hidden = true;
+      forgotForm.setAttribute("aria-hidden", "true");
+    } catch (err) {
+      setStatus(err.message || at("loginErr"), "err");
+    }
+  });
+
+  if (resetModeOn) {
+    setAuthMode("login");
+    if (hLogin) hLogin.textContent = at("resetTitle");
+    if (loginForm) loginForm.hidden = true;
+    if (authForgotPassword) authForgotPassword.disabled = true;
+    if (forgotForm) {
+      forgotForm.hidden = true;
+      forgotForm.setAttribute("aria-hidden", "true");
+    }
+    if (resetForm) {
+      resetForm.hidden = false;
+      resetForm.setAttribute("aria-hidden", "false");
+    }
+    requestAnimationFrame(() => {
+      resetPassInput?.focus();
+    });
+  } else if (location.hash === "#register") {
     setAuthMode("register");
     requestAnimationFrame(() => {
       registerForm?.querySelector('input[name="firstName"]')?.focus();
@@ -258,6 +413,7 @@ if (skipAuthForms) {
     try {
       const data = await apiPost(apiPath("/api/auth/login"), { email: identifier, password });
       setSession(data);
+      await rememberLoginCredentials(identifier, password);
       setStatus(at("loginOk"), "ok");
       const target = authRedirectUrl();
       setTimeout(() => {
@@ -265,6 +421,36 @@ if (skipAuthForms) {
       }, 400);
     } catch (err) {
       setStatus(err.message || at("loginErr"), "err");
+    }
+  });
+
+  resetForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!resetToken) {
+      setStatus(at("resetTokenBad"), "err");
+      return;
+    }
+    const newPassword = String(resetPassInput?.value || "");
+    const newPasswordConfirm = String(resetPassConfirmInput?.value || "");
+    if (newPassword.length < 10) {
+      setStatus(at("errPassShort"), "err");
+      return;
+    }
+    if (newPassword !== newPasswordConfirm) {
+      setStatus(at("errPassMatch"), "err");
+      return;
+    }
+    try {
+      const data = await apiPost(apiPath("/api/auth/reset-password"), { token: resetToken, newPassword });
+      setSession(data);
+      await rememberLoginCredentials(String(data?.user?.email || ""), newPassword);
+      setStatus(at("resetOk"), "ok");
+      const target = authRedirectUrl();
+      setTimeout(() => {
+        window.location.href = target;
+      }, 450);
+    } catch (err) {
+      setStatus(err.message || at("resetTokenBad"), "err");
     }
   });
 
@@ -324,6 +510,7 @@ if (skipAuthForms) {
     try {
       const data = await apiPost(apiPath("/api/auth/register"), payload);
       setSession(data);
+      await rememberLoginCredentials(email.toLowerCase(), password);
       setStatus(at("regOk"), "ok");
       const target = authRedirectUrl();
       setTimeout(() => {

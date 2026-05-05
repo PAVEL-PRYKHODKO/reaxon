@@ -1637,6 +1637,11 @@ body[data-page="auth"] .auth-page-wrap .lead-form {
   padding: 0;
 }
 
+/* В auth блоках display:flex у .lead-form, поэтому [hidden] нужно усилить явно. */
+body[data-page="auth"] .auth-page-wrap .lead-form[hidden] {
+  display: none !important;
+}
+
 body[data-page="auth"] .auth-page-wrap .lead-form .btn {
   width: 100%;
   margin-top: 2px;

@@ -1763,6 +1763,37 @@ body {
   overflow: hidden;
 }
 
+.ap-cards-photo-editor {
+  margin-top: 10px;
+  border: 1px solid var(--ap-border);
+  border-radius: 10px;
+  background: var(--ap-surface-elevated);
+  padding: 10px;
+}
+
+.ap-cards-photo-editor-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ap-cards-photo-editor-controls label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.82rem;
+}
+
+#ap-cards-photo-canvas {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  border: 1px solid var(--ap-border);
+  background: #0f172a;
+  display: block;
+}
+
 #ap-cards-photo-preview {
   display: none;
   max-width: 100%;

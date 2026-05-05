@@ -12692,7 +12692,10 @@
           "sub": "",
           "hidden": false
         }
-      ]
+      ],
+      "catalogPackImages": {
+        "bucket:18": "/uploads/products/price--069-__bucket_18.png?_=1777978106572"
+      }
     },
     "price-ак-070-жов": {
       "detailPackOptions": [
@@ -14578,7 +14581,10 @@
           "sub": "",
           "hidden": false
         }
-      ]
+      ],
+      "catalogPackImages": {
+        "bucket:18": "/uploads/products/price--512-__bucket_18.jpg?_=1777987829893"
+      }
     },
     "price-ак-512-жов": {
       "detailPackOptions": [
