@@ -3,3 +3,9 @@ node_modules/
 .DS_Store
 .cursor/
 analytics-store.json
+
+# Runtime-generated media (managed via admin panel in deployed environment)
+uploads/avatars/*
+uploads/products/*
+uploads/hero-slides/*
+uploads/products-banner/*
