@@ -469,6 +469,7 @@
           <p id="ap-price-draft-hint" class="ap-draft-hint ap-muted">Изменения только в браузере, пока не нажмёте «Сохранить каталог».</p>
           <div class="ap-draft-bar-actions">
             <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-price-save" disabled>Сохранить каталог на сервер</button>
+            <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-price-autofix-ranges">Автоисправить фасовки по диапазонам</button>
             <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-price-reload">Перечитать с сервера</button>
             <button
               type="button"
@@ -496,7 +497,7 @@
             <p id="ap-price-find-hint" class="ap-muted ap-price-find-hint" aria-live="polite"></p>
           </div>
         </div>
-        <p id="ap-price-csv-hint" class="ap-muted ap-price-csv-hint">Формат колонок: <code>id,family,code,name,bucketKg,drumKg,priceNoNdsPerKg,priceNdsPerKg</code>. Можно загрузить CSV, XLS или XLSX; новые строки без id будут добавлены как новые позиции. При импорте лишние пробелы, неразрывные пробелы и переносы строк в ячейках убираются, текст приводится к единому виду.</p>
+        <p id="ap-price-csv-hint" class="ap-muted ap-price-csv-hint">Базовый формат: <code>id,family,code,name,jarSmallKg,jarBigKg,bucketKg,drumKg,priceNoNdsPerKg,priceNdsPerKg</code>. Можно загрузить CSV, XLS или XLSX; новые строки без id будут добавлены как новые позиции. Дополнительные столбцы из файла автоматически появятся в таблице как редактируемые. При импорте лишние пробелы, неразрывные пробелы и переносы строк в ячейках убираются, текст приводится к единому виду.</p>
         <p id="ap-price-last-file" class="ap-muted ap-price-last-file">Файл ещё не загружался.</p>
         <details class="ap-price-import-history" id="ap-price-import-history-wrap">
           <summary>История загрузок прайса</summary>
@@ -519,10 +520,10 @@
                 <th>Наименование</th>
                 <th>Без НДС / кг</th>
                 <th>С НДС / кг</th>
-                <th>2,8 кг</th>
-                <th>20 кг</th>
-                <th>50 кг</th>
-                <th>От фасовки → /кг</th>
+                <th title="Мала банка, кг">мал /кг/ банка</th>
+                <th title="Велика банка, кг">вел /кг/ банка</th>
+                <th title="Фасовка ведра, кг">Вага /кг/ відро</th>
+                <th title="Фасовка барабана, кг">Вага /кг/ барабан</th>
               </tr>
             </thead>
             <tbody id="ap-price-catalog-body"></tbody>

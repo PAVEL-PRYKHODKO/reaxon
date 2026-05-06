@@ -1,0 +1,3128 @@
+{
+  "id": "2026-05-06T14-17-40-235Z",
+  "createdAt": "2026-05-06T14:17:40.235Z",
+  "reason": "before-save",
+  "count": 312,
+  "products": [
+    {
+      "id": "price-ак-069-жов",
+      "family": "primer",
+      "code": "АК-069 ЖОВ",
+      "name": "Грунтовка АК-069 Жовта",
+      "bucketKg": 18,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 204.2,
+      "priceNdsPerKg": 245.04
+    },
+    {
+      "id": "price-ак-070-жов",
+      "family": "primer",
+      "code": "АК-070 ЖОВ",
+      "name": "Грунтовка АК-070 Жовта",
+      "bucketKg": 18,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 204.2,
+      "priceNdsPerKg": 245.04
+    },
+    {
+      "id": "price-вл-02",
+      "family": "primer",
+      "code": "ВЛ-02",
+      "name": "Грунтовка ВЛ-02, ВЛ-023",
+      "bucketKg": 20,
+      "drumKg": 43.75,
+      "priceNoNdsPerKg": 235,
+      "priceNdsPerKg": 282
+    },
+    {
+      "id": "price-вл-08",
+      "family": "primer",
+      "code": "ВЛ-08",
+      "name": "Грунтовка ВЛ-08",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 201.7,
+      "priceNdsPerKg": 242.04
+    },
+    {
+      "id": "price-гп-01",
+      "family": "primer",
+      "code": "ГП-01",
+      "name": "Грунтовка ГП-01",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 196,
+      "priceNdsPerKg": 235.2
+    },
+    {
+      "id": "price-гф-021-біл",
+      "family": "primer",
+      "code": "ГФ-021 БІЛ",
+      "name": "Грунтовка ГФ-021 Біла",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 95.6,
+      "priceNdsPerKg": 114.72
+    },
+    {
+      "id": "price-гф-021-жов",
+      "family": "primer",
+      "code": "ГФ-021 ЖОВ",
+      "name": "Грунтовка ГФ-021 Жовта, помаранчева",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 79.2,
+      "priceNdsPerKg": 95.04
+    },
+    {
+      "id": "price-гф-021-чер",
+      "family": "primer",
+      "code": "ГФ-021 ЧЕР",
+      "name": "Грунтовка ГФ-021 Червоно-коричнева, чорна",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 150,
+      "priceNdsPerKg": 180
+    },
+    {
+      "id": "price-гф-021-сір",
+      "family": "primer",
+      "code": "ГФ-021 СІР",
+      "name": "Грунтовка ГФ-021 Сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 154,
+      "priceNdsPerKg": 184.8
+    },
+    {
+      "id": "price-гф-021-мр",
+      "family": "primer",
+      "code": "ГФ-021 МР",
+      "name": "Грунтовка ГФ-021 МР Сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 154,
+      "priceNdsPerKg": 184.8
+    },
+    {
+      "id": "price-гф-0119-чер",
+      "family": "primer",
+      "code": "ГФ-0119 ЧЕР",
+      "name": "Грунтовка ГФ-0119 Червоно-коричнева",
+      "bucketKg": 25,
+      "drumKg": 45,
+      "priceNoNdsPerKg": 150,
+      "priceNdsPerKg": 180
+    },
+    {
+      "id": "price-гф-0119-сір",
+      "family": "primer",
+      "code": "ГФ-0119 СІР",
+      "name": "Грунтовка ГФ-0119 Сіра",
+      "bucketKg": 25,
+      "drumKg": 45,
+      "priceNoNdsPerKg": 166,
+      "priceNdsPerKg": 199.2
+    },
+    {
+      "id": "price-гф-0163-кор",
+      "family": "primer",
+      "code": "ГФ-0163 КОР",
+      "name": "Грунтовка ГФ-0163 Коричнева",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 161.7,
+      "priceNdsPerKg": 194.04
+    },
+    {
+      "id": "price-гф-0195-сір",
+      "family": "primer",
+      "code": "ГФ-0195 СІР",
+      "name": "Грунтовка ГФ-0195 Сіра",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 68,
+      "priceNdsPerKg": 81.6
+    },
+    {
+      "id": "price-гф-032-кор",
+      "family": "primer",
+      "code": "ГФ-032 КОР",
+      "name": "Грунтовка ГФ-032 Коричнева",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 158.35,
+      "priceNdsPerKg": 190.02
+    },
+    {
+      "id": "price-гф-032-жов",
+      "family": "primer",
+      "code": "ГФ-032 ЖОВ",
+      "name": "Грунтовка ГФ-032 Жовта, помаранчева",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 190,
+      "priceNdsPerKg": 228
+    },
+    {
+      "id": "price-мс-067-кре",
+      "family": "primer",
+      "code": "МС-067 КРЕ",
+      "name": "Грунтовка МС-067 Кремова",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 91.7,
+      "priceNdsPerKg": 110.04
+    },
+    {
+      "id": "price-мс-067-сір",
+      "family": "primer",
+      "code": "МС-067 СІР",
+      "name": "Грунтовка МС-067 Сіра, червоно-корич.",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 205,
+      "priceNdsPerKg": 246
+    },
+    {
+      "id": "price-мч-042-біл",
+      "family": "primer",
+      "code": "МЧ-042 БІЛ",
+      "name": "Грунтовка МЧ-042 Біла",
+      "bucketKg": 21,
+      "drumKg": null,
+      "priceNoNdsPerKg": 190,
+      "priceNdsPerKg": 228
+    },
+    {
+      "id": "price-мч-042-чор",
+      "family": "primer",
+      "code": "МЧ-042 ЧОР",
+      "name": "Грунтовка МЧ-042 Чорна",
+      "bucketKg": 21,
+      "drumKg": null,
+      "priceNoNdsPerKg": 166.5,
+      "priceNdsPerKg": 199.8
+    },
+    {
+      "id": "price-пф-0101-кп",
+      "family": "primer",
+      "code": "ПФ-0101 КП",
+      "name": "Грунтовка ПФ-0101 КП Сіра",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 153.35,
+      "priceNdsPerKg": 184.02
+    },
+    {
+      "id": "price-пф-020-чер",
+      "family": "primer",
+      "code": "ПФ-020 ЧЕР",
+      "name": "Грунтовка ПФ-020 Червоно-коричнева",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 48,
+      "priceNdsPerKg": 57.6
+    },
+    {
+      "id": "price-пф-0244-сір",
+      "family": "primer",
+      "code": "ПФ-0244 СІР",
+      "name": "Грунтовка ПФ-0244 Сіро-блакитна",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 52.5,
+      "priceNdsPerKg": 63
+    },
+    {
+      "id": "price-фл-03-ж",
+      "family": "primer",
+      "code": "ФЛ-03 Ж",
+      "name": "Грунтовка ФЛ-03 Ж жовта",
+      "bucketKg": 25,
+      "drumKg": 45,
+      "priceNoNdsPerKg": 175,
+      "priceNdsPerKg": 210
+    },
+    {
+      "id": "price-фл-03-к",
+      "family": "primer",
+      "code": "ФЛ-03 К",
+      "name": "Грунтовка ФЛ-03 К коричнева",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 168.5,
+      "priceNdsPerKg": 202.2
+    },
+    {
+      "id": "price-фл-03-с",
+      "family": "primer",
+      "code": "ФЛ-03 С",
+      "name": "Грунтовка ФЛ-03 С сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 170.85,
+      "priceNdsPerKg": 205.02
+    },
+    {
+      "id": "price-фл-04-к",
+      "family": "primer",
+      "code": "ФЛ-04 К",
+      "name": "Грунтовка ФЛ-04 К коричнева",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 168.5,
+      "priceNdsPerKg": 202.2
+    },
+    {
+      "id": "price-фл-04-с",
+      "family": "primer",
+      "code": "ФЛ-04 С",
+      "name": "Грунтовка ФЛ-04 С сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 170.85,
+      "priceNdsPerKg": 205.02
+    },
+    {
+      "id": "price-фл-086-ж",
+      "family": "primer",
+      "code": "ФЛ-086 Ж",
+      "name": "Грунтовка ФЛ-086 Ж жовта",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 195.85,
+      "priceNdsPerKg": 235.02
+    },
+    {
+      "id": "price-хс-059-чер",
+      "family": "primer",
+      "code": "ХС-059 ЧЕР",
+      "name": "Грунтовка ХС-059 Червоно-коричнева",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 192.5,
+      "priceNdsPerKg": 231
+    },
+    {
+      "id": "price-хс-059-сір",
+      "family": "primer",
+      "code": "ХС-059 СІР",
+      "name": "Грунтовка ХС-059 Сіра",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-хс-010-біл",
+      "family": "primer",
+      "code": "ХС-010 БІЛ",
+      "name": "Грунтовка ХС-010 Біла",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 183.5,
+      "priceNdsPerKg": 220.2
+    },
+    {
+      "id": "price-хс-010",
+      "family": "primer",
+      "code": "ХС-010",
+      "name": "Грунтовка ХС-010, ХС-068 Зелена",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 196.7,
+      "priceNdsPerKg": 236.04
+    },
+    {
+      "id": "price-еп-0181-чор",
+      "family": "primer",
+      "code": "ЕП-0181 ЧОР",
+      "name": "Грунтовка ЕП-0181 Чорна",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 445.85,
+      "priceNdsPerKg": 535.02
+    },
+    {
+      "id": "price-еп-0199-чер",
+      "family": "primer",
+      "code": "ЕП-0199 ЧЕР",
+      "name": "Грунтовка ЕП-0199 Червоно-коричнева",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 92.5,
+      "priceNdsPerKg": 111
+    },
+    {
+      "id": "price-еп-0199-сір",
+      "family": "primer",
+      "code": "ЕП-0199 СІР",
+      "name": "Грунтовка ЕП-0199 Сіра",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 96.1,
+      "priceNdsPerKg": 115.32
+    },
+    {
+      "id": "price-еп-0215-жов",
+      "family": "primer",
+      "code": "ЕП-0215 ЖОВ",
+      "name": "Грунтовка ЕП-0215 Жовта",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 283.35,
+      "priceNdsPerKg": 340.02
+    },
+    {
+      "id": "price-еп-057-т",
+      "family": "primer",
+      "code": "ЕП-057 Т",
+      "name": "Грунтовка ЕП-057 Т/сіра",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 133.5,
+      "priceNdsPerKg": 160.2
+    },
+    {
+      "id": "price-еп-076-жов",
+      "family": "primer",
+      "code": "ЕП-076 ЖОВ",
+      "name": "Грунтовка ЕП-076 Жовта",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 247.5,
+      "priceNdsPerKg": 297
+    },
+    {
+      "id": "price-аф-133-біл",
+      "family": "enamel",
+      "code": "АФ-133 БІЛ",
+      "name": "Гр.емаль АФ-133 Біла",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 71.8,
+      "priceNdsPerKg": 86.16
+    },
+    {
+      "id": "price-аф-133-жов",
+      "family": "enamel",
+      "code": "АФ-133 ЖОВ",
+      "name": "Гр.емаль АФ-133 Жовта",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 70.5,
+      "priceNdsPerKg": 84.6
+    },
+    {
+      "id": "price-аф-133-син",
+      "family": "enamel",
+      "code": "АФ-133 СИН",
+      "name": "Гр.емаль АФ-133 Синя",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 72,
+      "priceNdsPerKg": 86.4
+    },
+    {
+      "id": "price-урф-1101-син",
+      "family": "enamel",
+      "code": "УРФ-1101 СИН",
+      "name": "Гр.емаль УРФ-1101 Синя R5005, R5017, сіра R7004",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 72,
+      "priceNdsPerKg": 86.4
+    },
+    {
+      "id": "price-урф-1101-жов",
+      "family": "enamel",
+      "code": "УРФ-1101 ЖОВ",
+      "name": "Гр.емаль УРФ-1101 Жовта R1003, 1016, 1021, 1023",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 75,
+      "priceNdsPerKg": 90
+    },
+    {
+      "id": "price-урф-1101-зел",
+      "family": "enamel",
+      "code": "УРФ-1101 ЗЕЛ",
+      "name": "Гр.емаль УРФ-1101 Зелена R6002, R6029",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 72.5,
+      "priceNdsPerKg": 87
+    },
+    {
+      "id": "price-урф-1101-чер",
+      "family": "enamel",
+      "code": "УРФ-1101 ЧЕР",
+      "name": "Гр.емаль УРФ-1101 Червона R3020, 3001",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 75,
+      "priceNdsPerKg": 90
+    },
+    {
+      "id": "price-урф-1101-сір",
+      "family": "enamel",
+      "code": "УРФ-1101 СІР",
+      "name": "Гр.емаль УРФ-1101 Сіра",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 164.2,
+      "priceNdsPerKg": 197.04
+    },
+    {
+      "id": "price-урф-1101-чор",
+      "family": "enamel",
+      "code": "УРФ-1101 ЧОР",
+      "name": "Гр.емаль УРФ-1101 Чорна",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 69.7,
+      "priceNdsPerKg": 83.64
+    },
+    {
+      "id": "price-урф-1128-сір",
+      "family": "enamel",
+      "code": "УРФ-1128 СІР",
+      "name": "Гр.емаль УРФ-1128 Сіра",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 187.5,
+      "priceNdsPerKg": 225
+    },
+    {
+      "id": "price-урф-1128-сиг",
+      "family": "enamel",
+      "code": "УРФ-1128 СИГ",
+      "name": "Гр.емаль УРФ-1128 Сигнально-біла R9003",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 75.2,
+      "priceNdsPerKg": 90.24
+    },
+    {
+      "id": "price-урф-1128-св",
+      "family": "enamel",
+      "code": "УРФ-1128 СВ",
+      "name": "Гр.эмаль УРФ-1128 Св.-бежева",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 178.5,
+      "priceNdsPerKg": 214.2
+    },
+    {
+      "id": "price-урф-1128-зел",
+      "family": "enamel",
+      "code": "УРФ-1128 ЗЕЛ",
+      "name": "Гр.эмаль УРФ-1128 Зеленая R6029",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 180,
+      "priceNdsPerKg": 216
+    },
+    {
+      "id": "price-урф-1128-чер",
+      "family": "enamel",
+      "code": "УРФ-1128 ЧЕР",
+      "name": "Гр.емаль УРФ-1128 Червона R3020, R3005, синя",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 175,
+      "priceNdsPerKg": 210
+    },
+    {
+      "id": "price-урф-1128-пом",
+      "family": "enamel",
+      "code": "УРФ-1128 ПОМ",
+      "name": "Гр.емаль УРФ-1128 Помаранчева",
+      "bucketKg": 25,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 179.2,
+      "priceNdsPerKg": 215.04
+    },
+    {
+      "id": "price-ак-113",
+      "family": "lacquer",
+      "code": "АК-113",
+      "name": "Лак АК-113, АК-113Ф (банка 2,4кг)",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 210,
+      "priceNdsPerKg": 252
+    },
+    {
+      "id": "price-ас-16",
+      "family": "lacquer",
+      "code": "АС-16",
+      "name": "Лак АС-16",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 208.2,
+      "priceNdsPerKg": 249.84
+    },
+    {
+      "id": "price-бт-577",
+      "family": "lacquer",
+      "code": "БТ-577",
+      "name": "Лак БТ-577, БТ-5100",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 110.5,
+      "priceNdsPerKg": 132.6
+    },
+    {
+      "id": "price-вл-725",
+      "family": "lacquer",
+      "code": "ВЛ-725",
+      "name": "Лак ВЛ-725",
+      "bucketKg": 15,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-вл-931",
+      "family": "lacquer",
+      "code": "ВЛ-931",
+      "name": "Лак ВЛ-931",
+      "bucketKg": 17,
+      "drumKg": null,
+      "priceNoNdsPerKg": 291.25,
+      "priceNdsPerKg": 349.5
+    },
+    {
+      "id": "price-гф-024",
+      "family": "lacquer",
+      "code": "ГФ-024",
+      "name": "Лак ГФ-024",
+      "bucketKg": 15,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 221,
+      "priceNdsPerKg": 265.2
+    },
+    {
+      "id": "price-ко-815",
+      "family": "lacquer",
+      "code": "КО-815",
+      "name": "Лак КО-815",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 487.5,
+      "priceNdsPerKg": 585
+    },
+    {
+      "id": "price-ко-85",
+      "family": "lacquer",
+      "code": "КО-85",
+      "name": "Лак КО-85",
+      "bucketKg": 17,
+      "drumKg": 200,
+      "priceNoNdsPerKg": 308.35,
+      "priceNdsPerKg": 370.02
+    },
+    {
+      "id": "price-ко-916-к",
+      "family": "lacquer",
+      "code": "КО-916 К",
+      "name": "Лак КО-916 К",
+      "bucketKg": null,
+      "drumKg": 200,
+      "priceNoNdsPerKg": 400,
+      "priceNdsPerKg": 480
+    },
+    {
+      "id": "price-ко-921",
+      "family": "lacquer",
+      "code": "КО-921",
+      "name": "Лак КО-921",
+      "bucketKg": 17,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 450,
+      "priceNdsPerKg": 540
+    },
+    {
+      "id": "price-мл-92",
+      "family": "lacquer",
+      "code": "МЛ-92",
+      "name": "Лак МЛ-92, ГФ-95 (електроізол.)",
+      "bucketKg": 17,
+      "drumKg": 42,
+      "priceNoNdsPerKg": 225.85,
+      "priceNdsPerKg": 271.02
+    },
+    {
+      "id": "price-мл-133",
+      "family": "lacquer",
+      "code": "МЛ-133",
+      "name": "Лак МЛ-133",
+      "bucketKg": 18,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 88,
+      "priceNdsPerKg": 105.6
+    },
+    {
+      "id": "price-мс-080",
+      "family": "lacquer",
+      "code": "МС-080",
+      "name": "Лак МС-080",
+      "bucketKg": 18,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-нц-134",
+      "family": "lacquer",
+      "code": "НЦ-134",
+      "name": "Лак НЦ-134",
+      "bucketKg": 17,
+      "drumKg": 42,
+      "priceNoNdsPerKg": 213.35,
+      "priceNdsPerKg": 256.02
+    },
+    {
+      "id": "price-нц-218",
+      "family": "lacquer",
+      "code": "НЦ-218",
+      "name": "Лак НЦ-218",
+      "bucketKg": 18,
+      "drumKg": 35,
+      "priceNoNdsPerKg": 208.5,
+      "priceNdsPerKg": 250.2
+    },
+    {
+      "id": "price-нц-551",
+      "family": "lacquer",
+      "code": "НЦ-551",
+      "name": "Лак НЦ-551",
+      "bucketKg": 17,
+      "drumKg": 33,
+      "priceNoNdsPerKg": 235.85,
+      "priceNdsPerKg": 283.02
+    },
+    {
+      "id": "price-нц-62-без",
+      "family": "lacquer",
+      "code": "НЦ-62 БЕЗ",
+      "name": "Лак НЦ-62 Безбарвний",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 212.5,
+      "priceNdsPerKg": 255
+    },
+    {
+      "id": "price-нц-62-чер",
+      "family": "lacquer",
+      "code": "НЦ-62 ЧЕР",
+      "name": "Лак НЦ-62 Червоний, зелений",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 216.7,
+      "priceNdsPerKg": 260.04
+    },
+    {
+      "id": "price-пф-170",
+      "family": "enamel",
+      "code": "ПФ-170",
+      "name": "Лак ПФ-170",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 167.5,
+      "priceNdsPerKg": 201
+    },
+    {
+      "id": "price-пф-283",
+      "family": "enamel",
+      "code": "ПФ-283",
+      "name": "Лак ПФ-283",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 155.9,
+      "priceNdsPerKg": 187.08
+    },
+    {
+      "id": "price-пф-231",
+      "family": "enamel",
+      "code": "ПФ-231",
+      "name": "Лак ПФ-231",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 137.5,
+      "priceNdsPerKg": 165
+    },
+    {
+      "id": "price-хв-5179",
+      "family": "enamel",
+      "code": "ХВ-5179",
+      "name": "Лак ХВ-5179",
+      "bucketKg": 17,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 210,
+      "priceNdsPerKg": 252
+    },
+    {
+      "id": "price-хс-567",
+      "family": "enamel",
+      "code": "ХС-567",
+      "name": "Лак ХС-567",
+      "bucketKg": 17,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 300,
+      "priceNdsPerKg": 360
+    },
+    {
+      "id": "price-хс-724",
+      "family": "enamel",
+      "code": "ХС-724",
+      "name": "Лак ХС-724",
+      "bucketKg": 17,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 205,
+      "priceNdsPerKg": 246
+    },
+    {
+      "id": "price-хв-784",
+      "family": "enamel",
+      "code": "ХВ-784",
+      "name": "Лак ХВ-784",
+      "bucketKg": 17,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 210,
+      "priceNdsPerKg": 252
+    },
+    {
+      "id": "price-еп-074",
+      "family": "lacquer",
+      "code": "ЕП-074",
+      "name": "Лак ЕП-074 (банка 2,5кг)",
+      "bucketKg": 17,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 268.35,
+      "priceNdsPerKg": 322.02
+    },
+    {
+      "id": "price-еп-075",
+      "family": "lacquer",
+      "code": "ЕП-075",
+      "name": "Лак ЕП-075 (банка 2,5кг)",
+      "bucketKg": 17,
+      "drumKg": 40,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": 0
+    },
+    {
+      "id": "price-еп-730",
+      "family": "lacquer",
+      "code": "ЕП-730",
+      "name": "Лак ЕП-730",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 258.35,
+      "priceNdsPerKg": 310.02
+    },
+    {
+      "id": "price-оліфа-оксоль",
+      "family": "other",
+      "code": "Олиф-Окс",
+      "name": "Оліфа \"Оксоль\"",
+      "bucketKg": 16,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 46.5,
+      "priceNdsPerKg": 55.8
+    },
+    {
+      "id": "price-бт-177-срі",
+      "family": "paint",
+      "code": "БТ-177 СРІ",
+      "name": "Фарба БТ-177 Срібляста (двокомп.)",
+      "bucketKg": 15,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 72.5,
+      "priceNdsPerKg": 87
+    },
+    {
+      "id": "price-вдкч-577-біл",
+      "family": "paint",
+      "code": "ВДКЧ-577 БІЛ",
+      "name": "Фарба ВДКЧ-577 Біла (для дерев)",
+      "bucketKg": 25,
+      "drumKg": null,
+      "priceNoNdsPerKg": 120.85,
+      "priceNdsPerKg": 145.02
+    },
+    {
+      "id": "price-вдак-112-біл",
+      "family": "paint",
+      "code": "ВДАК-112 БІЛ",
+      "name": "Фарба ВДАК-112 Біла",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 48.35,
+      "priceNdsPerKg": 58.02
+    },
+    {
+      "id": "price-вдак-112-беж",
+      "family": "paint",
+      "code": "ВДАК-112 БЕЖ",
+      "name": "Фарба ВДАК-112 Бежева, рожева",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 48.35,
+      "priceNdsPerKg": 58.02
+    },
+    {
+      "id": "price-вдак-112-чер",
+      "family": "paint",
+      "code": "ВДАК-112 ЧЕР",
+      "name": "Фарба ВДАК-112 Червона R3003",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-ак-501-біл",
+      "family": "paint",
+      "code": "АК-501 БІЛ",
+      "name": "Фарба АК-501 Біла (д/розм.доріг)",
+      "bucketKg": 30,
+      "drumKg": null,
+      "priceNoNdsPerKg": 170.85,
+      "priceNdsPerKg": 205.02
+    },
+    {
+      "id": "price-ак-501-жов",
+      "family": "paint",
+      "code": "АК-501 ЖОВ",
+      "name": "Фарба АК-501 Жовта (д/розм.доріг)",
+      "bucketKg": 30,
+      "drumKg": null,
+      "priceNoNdsPerKg": 153.35,
+      "priceNdsPerKg": 184.02
+    },
+    {
+      "id": "price-ак-501-зел",
+      "family": "paint",
+      "code": "АК-501 ЗЕЛ",
+      "name": "Фарба АК-501 Зелена (д/розм.доріг)",
+      "bucketKg": 30,
+      "drumKg": null,
+      "priceNoNdsPerKg": 110,
+      "priceNdsPerKg": 132
+    },
+    {
+      "id": "price-ак-501-чер",
+      "family": "paint",
+      "code": "АК-501 ЧЕР",
+      "name": "Фарба АК-501 Червона (д/розм.доріг)",
+      "bucketKg": 30,
+      "drumKg": null,
+      "priceNoNdsPerKg": 155.85,
+      "priceNdsPerKg": 187.02
+    },
+    {
+      "id": "price-ак-501-сір",
+      "family": "lacquer",
+      "code": "АК-501 СІР",
+      "name": "Фарба АК-501 Сіро-блакитна R6033 (д/розм.доріг)",
+      "bucketKg": 30,
+      "drumKg": null,
+      "priceNoNdsPerKg": 107.5,
+      "priceNdsPerKg": 129
+    },
+    {
+      "id": "price-ак-501-чор",
+      "family": "paint",
+      "code": "АК-501 ЧОР",
+      "name": "Фарба АК-501 Чорна, корич.R3009 (д/розм.доріг)",
+      "bucketKg": 30,
+      "drumKg": null,
+      "priceNoNdsPerKg": 106,
+      "priceNdsPerKg": 127.2
+    },
+    {
+      "id": "price-ак-512-біл",
+      "family": "enamel",
+      "code": "АК-512 БІЛ",
+      "name": "Емаль АК-512 Біла",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 88.4,
+      "priceNdsPerKg": 106.08
+    },
+    {
+      "id": "price-ак-512-жов",
+      "family": "enamel",
+      "code": "АК-512 ЖОВ",
+      "name": "Емаль АК-512 Жовта",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 86.9,
+      "priceNdsPerKg": 104.28
+    },
+    {
+      "id": "price-ак-512-син",
+      "family": "enamel",
+      "code": "АК-512 СИН",
+      "name": "Емаль АК-512 Синя",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 88.5,
+      "priceNdsPerKg": 106.2
+    },
+    {
+      "id": "price-ак-512-тем",
+      "family": "enamel",
+      "code": "АК-512 ТЕМ",
+      "name": "Емаль АК-512 Темно-зелена",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 92,
+      "priceNdsPerKg": 110.4
+    },
+    {
+      "id": "price-ак-512-хак",
+      "family": "enamel",
+      "code": "АК-512 ХАК",
+      "name": "Емаль АК-512 Хакі",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 86.25,
+      "priceNdsPerKg": 103.5
+    },
+    {
+      "id": "price-ак-512-чор",
+      "family": "enamel",
+      "code": "АК-512 ЧОР",
+      "name": "Емаль АК-512 Чорна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 84.4,
+      "priceNdsPerKg": 101.28
+    },
+    {
+      "id": "price-акс-7201-син",
+      "family": "enamel",
+      "code": "АКС-7201 СИН",
+      "name": "Емаль АКС-7201 Синя R5015, зелена",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 170.85,
+      "priceNdsPerKg": 205.02
+    },
+    {
+      "id": "price-акс-7201-сір",
+      "family": "enamel",
+      "code": "АКС-7201 СІР",
+      "name": "Емаль АКС-7201 Сіра R7035, чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 170.85,
+      "priceNdsPerKg": 205.02
+    },
+    {
+      "id": "price-ас-182-біл",
+      "family": "enamel",
+      "code": "АС-182 БІЛ",
+      "name": "Емаль АС-182 Біла",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 237.5,
+      "priceNdsPerKg": 285
+    },
+    {
+      "id": "price-ас-182-сма",
+      "family": "enamel",
+      "code": "АС-182 СМА",
+      "name": "Емаль АС-182 Смарагдова, мор.хвиля, синя, жовта",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 90,
+      "priceNdsPerKg": 108
+    },
+    {
+      "id": "price-ас-182-виш",
+      "family": "enamel",
+      "code": "АС-182 ВИШ",
+      "name": "Емаль АС-182 Вишнева",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 204.2,
+      "priceNdsPerKg": 245.04
+    },
+    {
+      "id": "price-ас-182-чер",
+      "family": "enamel",
+      "code": "АС-182 ЧЕР",
+      "name": "Емаль АС-182 Червона, помаранчева",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 235.85,
+      "priceNdsPerKg": 283.02
+    },
+    {
+      "id": "price-ас-182-сір",
+      "family": "enamel",
+      "code": "АС-182 СІР",
+      "name": "Емаль АС-182 Сіра, чорна",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 205,
+      "priceNdsPerKg": 246
+    },
+    {
+      "id": "price-ас-588-чор",
+      "family": "enamel",
+      "code": "АС-588 ЧОР",
+      "name": "Емаль АС-588 Чорна",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 308.35,
+      "priceNdsPerKg": 370.02
+    },
+    {
+      "id": "price-ау-52-жов",
+      "family": "enamel",
+      "code": "АУ-52 ЖОВ",
+      "name": "Емаль АУ-52 Жовта R1028, червона, синя, зелена",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 190,
+      "priceNdsPerKg": 228
+    },
+    {
+      "id": "price-ау-52-сір",
+      "family": "enamel",
+      "code": "АУ-52 СІР",
+      "name": "Емаль АУ-52 Сіра R7032, R7041, чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 187.5,
+      "priceNdsPerKg": 225
+    },
+    {
+      "id": "price-вл-515-чер",
+      "family": "enamel",
+      "code": "ВЛ-515 ЧЕР",
+      "name": "Емаль ВЛ-515 Червоно-коричнева",
+      "bucketKg": 18,
+      "drumKg": 35,
+      "priceNoNdsPerKg": 226.7,
+      "priceNdsPerKg": 272.04
+    },
+    {
+      "id": "price-вл-725-срі",
+      "family": "enamel",
+      "code": "ВЛ-725 СРІ",
+      "name": "Емаль ВЛ-725 Срібляста",
+      "bucketKg": 18,
+      "drumKg": null,
+      "priceNoNdsPerKg": 240,
+      "priceNdsPerKg": 288
+    },
+    {
+      "id": "price-гф-1426-зах",
+      "family": "enamel",
+      "code": "ГФ-1426 ЗАХ",
+      "name": "Емаль ГФ-1426 Захисна",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 187.5,
+      "priceNdsPerKg": 225
+    },
+    {
+      "id": "price-гф-1426-сір",
+      "family": "enamel",
+      "code": "ГФ-1426 СІР",
+      "name": "Емаль ГФ-1426 Сіра",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 168.35,
+      "priceNdsPerKg": 202.02
+    },
+    {
+      "id": "price-гф-820-срі",
+      "family": "enamel",
+      "code": "ГФ-820 СРІ",
+      "name": "Емаль ГФ-820 Срібляста",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 304.2,
+      "priceNdsPerKg": 365.04
+    },
+    {
+      "id": "price-гф-92-хс",
+      "family": "enamel",
+      "code": "ГФ-92 ХС",
+      "name": "Емаль ГФ-92 ХС Чорна (електроізол.)",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 150,
+      "priceNdsPerKg": 180
+    },
+    {
+      "id": "price-гф-92-гс",
+      "family": "enamel",
+      "code": "ГФ-92 ГС",
+      "name": "Емаль ГФ-92 ГС Сіра (електроізол.)",
+      "bucketKg": 20,
+      "drumKg": 40,
+      "priceNoNdsPerKg": 220.85,
+      "priceNdsPerKg": 265.02
+    },
+    {
+      "id": "price-ко-168-біл",
+      "family": "enamel",
+      "code": "КО-168 БІЛ",
+      "name": "Емаль КО-168 Біла",
+      "bucketKg": 25,
+      "drumKg": null,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-ко-168-син",
+      "family": "enamel",
+      "code": "КО-168 СИН",
+      "name": "Емаль КО-168 Синя",
+      "bucketKg": 25,
+      "drumKg": null,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-ко-168-срі",
+      "family": "enamel",
+      "code": "КО-168 СРІ",
+      "name": "Емаль КО-168 Срібляста",
+      "bucketKg": 25,
+      "drumKg": null,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-ко-168-сл",
+      "family": "enamel",
+      "code": "КО-168 СЛ",
+      "name": "Емаль КО-168 Сл.кістка, сіра, бежева",
+      "bucketKg": 25,
+      "drumKg": null,
+      "priceNoNdsPerKg": 75,
+      "priceNdsPerKg": 90
+    },
+    {
+      "id": "price-ко-174-біл",
+      "family": "enamel",
+      "code": "КО-174 БІЛ",
+      "name": "Емаль КО-174 Біла, св.-сіра",
+      "bucketKg": 25,
+      "drumKg": null,
+      "priceNoNdsPerKg": 175,
+      "priceNdsPerKg": 210
+    },
+    {
+      "id": "price-ко-174-кор",
+      "family": "enamel",
+      "code": "КО-174 КОР",
+      "name": "Емаль КО-174 Коричнева",
+      "bucketKg": 25,
+      "drumKg": null,
+      "priceNoNdsPerKg": 80.5,
+      "priceNdsPerKg": 96.6
+    },
+    {
+      "id": "price-ко-84-чор",
+      "family": "enamel",
+      "code": "КО-84 ЧОР",
+      "name": "Емаль КО-84 Чорна 300⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 164,
+      "priceNdsPerKg": 196.8
+    },
+    {
+      "id": "price-ко-84-син",
+      "family": "enamel",
+      "code": "КО-84 СИН",
+      "name": "Емаль КО-84 Синя R5005 300⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 317.5,
+      "priceNdsPerKg": 381
+    },
+    {
+      "id": "price-ко-811-зел",
+      "family": "enamel",
+      "code": "КО-811 ЗЕЛ",
+      "name": "Емаль КО-811 Зелена, жовта 400⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 240,
+      "priceNdsPerKg": 288
+    },
+    {
+      "id": "price-ко-811-чер",
+      "family": "enamel",
+      "code": "КО-811 ЧЕР",
+      "name": "Емаль КО-811 Червона 400⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 245.85,
+      "priceNdsPerKg": 295.02
+    },
+    {
+      "id": "price-ко-811-чор",
+      "family": "enamel",
+      "code": "КО-811 ЧОР",
+      "name": "Емаль КО-811 Чорна, сіра 400⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 475,
+      "priceNdsPerKg": 570
+    },
+    {
+      "id": "price-ко-813-срі",
+      "family": "enamel",
+      "code": "КО-813 СРІ",
+      "name": "Емаль КО-813 Срібл. 500⁰С",
+      "bucketKg": 20,
+      "drumKg": 42.4,
+      "priceNoNdsPerKg": 447.5,
+      "priceNdsPerKg": 537
+    },
+    {
+      "id": "price-ко-814-срі",
+      "family": "enamel",
+      "code": "КО-814 СРІ",
+      "name": "Емаль КО-814 Срібл. 400⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 307.5,
+      "priceNdsPerKg": 369
+    },
+    {
+      "id": "price-ко-818-срі",
+      "family": "enamel",
+      "code": "КО-818 СРІ",
+      "name": "Емаль КО-818 Срібл. 600⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 253,
+      "priceNdsPerKg": 303.6
+    },
+    {
+      "id": "price-ко-818-чор",
+      "family": "enamel",
+      "code": "КО-818 ЧОР",
+      "name": "Емаль КО-818 Чорна 600⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 795.85,
+      "priceNdsPerKg": 955.02
+    },
+    {
+      "id": "price-ко-828-срі",
+      "family": "enamel",
+      "code": "КО-828 СРІ",
+      "name": "Емаль КО-828 Срібл. 400⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 291.7,
+      "priceNdsPerKg": 350.04
+    },
+    {
+      "id": "price-ко-830-чор",
+      "family": "enamel",
+      "code": "КО-830 ЧОР",
+      "name": "Емаль КО-830 Чорна 300⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 216.7,
+      "priceNdsPerKg": 260.04
+    },
+    {
+      "id": "price-ко-868-чор",
+      "family": "enamel",
+      "code": "КО-868 ЧОР",
+      "name": "Емаль КО-868 Чорна 600⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 199.7,
+      "priceNdsPerKg": 239.64
+    },
+    {
+      "id": "price-ко-870-чор",
+      "family": "enamel",
+      "code": "КО-870 ЧОР",
+      "name": "Емаль КО-870 Чорна 600⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-ко-88-чор",
+      "family": "enamel",
+      "code": "КО-88 ЧОР",
+      "name": "Емаль КО-88 Чорна 400⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 308.35,
+      "priceNdsPerKg": 370.02
+    },
+    {
+      "id": "price-ко-911-чер",
+      "family": "enamel",
+      "code": "КО-911 ЧЕР",
+      "name": "Емаль КО-911 Червоно-кор. 400⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 384.2,
+      "priceNdsPerKg": 461.04
+    },
+    {
+      "id": "price-ко-911-пом",
+      "family": "enamel",
+      "code": "КО-911 ПОМ",
+      "name": "Емаль КО-911 Помаранчева. 400⁰С",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 384.2,
+      "priceNdsPerKg": 461.04
+    },
+    {
+      "id": "price-ко-983-чер",
+      "family": "enamel",
+      "code": "КО-983 ЧЕР",
+      "name": "Емаль КО-983 Червоно-корич.",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": 296.7,
+      "priceNdsPerKg": 356.04
+    },
+    {
+      "id": "price-пф-837-срі",
+      "family": "enamel",
+      "code": "ПФ-837 СРІ",
+      "name": "Емаль ПФ-837 Срібляста (двокомп.) 420⁰С",
+      "bucketKg": 17,
+      "drumKg": null,
+      "priceNoNdsPerKg": 361.7,
+      "priceNdsPerKg": 434.04
+    },
+    {
+      "id": "price-мл-12-біл",
+      "family": "enamel",
+      "code": "МЛ-12 БІЛ",
+      "name": "Емаль МЛ-12 Біла",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 241,
+      "priceNdsPerKg": 289.2
+    },
+    {
+      "id": "price-мл-12-беж",
+      "family": "enamel",
+      "code": "МЛ-12 БЕЖ",
+      "name": "Емаль МЛ-12 Бежева",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-мл-12-сір",
+      "family": "enamel",
+      "code": "МЛ-12 СІР",
+      "name": "Емаль МЛ-12 Сіра, сіро-блакитна, св.-димчаста",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 235,
+      "priceNdsPerKg": 282
+    },
+    {
+      "id": "price-мл-12-срі",
+      "family": "enamel",
+      "code": "МЛ-12 СРІ",
+      "name": "Емаль МЛ-12 Срібляста",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 245,
+      "priceNdsPerKg": 294
+    },
+    {
+      "id": "price-мл-12-зол",
+      "family": "enamel",
+      "code": "МЛ-12 ЗОЛ",
+      "name": "Емаль МЛ-12 Зол.-жовта, жовта R1023, R1018, помаранч., жовто-зел.R6018",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 239.2,
+      "priceNdsPerKg": 287.04
+    },
+    {
+      "id": "price-мл-12-пур",
+      "family": "enamel",
+      "code": "МЛ-12 ПУР",
+      "name": "Емаль МЛ-12 Пурпурно-червона R3004 (гнила вишня)",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 230,
+      "priceNdsPerKg": 276
+    },
+    {
+      "id": "price-мл-12-чер",
+      "family": "enamel",
+      "code": "МЛ-12 ЧЕР",
+      "name": "Емаль МЛ-12 Червона",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 246,
+      "priceNdsPerKg": 295.2
+    },
+    {
+      "id": "price-мл-12-син",
+      "family": "enamel",
+      "code": "МЛ-12 СИН",
+      "name": "Емаль МЛ-12 Синя R5002, 5013, R5011, блакитна",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 238.5,
+      "priceNdsPerKg": 286.2
+    },
+    {
+      "id": "price-мл-12-зах",
+      "family": "enamel",
+      "code": "МЛ-12 ЗАХ",
+      "name": "Емаль МЛ-12 Захисна, зелена",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 238.5,
+      "priceNdsPerKg": 286.2
+    },
+    {
+      "id": "price-мл-12-чор",
+      "family": "enamel",
+      "code": "МЛ-12 ЧОР",
+      "name": "Емаль МЛ-12 Чорна",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 230,
+      "priceNdsPerKg": 276
+    },
+    {
+      "id": "price-мл-12-пм",
+      "family": "enamel",
+      "code": "МЛ-12 ПМ",
+      "name": "Емаль МЛ-12 ПМ Жовто-олив.R6014",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 105.25,
+      "priceNdsPerKg": 126.3
+    },
+    {
+      "id": "price-мл-152-сві",
+      "family": "enamel",
+      "code": "МЛ-152 СВІ",
+      "name": "Емаль МЛ-152 Світло-сіра, чорна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 65.85,
+      "priceNdsPerKg": 79.02
+    },
+    {
+      "id": "price-мл-158-біл",
+      "family": "enamel",
+      "code": "МЛ-158 БІЛ",
+      "name": "Емаль МЛ-158 Біла R9003 (шагрень)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 234,
+      "priceNdsPerKg": 280.8
+    },
+    {
+      "id": "price-мл-158-жов",
+      "family": "enamel",
+      "code": "МЛ-158 ЖОВ",
+      "name": "Емаль МЛ-158 Жовта R1028 (шагрень)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 229.2,
+      "priceNdsPerKg": 275.04
+    },
+    {
+      "id": "price-мл-158-зел",
+      "family": "enamel",
+      "code": "МЛ-158 ЗЕЛ",
+      "name": "Емаль МЛ-158 Зелена (шагрень)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 229.2,
+      "priceNdsPerKg": 275.04
+    },
+    {
+      "id": "price-мл-158-пом",
+      "family": "enamel",
+      "code": "МЛ-158 ПОМ",
+      "name": "Емаль МЛ-158 Помаранчева R2004, червона (шагрень)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 234,
+      "priceNdsPerKg": 280.8
+    },
+    {
+      "id": "price-мл-158-сір",
+      "family": "enamel",
+      "code": "МЛ-158 СІР",
+      "name": "Емаль МЛ-158 Сіра (шагрень)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 229.2,
+      "priceNdsPerKg": 275.04
+    },
+    {
+      "id": "price-мл-158-син",
+      "family": "enamel",
+      "code": "МЛ-158 СИН",
+      "name": "Емаль МЛ-158 Синя R5017 (шагрень)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 229.2,
+      "priceNdsPerKg": 275.04
+    },
+    {
+      "id": "price-мл-158-чор",
+      "family": "enamel",
+      "code": "МЛ-158 ЧОР",
+      "name": "Емаль МЛ-158 Чорна (шагрень)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 229.2,
+      "priceNdsPerKg": 275.04
+    },
+    {
+      "id": "price-мл-165-зел",
+      "family": "enamel",
+      "code": "МЛ-165 ЗЕЛ",
+      "name": "Емаль МЛ-165 Зелена (смарагд.), захисна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 234,
+      "priceNdsPerKg": 280.8
+    },
+    {
+      "id": "price-мл-165-кор",
+      "family": "enamel",
+      "code": "МЛ-165 КОР",
+      "name": "Емаль МЛ-165 Коричнева, чорна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 229.2,
+      "priceNdsPerKg": 275.04
+    },
+    {
+      "id": "price-мл-165-бл",
+      "family": "enamel",
+      "code": "МЛ-165 БЛ",
+      "name": "Емаль МЛ-165 Бл.-сіра (мор.хвиля), синя",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 234,
+      "priceNdsPerKg": 280.8
+    },
+    {
+      "id": "price-мл-165-сір",
+      "family": "enamel",
+      "code": "МЛ-165 СІР",
+      "name": "Емаль МЛ-165 Сіра, т/сіра",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 229.2,
+      "priceNdsPerKg": 275.04
+    },
+    {
+      "id": "price-мл-165-срі",
+      "family": "enamel",
+      "code": "МЛ-165 СРІ",
+      "name": "Емаль МЛ-165 Срібляста",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 258.35,
+      "priceNdsPerKg": 310.02
+    },
+    {
+      "id": "price-мл-242-біл",
+      "family": "enamel",
+      "code": "МЛ-242 БІЛ",
+      "name": "Емаль МЛ-242 Біла",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 65,
+      "priceNdsPerKg": 78
+    },
+    {
+      "id": "price-мс-17-біл",
+      "family": "enamel",
+      "code": "МС-17 БІЛ",
+      "name": "Емаль МС-17 Біла",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 205,
+      "priceNdsPerKg": 246
+    },
+    {
+      "id": "price-мс-17-чер",
+      "family": "enamel",
+      "code": "МС-17 ЧЕР",
+      "name": "Емаль МС-17 Червона, помаранчева",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 210,
+      "priceNdsPerKg": 252
+    },
+    {
+      "id": "price-мс-17-жов",
+      "family": "enamel",
+      "code": "МС-17 ЖОВ",
+      "name": "Емаль МС-17 Жовта R1028",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 161,
+      "priceNdsPerKg": 193.2
+    },
+    {
+      "id": "price-мс-17-зел",
+      "family": "enamel",
+      "code": "МС-17 ЗЕЛ",
+      "name": "Емаль МС-17 Зелена, синя",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 182,
+      "priceNdsPerKg": 218.4
+    },
+    {
+      "id": "price-мс-17-срі",
+      "family": "enamel",
+      "code": "МС-17 СРІ",
+      "name": "Емаль МС-17 Срібляста МЕ",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 100,
+      "priceNdsPerKg": 120
+    },
+    {
+      "id": "price-мс-17-сір",
+      "family": "enamel",
+      "code": "МС-17 СІР",
+      "name": "Емаль МС-17 Сіра, т/с",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 182,
+      "priceNdsPerKg": 218.4
+    },
+    {
+      "id": "price-мс-17-чор",
+      "family": "enamel",
+      "code": "МС-17 ЧОР",
+      "name": "Емаль МС-17 Чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 180,
+      "priceNdsPerKg": 216
+    },
+    {
+      "id": "price-мс-17м",
+      "family": "enamel",
+      "code": "МС-17М",
+      "name": "Емаль МС-17М Чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 192,
+      "priceNdsPerKg": 230.4
+    },
+    {
+      "id": "price-мс-160-сір",
+      "family": "enamel",
+      "code": "МС-160 СІР",
+      "name": "Емаль МС-160 Сіра МЕ",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 195.85,
+      "priceNdsPerKg": 235.02
+    },
+    {
+      "id": "price-мс-160-срі",
+      "family": "enamel",
+      "code": "МС-160 СРІ",
+      "name": "Емаль МС-160 Срібляста МЕ",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 198.5,
+      "priceNdsPerKg": 238.2
+    },
+    {
+      "id": "price-мч-123-чор",
+      "family": "enamel",
+      "code": "МЧ-123 ЧОР",
+      "name": "Емаль МЧ-123 Чорна",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 68,
+      "priceNdsPerKg": 81.6
+    },
+    {
+      "id": "price-мч-123-тем",
+      "family": "enamel",
+      "code": "МЧ-123 ТЕМ",
+      "name": "Емаль МЧ-123 Темно-сіра R7016",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 72,
+      "priceNdsPerKg": 86.4
+    },
+    {
+      "id": "price-нц-25-зах",
+      "family": "enamel",
+      "code": "НЦ-25 ЗАХ",
+      "name": "Емаль НЦ-25 Захисна, хакі, зелена",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 204.2,
+      "priceNdsPerKg": 245.04
+    },
+    {
+      "id": "price-нц-132-біл",
+      "family": "enamel",
+      "code": "НЦ-132 БІЛ",
+      "name": "Емаль НЦ-132 Біла",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-нц-132-бла",
+      "family": "enamel",
+      "code": "НЦ-132 БЛА",
+      "name": "Емаль НЦ-132 Блакитна, синя",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-нц-132-чер",
+      "family": "enamel",
+      "code": "НЦ-132 ЧЕР",
+      "name": "Емаль НЦ-132 Червона, помаранчева",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 225.85,
+      "priceNdsPerKg": 271.02
+    },
+    {
+      "id": "price-нц-132-сір",
+      "family": "enamel",
+      "code": "НЦ-132 СІР",
+      "name": "Емаль НЦ-132 Сіра, світло-сіра",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 204.2,
+      "priceNdsPerKg": 245.04
+    },
+    {
+      "id": "price-нц-132-зол",
+      "family": "enamel",
+      "code": "НЦ-132 ЗОЛ",
+      "name": "Емаль НЦ-132 Зол.-жовта",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 220,
+      "priceNdsPerKg": 264
+    },
+    {
+      "id": "price-нц-132-зел",
+      "family": "enamel",
+      "code": "НЦ-132 ЗЕЛ",
+      "name": "Емаль НЦ-132 Зелена, бірюза",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-нц-132-фіс",
+      "family": "enamel",
+      "code": "НЦ-132 ФІС",
+      "name": "Емаль НЦ-132 Фісташкова, захисна, хакі, салатн.R6019",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-нц-132-срі",
+      "family": "enamel",
+      "code": "НЦ-132 СРІ",
+      "name": "Емаль НЦ-132 Срібляста",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.5,
+      "priceNdsPerKg": 250.2
+    },
+    {
+      "id": "price-нц-132-м",
+      "family": "enamel",
+      "code": "НЦ-132 М",
+      "name": "Емаль НЦ-132 М чорна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 183.5,
+      "priceNdsPerKg": 220.2
+    },
+    {
+      "id": "price-нц-273-срі",
+      "family": "enamel",
+      "code": "НЦ-273 СРІ",
+      "name": "Емаль НЦ-273 Срібляста (двокомпонентна)",
+      "bucketKg": null,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 110.5,
+      "priceNdsPerKg": 132.6
+    },
+    {
+      "id": "price-нц-5123-чер",
+      "family": "enamel",
+      "code": "НЦ-5123 ЧЕР",
+      "name": "Емаль НЦ-5123 Червоно-корич.",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 206,
+      "priceNdsPerKg": 247.2
+    },
+    {
+      "id": "price-нц-5123-зел",
+      "family": "enamel",
+      "code": "НЦ-5123 ЗЕЛ",
+      "name": "Емаль НЦ-5123 Зелена",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 80,
+      "priceNdsPerKg": 96
+    },
+    {
+      "id": "price-пф-101к",
+      "family": "enamel",
+      "code": "ПФ-101К",
+      "name": "Емаль ПФ-101К Жовта",
+      "bucketKg": 18,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 189,
+      "priceNdsPerKg": 226.8
+    },
+    {
+      "id": "price-пф-115-біл",
+      "family": "enamel",
+      "code": "ПФ-115 БІЛ",
+      "name": "Емаль ПФ-115 Біла",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 170.85,
+      "priceNdsPerKg": 205.02
+    },
+    {
+      "id": "price-пф-115-зел",
+      "family": "enamel",
+      "code": "ПФ-115 ЗЕЛ",
+      "name": "Емаль ПФ-115 Зелена R6029, т/з R6007, захисна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 161.7,
+      "priceNdsPerKg": 194.04
+    },
+    {
+      "id": "price-пф-115-чер",
+      "family": "enamel",
+      "code": "ПФ-115 ЧЕР",
+      "name": "Емаль ПФ-115 Червоно-корич., коричнева",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 162.5,
+      "priceNdsPerKg": 195
+    },
+    {
+      "id": "price-пф-115-кре",
+      "family": "enamel",
+      "code": "ПФ-115 КРЕ",
+      "name": "Емаль ПФ-115 Кремова, бежева",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 162.5,
+      "priceNdsPerKg": 195
+    },
+    {
+      "id": "price-пф-115-чор",
+      "family": "enamel",
+      "code": "ПФ-115 ЧОР",
+      "name": "Емаль ПФ-115 Чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 162.5,
+      "priceNdsPerKg": 195
+    },
+    {
+      "id": "price-пф-115-пом",
+      "family": "enamel",
+      "code": "ПФ-115 ПОМ",
+      "name": "Емаль ПФ-115 Помаранчева",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 183.5,
+      "priceNdsPerKg": 220.2
+    },
+    {
+      "id": "price-пф-115-жов",
+      "family": "enamel",
+      "code": "ПФ-115 ЖОВ",
+      "name": "Емаль ПФ-115 Жовта",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 166.7,
+      "priceNdsPerKg": 200.04
+    },
+    {
+      "id": "price-пф-115-сал",
+      "family": "enamel",
+      "code": "ПФ-115 САЛ",
+      "name": "Емаль ПФ-115 Салатна R6019",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 166.7,
+      "priceNdsPerKg": 200.04
+    },
+    {
+      "id": "price-пф-115-срі",
+      "family": "enamel",
+      "code": "ПФ-115 СРІ",
+      "name": "Емаль ПФ-115 Срібляста",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 91.7,
+      "priceNdsPerKg": 110.04
+    },
+    {
+      "id": "price-пф-115-син",
+      "family": "enamel",
+      "code": "ПФ-115 СИН",
+      "name": "Емаль ПФ-115 Синя R5017, R5015, блакитна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 179.2,
+      "priceNdsPerKg": 215.04
+    },
+    {
+      "id": "price-пф-115-сір",
+      "family": "enamel",
+      "code": "ПФ-115 СІР",
+      "name": "Емаль ПФ-115 Сіра, св.-сіра, т/сіра",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 170.85,
+      "priceNdsPerKg": 205.02
+    },
+    {
+      "id": "price-пф-115-хак",
+      "family": "enamel",
+      "code": "ПФ-115 ХАК",
+      "name": "Емаль ПФ-115 Хакі, фісташ, б/зел.R6021",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 161.7,
+      "priceNdsPerKg": 194.04
+    },
+    {
+      "id": "price-пф-115-фіо",
+      "family": "enamel",
+      "code": "ПФ-115 ФІО",
+      "name": "Емаль ПФ-115 Фіолетова",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 175,
+      "priceNdsPerKg": 210
+    },
+    {
+      "id": "price-пф-115-м",
+      "family": "enamel",
+      "code": "ПФ-115 М",
+      "name": "Емаль ПФ-115 М Синя R5015, R5017",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 56.5,
+      "priceNdsPerKg": 67.8
+    },
+    {
+      "id": "price-пф-132-мр",
+      "family": "enamel",
+      "code": "ПФ-132 МР",
+      "name": "Емаль ПФ-132 МР Срібляста",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 186.7,
+      "priceNdsPerKg": 224.04
+    },
+    {
+      "id": "price-пф-133-зел",
+      "family": "enamel",
+      "code": "ПФ-133 ЗЕЛ",
+      "name": "Емаль ПФ-133 Зелена, жовта, помаранчева, червона",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 73.25,
+      "priceNdsPerKg": 87.9
+    },
+    {
+      "id": "price-пф-133-сір",
+      "family": "enamel",
+      "code": "ПФ-133 СІР",
+      "name": "Емаль ПФ-133 Сіра, чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 65.6,
+      "priceNdsPerKg": 78.72
+    },
+    {
+      "id": "price-пф-167-біл",
+      "family": "enamel",
+      "code": "ПФ-167 БІЛ",
+      "name": "Емаль ПФ-167 Біла, сл.кістка",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 58.5,
+      "priceNdsPerKg": 70.2
+    },
+    {
+      "id": "price-пф-167-сір",
+      "family": "enamel",
+      "code": "ПФ-167 СІР",
+      "name": "Емаль ПФ-167 Сіра, кр.-корич., чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 62.1,
+      "priceNdsPerKg": 74.52
+    },
+    {
+      "id": "price-пф-167-бла",
+      "family": "enamel",
+      "code": "ПФ-167 БЛА",
+      "name": "Емаль ПФ-167 Блакитна, синя",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 63,
+      "priceNdsPerKg": 75.6
+    },
+    {
+      "id": "price-пф-167-жов",
+      "family": "enamel",
+      "code": "ПФ-167 ЖОВ",
+      "name": "Емаль ПФ-167 Жовта, зел., червона, бірюза",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 60,
+      "priceNdsPerKg": 72
+    },
+    {
+      "id": "price-пф-188-чер",
+      "family": "enamel",
+      "code": "ПФ-188 ЧЕР",
+      "name": "Емаль ПФ-188 Червона R3020",
+      "bucketKg": null,
+      "drumKg": 50,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-пф-188-сір",
+      "family": "enamel",
+      "code": "ПФ-188 СІР",
+      "name": "Емаль ПФ-188 Сіра R7024",
+      "bucketKg": null,
+      "drumKg": 50,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-пф-19-м",
+      "family": "enamel",
+      "code": "ПФ-19 М",
+      "name": "Емаль ПФ-19 М Чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 145.85,
+      "priceNdsPerKg": 175.02
+    },
+    {
+      "id": "price-пф-218-гс",
+      "family": "enamel",
+      "code": "ПФ-218 ГС",
+      "name": "Емаль ПФ-218 ГС Світло-сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 183.35,
+      "priceNdsPerKg": 220.02
+    },
+    {
+      "id": "price-пф-218-хс",
+      "family": "enamel",
+      "code": "ПФ-218 ХС",
+      "name": "Емаль ПФ-218 ХС Світло-сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 183.35,
+      "priceNdsPerKg": 220.02
+    },
+    {
+      "id": "price-пф-1126-св",
+      "family": "enamel",
+      "code": "ПФ-1126 СВ",
+      "name": "Емаль ПФ-1126 Св.-димч., сл.кістка, бежева, біла",
+      "bucketKg": null,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 187.5,
+      "priceNdsPerKg": 225
+    },
+    {
+      "id": "price-пф-223-біл",
+      "family": "enamel",
+      "code": "ПФ-223 БІЛ",
+      "name": "Емаль ПФ-223 Біла, жовта, червона",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 174,
+      "priceNdsPerKg": 208.8
+    },
+    {
+      "id": "price-пф-223-зел",
+      "family": "enamel",
+      "code": "ПФ-223 ЗЕЛ",
+      "name": "Емаль ПФ-223 Зелена, зелено-сіра, сіро-зелена",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 174,
+      "priceNdsPerKg": 208.8
+    },
+    {
+      "id": "price-пф-223-тем",
+      "family": "enamel",
+      "code": "ПФ-223 ТЕМ",
+      "name": "Емаль ПФ-223 Темно-сіра, блакитна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 174,
+      "priceNdsPerKg": 208.8
+    },
+    {
+      "id": "price-пф-223-чор",
+      "family": "enamel",
+      "code": "ПФ-223 ЧОР",
+      "name": "Емаль ПФ-223 Чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 172,
+      "priceNdsPerKg": 206.4
+    },
+    {
+      "id": "price-пф-266-чер",
+      "family": "enamel",
+      "code": "ПФ-266 ЧЕР",
+      "name": "Емаль ПФ-266 Чер.-кор., жовто-кор., сіра",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 48.5,
+      "priceNdsPerKg": 58.2
+    },
+    {
+      "id": "price-пе-736-сір",
+      "family": "enamel",
+      "code": "ПЕ-736 СІР",
+      "name": "Емаль ПЕ-736 Сіра R7032, R7040",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-хв-16-біл",
+      "family": "enamel",
+      "code": "ХВ-16 БІЛ",
+      "name": "Емаль ХВ-16 Біла",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 192,
+      "priceNdsPerKg": 230.4
+    },
+    {
+      "id": "price-хв-16-сір",
+      "family": "enamel",
+      "code": "ХВ-16 СІР",
+      "name": "Емаль ХВ-16 Сіро-блакитна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 180,
+      "priceNdsPerKg": 216
+    },
+    {
+      "id": "price-хв-16-чор",
+      "family": "enamel",
+      "code": "ХВ-16 ЧОР",
+      "name": "Емаль ХВ-16 Чорна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 184.6,
+      "priceNdsPerKg": 221.52
+    },
+    {
+      "id": "price-хв-16-лим",
+      "family": "enamel",
+      "code": "ХВ-16 ЛИМ",
+      "name": "Емаль ХВ-16 Лим.-жовта, жовта",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 183.35,
+      "priceNdsPerKg": 220.02
+    },
+    {
+      "id": "price-хв-16-зел",
+      "family": "enamel",
+      "code": "ХВ-16 ЗЕЛ",
+      "name": "Емаль ХВ-16 Зелена, захисна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-хв-16-срі",
+      "family": "enamel",
+      "code": "ХВ-16 СРІ",
+      "name": "Емаль ХВ-16 Срібляста (двокомп.)",
+      "bucketKg": 16.8,
+      "drumKg": 46.2,
+      "priceNoNdsPerKg": 204.2,
+      "priceNdsPerKg": 245.04
+    },
+    {
+      "id": "price-хв-16-чер",
+      "family": "enamel",
+      "code": "ХВ-16 ЧЕР",
+      "name": "Емаль ХВ-16 Червоно-коричнева",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 195.85,
+      "priceNdsPerKg": 235.02
+    },
+    {
+      "id": "price-хв-110-біл",
+      "family": "enamel",
+      "code": "ХВ-110 БІЛ",
+      "name": "Емаль ХВ-110 Біла",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-хв-110-пом",
+      "family": "enamel",
+      "code": "ХВ-110 ПОМ",
+      "name": "Емаль ХВ-110 Помаранчева",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 100,
+      "priceNdsPerKg": 120
+    },
+    {
+      "id": "price-хв-110-сір",
+      "family": "enamel",
+      "code": "ХВ-110 СІР",
+      "name": "Емаль ХВ-110 Сіра",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 90,
+      "priceNdsPerKg": 108
+    },
+    {
+      "id": "price-хв-113-сір",
+      "family": "enamel",
+      "code": "ХВ-113 СІР",
+      "name": "Емаль ХВ-113 Сіра",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-хв-114-чер",
+      "family": "enamel",
+      "code": "ХВ-114 ЧЕР",
+      "name": "Емаль ХВ-114 Червоно-коричнева",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 210,
+      "priceNdsPerKg": 252
+    },
+    {
+      "id": "price-хв-124-біл",
+      "family": "enamel",
+      "code": "ХВ-124 БІЛ",
+      "name": "Емаль ХВ-124 Біла",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-хв-124-зел",
+      "family": "enamel",
+      "code": "ХВ-124 ЗЕЛ",
+      "name": "Емаль ХВ-124 Зелена, захисна",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 186.7,
+      "priceNdsPerKg": 224.04
+    },
+    {
+      "id": "price-хв-124-жов",
+      "family": "enamel",
+      "code": "ХВ-124 ЖОВ",
+      "name": "Емаль ХВ-124 Жовта, бежева, червона",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-хв-124-сір",
+      "family": "enamel",
+      "code": "ХВ-124 СІР",
+      "name": "Емаль ХВ-124 Сіра, світло-сіра, чорна, корич.",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 186.7,
+      "priceNdsPerKg": 224.04
+    },
+    {
+      "id": "price-хв-125-срі",
+      "family": "enamel",
+      "code": "ХВ-125 СРІ",
+      "name": "Емаль ХВ-125 Срібляста",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 73.85,
+      "priceNdsPerKg": 88.62
+    },
+    {
+      "id": "price-хв-1100-сір",
+      "family": "enamel",
+      "code": "ХВ-1100 СІР",
+      "name": "Емаль ХВ-1100 Сіра",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 196.7,
+      "priceNdsPerKg": 236.04
+    },
+    {
+      "id": "price-хв-1100-жов",
+      "family": "enamel",
+      "code": "ХВ-1100 ЖОВ",
+      "name": "Емаль ХВ-1100 Жовта, червона",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 75,
+      "priceNdsPerKg": 90
+    },
+    {
+      "id": "price-хв-1120-зах",
+      "family": "enamel",
+      "code": "ХВ-1120 ЗАХ",
+      "name": "Емаль ХВ-1120 Захисна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 183.35,
+      "priceNdsPerKg": 220.02
+    },
+    {
+      "id": "price-хв-161-сір",
+      "family": "enamel",
+      "code": "ХВ-161 СІР",
+      "name": "Емаль ХВ-161 Сіра, зелена",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 91.7,
+      "priceNdsPerKg": 110.04
+    },
+    {
+      "id": "price-хв-518-зах",
+      "family": "enamel",
+      "code": "ХВ-518 ЗАХ",
+      "name": "Емаль ХВ-518 Захисна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 191.7,
+      "priceNdsPerKg": 230.04
+    },
+    {
+      "id": "price-хв-518-сір",
+      "family": "enamel",
+      "code": "ХВ-518 СІР",
+      "name": "Емаль ХВ-518 Сіра",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 170,
+      "priceNdsPerKg": 204
+    },
+    {
+      "id": "price-хв-518-чор",
+      "family": "enamel",
+      "code": "ХВ-518 ЧОР",
+      "name": "Емаль ХВ-518 Чорна",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 170,
+      "priceNdsPerKg": 204
+    },
+    {
+      "id": "price-хв-785-біл",
+      "family": "enamel",
+      "code": "ХВ-785 БІЛ",
+      "name": "Емаль ХВ-785 Біла",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-хв-785-жов",
+      "family": "enamel",
+      "code": "ХВ-785 ЖОВ",
+      "name": "Емаль ХВ-785 Жовта, зелена, салатна, синя",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 199.2,
+      "priceNdsPerKg": 239.04
+    },
+    {
+      "id": "price-хв-785-сір",
+      "family": "enamel",
+      "code": "ХВ-785 СІР",
+      "name": "Емаль ХВ-785 Сіра",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 199.2,
+      "priceNdsPerKg": 239.04
+    },
+    {
+      "id": "price-хв-785-чер",
+      "family": "enamel",
+      "code": "ХВ-785 ЧЕР",
+      "name": "Емаль ХВ-785 Червона, помаранчева",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 202.1,
+      "priceNdsPerKg": 242.52
+    },
+    {
+      "id": "price-хв-785-кре",
+      "family": "enamel",
+      "code": "ХВ-785 КРЕ",
+      "name": "Емаль ХВ-785 Кремова, сл.кістка, бежева",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 183.5,
+      "priceNdsPerKg": 220.2
+    },
+    {
+      "id": "price-хв-785-чор",
+      "family": "enamel",
+      "code": "ХВ-785 ЧОР",
+      "name": "Емаль ХВ-785 Чорна, чер.-кор.",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 199.2,
+      "priceNdsPerKg": 239.04
+    },
+    {
+      "id": "price-хс-5146-біл",
+      "family": "enamel",
+      "code": "ХС-5146 БІЛ",
+      "name": "Емаль ХС-5146 Біла",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 95.8,
+      "priceNdsPerKg": 114.96
+    },
+    {
+      "id": "price-хс-5245-чор",
+      "family": "enamel",
+      "code": "ХС-5245 ЧОР",
+      "name": "Емаль ХС-5245 Чорна",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-хс-5400-м",
+      "family": "enamel",
+      "code": "ХС-5400 М",
+      "name": "Емаль ХС-5400 М Чорна",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 146,
+      "priceNdsPerKg": 175.2
+    },
+    {
+      "id": "price-хс-75-у",
+      "family": "enamel",
+      "code": "ХС-75 У",
+      "name": "Емаль ХС-75 У ГМ Сіра",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 116.7,
+      "priceNdsPerKg": 140.04
+    },
+    {
+      "id": "price-хс-710-біл",
+      "family": "enamel",
+      "code": "ХС-710 БІЛ",
+      "name": "Емаль ХС-710 Біла, синя",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-хс-710-сір",
+      "family": "enamel",
+      "code": "ХС-710 СІР",
+      "name": "Емаль ХС-710 Сіра, сл.кістка",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-хс-710-зел",
+      "family": "enamel",
+      "code": "ХС-710 ЗЕЛ",
+      "name": "Емаль ХС-710 Зелена",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-хс-717-чер",
+      "family": "enamel",
+      "code": "ХС-717 ЧЕР",
+      "name": "Емаль ХС-717 Червоно-корич.",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 129,
+      "priceNdsPerKg": 154.8
+    },
+    {
+      "id": "price-хс-759-чор",
+      "family": "enamel",
+      "code": "ХС-759 ЧОР",
+      "name": "Емаль ХС-759 Чорна",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 190.85,
+      "priceNdsPerKg": 229.02
+    },
+    {
+      "id": "price-хс-759-зел",
+      "family": "enamel",
+      "code": "ХС-759 ЗЕЛ",
+      "name": "Емаль ХС-759 Зелена",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-хс-759-жов",
+      "family": "enamel",
+      "code": "ХС-759 ЖОВ",
+      "name": "Емаль ХС-759 Жовта, біла",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 88,
+      "priceNdsPerKg": 105.6
+    },
+    {
+      "id": "price-хс-759-пом",
+      "family": "enamel",
+      "code": "ХС-759 ПОМ",
+      "name": "Емаль ХС-759 Помаранчева, червона",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 200,
+      "priceNdsPerKg": 240
+    },
+    {
+      "id": "price-хс-759-сір",
+      "family": "enamel",
+      "code": "ХС-759 СІР",
+      "name": "Емаль ХС-759 Сіра",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 208.35,
+      "priceNdsPerKg": 250.02
+    },
+    {
+      "id": "price-хс-759-син",
+      "family": "enamel",
+      "code": "ХС-759 СИН",
+      "name": "Емаль ХС-759 Синя",
+      "bucketKg": 20,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 75,
+      "priceNdsPerKg": 90
+    },
+    {
+      "id": "price-еп-51-біл",
+      "family": "enamel",
+      "code": "ЕП-51 БІЛ",
+      "name": "Емаль ЕП-51 Біла",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 228.5,
+      "priceNdsPerKg": 274.2
+    },
+    {
+      "id": "price-еп-51-жов",
+      "family": "enamel",
+      "code": "ЕП-51 ЖОВ",
+      "name": "Емаль ЕП-51 Жовта",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 228.5,
+      "priceNdsPerKg": 274.2
+    },
+    {
+      "id": "price-еп-51-зах",
+      "family": "enamel",
+      "code": "ЕП-51 ЗАХ",
+      "name": "Емаль ЕП-51 Захисна (банка 2,5кг)",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 221.7,
+      "priceNdsPerKg": 266.04
+    },
+    {
+      "id": "price-еп-51-чер",
+      "family": "enamel",
+      "code": "ЕП-51 ЧЕР",
+      "name": "Емаль ЕП-51 Червона",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 228.5,
+      "priceNdsPerKg": 274.2
+    },
+    {
+      "id": "price-еп-51-син",
+      "family": "enamel",
+      "code": "ЕП-51 СИН",
+      "name": "Емаль ЕП-51 Синя (банка 2,5кг)",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 228.5,
+      "priceNdsPerKg": 274.2
+    },
+    {
+      "id": "price-еп-51-сір",
+      "family": "enamel",
+      "code": "ЕП-51 СІР",
+      "name": "Емаль ЕП-51 Сіра",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 221.7,
+      "priceNdsPerKg": 266.04
+    },
+    {
+      "id": "price-еп-51-чор",
+      "family": "enamel",
+      "code": "ЕП-51 ЧОР",
+      "name": "Емаль ЕП-51 Чорна (банка 2,5кг)",
+      "bucketKg": 18,
+      "drumKg": 46,
+      "priceNoNdsPerKg": 220,
+      "priceNdsPerKg": 264
+    },
+    {
+      "id": "price-еп-140-біл",
+      "family": "enamel",
+      "code": "ЕП-140 БІЛ",
+      "name": "Емаль ЕП-140 Біла",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 241.7,
+      "priceNdsPerKg": 290.04
+    },
+    {
+      "id": "price-еп-140-беж",
+      "family": "enamel",
+      "code": "ЕП-140 БЕЖ",
+      "name": "Емаль ЕП-140 Бежева, сл.кістка",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 238.35,
+      "priceNdsPerKg": 286.02
+    },
+    {
+      "id": "price-еп-140-жов",
+      "family": "enamel",
+      "code": "ЕП-140 ЖОВ",
+      "name": "Емаль ЕП-140 Жовто-сіра R7034",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 258.5,
+      "priceNdsPerKg": 310.2
+    },
+    {
+      "id": "price-еп-140-бл",
+      "family": "enamel",
+      "code": "ЕП-140 БЛ",
+      "name": "Емаль ЕП-140 Бл.-сіра, сіро-блакитна, синя, блакитна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 238.35,
+      "priceNdsPerKg": 286.02
+    },
+    {
+      "id": "price-еп-140-зах",
+      "family": "enamel",
+      "code": "ЕП-140 ЗАХ",
+      "name": "Емаль ЕП-140 Захисна, зелена, т/з (банка 2,1+0,9=3кг)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 240,
+      "priceNdsPerKg": 288
+    },
+    {
+      "id": "price-еп-140-тем",
+      "family": "enamel",
+      "code": "ЕП-140 ТЕМ",
+      "name": "Емаль ЕП-140 Темно-червона",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 245.85,
+      "priceNdsPerKg": 295.02
+    },
+    {
+      "id": "price-еп-140-сір",
+      "family": "enamel",
+      "code": "ЕП-140 СІР",
+      "name": "Емаль ЕП-140 Сіра, т/с, с/с",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 238.35,
+      "priceNdsPerKg": 286.02
+    },
+    {
+      "id": "price-еп-140-чор",
+      "family": "enamel",
+      "code": "ЕП-140 ЧОР",
+      "name": "Емаль ЕП-140 Чорна, коричнева (банка 3кг)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 238.35,
+      "priceNdsPerKg": 286.02
+    },
+    {
+      "id": "price-еп-140-срі",
+      "family": "enamel",
+      "code": "ЕП-140 СРІ",
+      "name": "Емаль ЕП-140 Срібляста",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 433.35,
+      "priceNdsPerKg": 520.02
+    },
+    {
+      "id": "price-еп-274-св",
+      "family": "enamel",
+      "code": "ЕП-274 СВ",
+      "name": "Емаль ЕП-274 Св.-сіра, сіра (банка 2,8кг)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 258.35,
+      "priceNdsPerKg": 310.02
+    },
+    {
+      "id": "price-еп-525-жов",
+      "family": "enamel",
+      "code": "ЕП-525 ЖОВ",
+      "name": "Емаль ЕП-525 Жовта",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 236.7,
+      "priceNdsPerKg": 284.04
+    },
+    {
+      "id": "price-еп-525-сір",
+      "family": "enamel",
+      "code": "ЕП-525 СІР",
+      "name": "Емаль ЕП-525 Сіра, т/с, чорна",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 236.7,
+      "priceNdsPerKg": 284.04
+    },
+    {
+      "id": "price-еп-525-чер",
+      "family": "enamel",
+      "code": "ЕП-525 ЧЕР",
+      "name": "Емаль ЕП-525 Червона, зелена",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 236.7,
+      "priceNdsPerKg": 284.04
+    },
+    {
+      "id": "price-еп-572-біл",
+      "family": "enamel",
+      "code": "ЕП-572 БІЛ",
+      "name": "Емаль ЕП-572 Біла (банка 2,5кг)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 416.7,
+      "priceNdsPerKg": 500.04
+    },
+    {
+      "id": "price-еп-572-чор",
+      "family": "enamel",
+      "code": "ЕП-572 ЧОР",
+      "name": "Емаль ЕП-572 Чорна (банка 2,5кг)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 400,
+      "priceNdsPerKg": 480
+    },
+    {
+      "id": "price-еп-574-чер",
+      "family": "enamel",
+      "code": "ЕП-574 ЧЕР",
+      "name": "Емаль ЕП-574 Червоно-коричнева",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-еп-574-сір",
+      "family": "enamel",
+      "code": "ЕП-574 СІР",
+      "name": "Емаль ЕП-574 Сіра",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 279.2,
+      "priceNdsPerKg": 335.04
+    },
+    {
+      "id": "price-еп-586-кре",
+      "family": "enamel",
+      "code": "ЕП-586 КРЕ",
+      "name": "Емаль ЕП-586 Кремово-жовта",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 268.35,
+      "priceNdsPerKg": 322.02
+    },
+    {
+      "id": "price-еп-773-беж",
+      "family": "enamel",
+      "code": "ЕП-773 БЕЖ",
+      "name": "Емаль ЕП-773 Бежева, кремова, сіра",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 233.35,
+      "priceNdsPerKg": 280.02
+    },
+    {
+      "id": "price-еп-773-зел",
+      "family": "enamel",
+      "code": "ЕП-773 ЗЕЛ",
+      "name": "Емаль ЕП-773 Зелена, червона",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 237.5,
+      "priceNdsPerKg": 285
+    },
+    {
+      "id": "price-еп-9111-чер",
+      "family": "enamel",
+      "code": "ЕП-9111 ЧЕР",
+      "name": "Емаль ЕП-9111 Червоно-корич. (електроізол.)",
+      "bucketKg": 20,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 88,
+      "priceNdsPerKg": 105.6
+    },
+    {
+      "id": "price-r9018",
+      "family": "enamel",
+      "code": "Цин-Акр СвСр",
+      "name": "Емаль ЦинкАкрил Світло-сіра R9018",
+      "bucketKg": 20,
+      "drumKg": null,
+      "priceNoNdsPerKg": null,
+      "priceNdsPerKg": null
+    },
+    {
+      "id": "price-затверджувач-n4",
+      "family": "other",
+      "code": "Затверд №4",
+      "name": "Затверджувач N4",
+      "bucketKg": 6,
+      "drumKg": null,
+      "priceNoNdsPerKg": 483.5,
+      "priceNdsPerKg": 580.2
+    },
+    {
+      "id": "price-пф-002-чер",
+      "family": "enamel",
+      "code": "ПФ-002 ЧЕР",
+      "name": "Шпаклівка ПФ-002 Червоно-корич.",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 141.7,
+      "priceNdsPerKg": 170.04
+    },
+    {
+      "id": "price-пф-002-сір",
+      "family": "enamel",
+      "code": "ПФ-002 СІР",
+      "name": "Шпаклівка ПФ-002 Сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 141.7,
+      "priceNdsPerKg": 170.04
+    },
+    {
+      "id": "price-нц-008-зах",
+      "family": "putty",
+      "code": "НЦ-008 ЗАХ",
+      "name": "Шпаклівка НЦ-008 Захисна",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 193.35,
+      "priceNdsPerKg": 232.02
+    },
+    {
+      "id": "price-нц-008-сір",
+      "family": "putty",
+      "code": "НЦ-008 СІР",
+      "name": "Шпаклівка НЦ-008 Сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 193.35,
+      "priceNdsPerKg": 232.02
+    },
+    {
+      "id": "price-хв-004-зел",
+      "family": "enamel",
+      "code": "ХВ-004 ЗЕЛ",
+      "name": "Шпаклівка ХВ-004 Зелена",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 165,
+      "priceNdsPerKg": 198
+    },
+    {
+      "id": "price-хв-004-чер",
+      "family": "enamel",
+      "code": "ХВ-004 ЧЕР",
+      "name": "Шпаклівка ХВ-004 Червоно-кор.",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 165,
+      "priceNdsPerKg": 198
+    },
+    {
+      "id": "price-хв-004-сір",
+      "family": "enamel",
+      "code": "ХВ-004 СІР",
+      "name": "Шпаклівка ХВ-004 Сіра",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 165,
+      "priceNdsPerKg": 198
+    },
+    {
+      "id": "price-еп-0010-к",
+      "family": "putty",
+      "code": "ЕП-0010 К",
+      "name": "Шпаклівка ЕП-0010 к/кор.",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 245,
+      "priceNdsPerKg": 294
+    },
+    {
+      "id": "price-еп-0020-к",
+      "family": "putty",
+      "code": "ЕП-0020 К",
+      "name": "Шпаклівка ЕП-0020 к/кор.",
+      "bucketKg": 25,
+      "drumKg": 50,
+      "priceNoNdsPerKg": 192,
+      "priceNdsPerKg": 230.4
+    },
+    {
+      "id": "price-композит-чорний",
+      "family": "other",
+      "code": "Комп-Черн",
+      "name": "Композит чорний",
+      "bucketKg": null,
+      "drumKg": null,
+      "priceNoNdsPerKg": 161.7,
+      "priceNdsPerKg": 194.04
+    },
+    {
+      "id": "price-перетворювач-іржі",
+      "family": "other",
+      "code": "Пертв-рж",
+      "name": "Перетворювач іржі",
+      "bucketKg": 10,
+      "drumKg": null,
+      "priceNoNdsPerKg": 112.5,
+      "priceNdsPerKg": 135
+    },
+    {
+      "id": "price-р-646",
+      "family": "other",
+      "code": "Р-646",
+      "name": "Р-ки Р-4, Р-5, Р-646",
+      "bucketKg": null,
+      "drumKg": null,
+      "priceNoNdsPerKg": 165,
+      "priceNdsPerKg": 198
+    },
+    {
+      "id": "price-р-к-ксилол",
+      "family": "other",
+      "code": "Р-к Ксил",
+      "name": "Р-к Ксилол",
+      "bucketKg": null,
+      "drumKg": null,
+      "priceNoNdsPerKg": 150,
+      "priceNdsPerKg": 180
+    }
+  ]
+}

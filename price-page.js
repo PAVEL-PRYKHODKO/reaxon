@@ -66,30 +66,6 @@ function toMoney(value) {
   return Number.isFinite(num) && num > 0 ? num.toFixed(2) : "";
 }
 
-/** Шесть ячеек упаковки: сначала все суммы без НДС (2,8 / 19,4 / 46,6 кг), затем все с НДС. */
-function packColsAll(p) {
-  const fnNo = typeof window.dpComputePriceTablePackTotalsNoNds === "function" ? window.dpComputePriceTablePackTotalsNoNds : null;
-  const fnNds =
-    typeof window.dpComputePriceTablePackTotalsNds === "function" ? window.dpComputePriceTablePackTotalsNds : null;
-  const fmt = window.dpFormatPackMoney;
-  const f = typeof fmt === "function" ? fmt : (n) => (Number(n) > 0 ? Number(n).toFixed(2) : "—");
-  const arrNo = fnNo ? fnNo(p.priceNoNdsPerKg) : null;
-  const arrNds = fnNds ? fnNds(p.priceNdsPerKg) : null;
-  const bez = [];
-  const sNds = [];
-  for (let i = 0; i < 3; i += 1) {
-    bez.push(
-      arrNo != null && arrNo[i] != null && Number.isFinite(Number(arrNo[i])) && Number(arrNo[i]) > 0 ? f(arrNo[i]) : "—"
-    );
-    sNds.push(
-      arrNds != null && arrNds[i] != null && Number.isFinite(Number(arrNds[i])) && Number(arrNds[i]) > 0
-        ? f(arrNds[i])
-        : "—"
-    );
-  }
-  return [...bez, ...sNds];
-}
-
 function getAuthUserRole() {
   try {
     if (!localStorage.getItem("authToken")) return "";
@@ -100,21 +76,18 @@ function getAuthUserRole() {
   }
 }
 
+function isPriceEditorRole(role) {
+  const r = String(role || "").trim().toLowerCase();
+  return r === "admin" || r === "accountant" || r === "bookkeeper" || r === "бухгалтер";
+}
+
 function isPriceAdmin() {
-  return getAuthUserRole() === "admin";
+  return isPriceEditorRole(getAuthUserRole());
 }
 
 /** Столбец ID — только для администратора, модератора и бухгалтера (тип покрытия виден всем, подпись RU/UA). */
 function priceShowsIdFamilyColumns() {
-  const r = getAuthUserRole();
-  if (!r) return false;
-  return (
-    r === "admin" ||
-    r === "moderator" ||
-    r === "accountant" ||
-    r === "bookkeeper" ||
-    r === "бухгалтер"
-  );
+  return true;
 }
 
 function syncPriceTableColumnVisibility() {
@@ -208,8 +181,52 @@ function getRows() {
   const arr = Array.isArray(window.PRODUCTS_DATA) ? window.PRODUCTS_DATA : [];
   const merge =
     typeof window.dpMergeCatalogRaw === "function" ? window.dpMergeCatalogRaw : (r) => r;
-  const norm = typeof window.dpNormalizeProduct === "function" ? window.dpNormalizeProduct : (r) => r;
+  const norm =
+    typeof window.dpNormalizeCatalogProduct === "function"
+      ? window.dpNormalizeCatalogProduct
+      : typeof window.dpNormalizeProduct === "function"
+      ? window.dpNormalizeProduct
+      : (r) => r;
   return arr.map((raw) => norm(merge(raw)));
+}
+
+function getDynamicPriceColumns(rows) {
+  const out = [];
+  const seen = new Set();
+  for (const p of rows) {
+    const map = p && p.extraPriceColumns && typeof p.extraPriceColumns === "object" ? p.extraPriceColumns : null;
+    if (!map) continue;
+    for (const key of Object.keys(map)) {
+      const label = String(key || "").trim();
+      if (!label) continue;
+      const k = label.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push(label);
+    }
+  }
+  return out;
+}
+
+function renderPriceTableHeader(dynamicCols) {
+  const table = priceEl("tableId");
+  if (!table) return;
+  const row = table.querySelector("thead tr");
+  if (!row) return;
+  const staticHeader = `
+    <th>ID</th>
+    <th data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</th>
+    <th>Артикул</th>
+    <th>Наименование</th>
+    <th>Без НДС / кг</th>
+    <th>С НДС / кг</th>
+    <th title="Мала банка, кг">мал /кг/ банка</th>
+    <th title="Велика банка, кг">вел /кг/ банка</th>
+    <th title="Фасовка ведра, кг">Вага /кг/ відро</th>
+    <th title="Фасовка барабана, кг">Вага /кг/ барабан</th>
+  `;
+  const dynHeader = dynamicCols.map((label) => `<th>${escAttr(label)}</th>`).join("");
+  row.innerHTML = `${staticHeader}${dynHeader}`;
 }
 
 function cellReadonly(text) {
@@ -243,17 +260,28 @@ function renderPriceTable(options) {
   const body = priceEl("tbodyId");
   if (!body) return;
   const rows = getFilteredRows();
+  const dynamicCols = getDynamicPriceColumns(rows);
+  renderPriceTableHeader(dynamicCols);
 
   body.innerHTML = rows
     .map((p) => {
       const id = p.id ?? "";
-      const pk = packColsAll(p);
-      const packRow = pk.map((x) => `<td>${escAttr(x)}</td>`).join("");
       const code = p.code ?? p.series ?? "";
       const fam = p.family ?? "";
       const nm = p.name ?? p.fullName ?? "";
       const pNo = toMoney(p.priceNoNdsPerKg);
       const pNds = toMoney(p.priceNdsPerKg);
+      const jarSmall = toMoney(p.jarSmallKg);
+      const jarBig = toMoney(p.jarBigKg);
+      const bucket = toMoney(p.bucketKg);
+      const drum = toMoney(p.drumKg);
+      const extraMap = p && p.extraPriceColumns && typeof p.extraPriceColumns === "object" ? p.extraPriceColumns : {};
+      const dynRow = dynamicCols
+        .map((col) => {
+          const raw = Object.prototype.hasOwnProperty.call(extraMap, col) ? extraMap[col] : "";
+          return `<td>${escAttr(String(raw ?? ""))}</td>`;
+        })
+        .join("");
 
       if (admin) {
         return `
@@ -261,10 +289,14 @@ function renderPriceTable(options) {
           <td>${cellReadonly(id)}</td>
           <td>${cellFamilySelect(id, fam)}</td>
           <td>${cellInput(id, "code", code, "text")}</td>
-          <td>${cellInput(id, "name", nm, "text")}</td>
+          <td>${cellReadonly(nm)}</td>
           <td>${cellInput(id, "priceNoNdsPerKg", pNo, "number", 'step="0.01" min="0"')}</td>
           <td>${cellInput(id, "priceNdsPerKg", pNds, "number", 'step="0.01" min="0"')}</td>
-          ${packRow}
+          <td>${cellInput(id, "jarSmallKg", jarSmall, "number", 'step="0.01" min="0"')}</td>
+          <td>${cellInput(id, "jarBigKg", jarBig, "number", 'step="0.01" min="0"')}</td>
+          <td>${cellInput(id, "bucketKg", bucket, "number", 'step="0.01" min="0"')}</td>
+          <td>${cellInput(id, "drumKg", drum, "number", 'step="0.01" min="0"')}</td>
+          ${dynRow}
         </tr>
       `;
       }
@@ -277,7 +309,11 @@ function renderPriceTable(options) {
           <td>${escAttr(nm)}</td>
           <td>${escAttr(pNo)}</td>
           <td>${escAttr(pNds)}</td>
-          ${packRow}
+          <td>${escAttr(jarSmall)}</td>
+          <td>${escAttr(jarBig)}</td>
+          <td>${escAttr(bucket)}</td>
+          <td>${escAttr(drum)}</td>
+          ${dynRow}
         </tr>
       `;
     })
@@ -332,22 +368,7 @@ function updatePriceActionButtons() {
 
 /** После сброса полей — обновить суммы по фасовкам из актуальных данных каталога. */
 function refreshAdminPricePackColumnsFromServer() {
-  if (document.body.dataset.crmEmbeddedPriceTable === "1") return;
-  const tbody = priceEl("tbodyId");
-  if (!tbody || !isPriceAdmin()) return;
-  const byId = new Map(getRows().map((p) => [String(p.id), p]));
-  tbody.querySelectorAll("tr[data-product-id]").forEach((tr) => {
-    const id = tr.getAttribute("data-product-id");
-    const p = byId.get(String(id));
-    if (!p) return;
-    const tds = tr.querySelectorAll("td");
-    if (tds.length < 12) return;
-    const pk = packColsAll(p);
-    for (let i = 0; i < 6; i += 1) {
-      const cell = tds[6 + i];
-      if (cell) cell.textContent = pk[i] ?? "—";
-    }
-  });
+  return;
 }
 
 function discardPricePendingEdits() {
@@ -533,17 +554,9 @@ function initPriceFilters() {
 /** Те же колонки, что таблица / Excel / PDF */
 function getPriceExportTableData() {
   const rows = getFilteredRows();
+  const dynamicCols = getDynamicPriceColumns(rows);
   const showIdCol = priceShowsIdFamilyColumns();
-  const tailHeader = [
-    "Без НДС за кг, грн",
-    "С НДС за кг, грн",
-    "2,8 кг без НДС, грн",
-    "≈19,4 кг без НДС, грн",
-    "≈46,6 кг без НДС, грн",
-    "2,8 кг с НДС, грн",
-    "≈19,4 кг с НДС, грн",
-    "≈46,6 кг с НДС, грн",
-  ];
+  const tailHeader = ["Без НДС за кг, грн", "С НДС за кг, грн", "мал /кг/ банка", "вел /кг/ банка", "Вага /кг/ відро", "Вага /кг/ барабан", ...dynamicCols];
   const typeCol =
     typeof window.dpCatalogPriceTypeColumnHeading === "function"
       ? window.dpCatalogPriceTypeColumnHeading()
@@ -555,12 +568,15 @@ function getPriceExportTableData() {
   const body = rows.map((p) => {
     const code = p.code ?? p.series ?? "";
     const nm = p.name ?? p.fullName ?? "";
-    const pk = packColsAll(p);
     const kgNo = toMoney(p.priceNoNdsPerKg);
     const kgNds = toMoney(p.priceNdsPerKg);
     const familyLbl = dpPriceFamilyCellLabel(p.family);
+    const extraMap = p && p.extraPriceColumns && typeof p.extraPriceColumns === "object" ? p.extraPriceColumns : {};
+    const dynVals = dynamicCols.map((col) =>
+      Object.prototype.hasOwnProperty.call(extraMap, col) ? String(extraMap[col] ?? "") : ""
+    );
 
-    const tail = [kgNo, kgNds, pk[0], pk[1], pk[2], pk[3], pk[4], pk[5]];
+    const tail = [kgNo, kgNds, toMoney(p.jarSmallKg), toMoney(p.jarBigKg), toMoney(p.bucketKg), toMoney(p.drumKg), ...dynVals];
     const withId = [p.id != null ? String(p.id) : "", familyLbl, code, nm, ...tail];
     return showIdCol ? withId : [code, familyLbl, nm, ...tail];
   });

@@ -244,7 +244,7 @@
     const out = { ...p };
     const r = window.dpRoundMoney;
     const rn = typeof r === "function" ? r : (v) => Math.round(Number(v) * 100) / 100;
-    for (const key of ["priceNoNdsPerKg", "priceNdsPerKg", "bucketKg", "drumKg"]) {
+    for (const key of ["priceNoNdsPerKg", "priceNdsPerKg", "jarSmallKg", "jarBigKg", "bucketKg", "drumKg"]) {
       const v = out[key];
       if (v === "" || v === undefined) {
         out[key] = null;

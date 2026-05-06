@@ -1174,6 +1174,11 @@ body {
   box-shadow: 0 0 0 2px color-mix(in srgb, #d11a2a 20%, transparent);
 }
 
+.ap-price-field.ap-price-field-invalid {
+  border-color: #d11a2a !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #d11a2a 20%, transparent);
+}
+
 .ap-product-catalog {
   max-height: calc(100vh - 15.5rem);
   overflow-y: auto;

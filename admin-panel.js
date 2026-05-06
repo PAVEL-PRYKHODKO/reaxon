@@ -2717,7 +2717,7 @@ function apEnsureUnifiedCatalogArticleCodes() {
 async function loadAdminProductsCatalog() {
   try {
     const d = await apiAdmin("GET", "/api/admin/products-catalog");
-    if (Array.isArray(d.products) && d.products.length) {
+    if (Array.isArray(d.products)) {
       window.PRODUCTS_DATA = d.products;
       apEnsureUnifiedCatalogArticleCodes();
     }
@@ -2849,16 +2849,17 @@ function addApPriceImportHistory(entry) {
   renderApPriceImportHistory();
 }
 
-/** Пустой каталог в браузере: таблица и импорт готовы к новому файлу; сервер не трогается, пока не нажмёте «Сохранить». */
-function clearApPriceCatalogLocalData() {
+/** Полная очистка каталога: очищает таблицу и сразу сохраняет пустой каталог на сервере. */
+async function clearApPriceCatalogLocalData() {
   const status = document.getElementById("ap-price-save-status");
   if (
     !window.confirm(
-      "Удалить все позиции прайса в этом окне браузера и сбросить историю загрузок?\n\nИмпорт CSV/Excel и таблица останутся — можно сразу загрузить новый файл.\nЧтобы сайт перестал показывать старый прайс, после очистки нажмите «Сохранить каталог на сервер»."
+      "Удалить все позиции прайса и сразу записать пустой каталог на сервер?\n\nПозиции исчезнут в админке, products.html и price.html после сохранения."
     )
   ) {
     return;
   }
+  setStatus(status, "Очищаем каталог и сохраняем изменения на сервер...", null);
   window.PRODUCTS_DATA = [];
   saveApPriceImportHistory([]);
   setApPriceLastFile(null);
@@ -2868,12 +2869,16 @@ function clearApPriceCatalogLocalData() {
   apPriceFindCursor = -1;
   apClearPriceRowHighlight();
   renderApPriceTable();
-  setApCatalogDirty(true);
-  setStatus(
-    status,
-    "Каталог очищен в браузере. Загрузите новый файл или отредактируйте таблицу, затем сохраните на сервер.",
-    "ok"
-  );
+  try {
+    await apiAdmin("PUT", "/api/admin/products-catalog", { products: [] });
+    setApCatalogDirty(false);
+    await notifyPublicCatalogUpdated();
+    await renderApPriceServerBackups();
+    setStatus(status, "Каталог очищен и сохранён на сервере. Данные на сайте обновлены.", "ok");
+  } catch (e) {
+    setApCatalogDirty(true);
+    setStatus(status, `Локально очищено, но не сохранено на сервер: ${e.message || String(e)}`, "err");
+  }
 }
 
 function rollbackApPriceImport(id) {
@@ -2935,7 +2940,8 @@ async function restoreApPriceServerBackup(id) {
   }
 }
 
-const AP_PRICE_IMPORT_FIELDS = ["id", "family", "code", "name", "bucketKg", "drumKg", "priceNoNdsPerKg", "priceNdsPerKg"];
+const AP_PRICE_IMPORT_FIELDS = ["id", "family", "code", "name", "jarSmallKg", "jarBigKg", "bucketKg", "drumKg", "priceNoNdsPerKg", "priceNdsPerKg"];
+let apPriceDynamicColumns = [];
 const AP_PRICE_IMPORT_ALIASES = {
   id: ["id", "ид", "ід", "identifier", "sku_id"],
   family: [
@@ -2964,6 +2970,8 @@ const AP_PRICE_IMPORT_ALIASES = {
     "продукція",
     "номенклатура",
   ],
+  jarSmallKg: ["jarsmallkg", "малкгбанка", "мал/кг/банка", "малбанка", "малабанка", "мал"],
+  jarBigKg: ["jarbigkg", "велкгбанка", "вел/кг/банка", "велбанка", "великабанка", "вел"],
   bucketKg: ["bucketkg", "ведрокг", "відрокг", "ведро", "відро", "фасовкаведро", "фасуваннявідро", "вагакгвідро", "вагакгведро"],
   drumKg: ["drumkg", "барабанкг", "бочкакг", "барабан", "бочка", "вагакгбарабан", "вагакгбочка"],
   priceNoNdsPerKg: [
@@ -2996,8 +3004,6 @@ const AP_PRICE_IMPORT_ALIASES = {
     "цена",
     "ціна",
   ],
-  total20Nds: ["20", "20кг", "20kg", "19.4", "19,4", "194кг", "цена20кг", "ціна20кг", "20кгсндс", "20кгзпдв"],
-  total50Nds: ["50", "50кг", "50kg", "46.6", "46,6", "466кг", "цена50кг", "ціна50кг", "50кгсндс", "50кгзпдв"],
 };
 
 function normalizeImportHeaderCell(h) {
@@ -3021,6 +3027,102 @@ function apPriceNum(v) {
   else s = s.replace(",", ".");
   const n = Number(s);
   return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+function apPackRangeLabelByKg(kgRaw) {
+  const w = Number(kgRaw);
+  if (!Number.isFinite(w) || w <= 0) return "—";
+  if (w >= 0.1 && w <= 2.7) return "Банка мал";
+  if (w >= 2.8 && w <= 6) return "Банка бол";
+  if (w >= 7 && w <= 30) return "Ведро";
+  if (w >= 32 && w <= 50) return "Барабан";
+  return "Вне диапазона";
+}
+
+function apPriceRangeMatch(field, valueRaw) {
+  const v = Number(valueRaw);
+  if (!Number.isFinite(v) || v <= 0) return true;
+  if (field === "jarSmallKg") return v >= 0.1 && v <= 2.7;
+  if (field === "jarBigKg") return v >= 2.8 && v <= 6;
+  if (field === "bucketKg") return v >= 7 && v <= 30;
+  if (field === "drumKg") return v >= 32 && v <= 50;
+  return true;
+}
+
+function apApplyPriceRangeValidationForRow(tr, p) {
+  if (!(tr instanceof HTMLTableRowElement)) return true;
+  let ok = true;
+  ["jarSmallKg", "jarBigKg", "bucketKg", "drumKg"].forEach((field) => {
+    const inp = tr.querySelector(`input[data-ap-field="${field}"]`);
+    if (!(inp instanceof HTMLInputElement)) return;
+    const valid = apPriceRangeMatch(field, p?.[field]);
+    inp.classList.toggle("ap-price-field-invalid", !valid);
+    if (!valid) ok = false;
+  });
+  return ok;
+}
+
+function apCollectPriceRangeIssues() {
+  const list = Array.isArray(window.PRODUCTS_DATA) ? window.PRODUCTS_DATA : [];
+  const issues = [];
+  for (const p of list) {
+    for (const field of ["jarSmallKg", "jarBigKg", "bucketKg", "drumKg"]) {
+      if (!apPriceRangeMatch(field, p?.[field])) issues.push({ id: String(p?.id || ""), field, value: p?.[field] });
+    }
+  }
+  return issues;
+}
+
+function apPriceKnownColumnIndexes(idx) {
+  const out = new Set();
+  for (const key of AP_PRICE_IMPORT_FIELDS) {
+    const i = Number(idx[key]);
+    if (Number.isFinite(i) && i >= 0) out.add(i);
+  }
+  return out;
+}
+
+function apExtractDynamicColumnsFromHeader(headerCells, idx) {
+  const known = apPriceKnownColumnIndexes(idx);
+  const cols = [];
+  const seen = new Set();
+  for (let i = 0; i < headerCells.length; i += 1) {
+    if (known.has(i)) continue;
+    const raw = String(headerCells[i] || "").trim();
+    if (!raw) continue;
+    const key = raw.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    cols.push(raw);
+  }
+  return cols;
+}
+
+function apRebuildDynamicColumns(preferred = []) {
+  const out = [];
+  const seen = new Set();
+  for (const c of preferred) {
+    const label = String(c || "").trim();
+    if (!label) continue;
+    const k = label.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(label);
+  }
+  const list = Array.isArray(window.PRODUCTS_DATA) ? window.PRODUCTS_DATA : [];
+  for (const p of list) {
+    const map = p && p.extraPriceColumns && typeof p.extraPriceColumns === "object" ? p.extraPriceColumns : null;
+    if (!map) continue;
+    for (const key of Object.keys(map)) {
+      const label = String(key || "").trim();
+      if (!label) continue;
+      const k = label.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push(label);
+    }
+  }
+  apPriceDynamicColumns = out;
 }
 
 function apPriceInferFamily(row) {
@@ -3097,9 +3199,11 @@ function parseTablePriceCatalog(rawRows) {
     .filter((r) => r.some(Boolean));
   if (rows.length < 2) throw new Error("Нужна строка заголовков и хотя бы одна строка данных.");
   const headerRow = apFindPriceHeaderRow(rows);
-  const header = rows[headerRow].map(normalizeImportHeaderCell);
+  const headerCells = rows[headerRow].map((x) => String(x || "").trim());
+  const header = headerCells.map(normalizeImportHeaderCell);
   const idx = {};
   for (const field of Object.keys(AP_PRICE_IMPORT_ALIASES)) idx[field] = apAliasIndex(header, field);
+  const dynamicCols = apExtractDynamicColumnsFromHeader(headerCells, idx);
   const products = [];
   for (let r = headerRow + 1; r < rows.length; r++) {
     const cells = rows[r];
@@ -3112,50 +3216,41 @@ function parseTablePriceCatalog(rawRows) {
       family: cellStr("family"),
       code: cellStr("code"),
       name: cellStr("name"),
+      jarSmallKg: apPriceNum(cellStr("jarSmallKg")),
+      jarBigKg: apPriceNum(cellStr("jarBigKg")),
       bucketKg: apPriceNum(cellStr("bucketKg")),
       drumKg: apPriceNum(cellStr("drumKg")),
       priceNoNdsPerKg: apPriceNum(cellStr("priceNoNdsPerKg")),
       priceNdsPerKg: apPriceNum(cellStr("priceNdsPerKg")),
     };
+    const extraPriceColumns = {};
+    for (const colLabel of dynamicCols) {
+      const ci = headerCells.findIndex((h) => String(h || "").trim() === colLabel);
+      if (ci < 0 || ci >= cells.length) continue;
+      const val = String(cells[ci] || "").trim();
+      if (!val) continue;
+      extraPriceColumns[colLabel] = val;
+    }
+    if (Object.keys(extraPriceColumns).length) raw.extraPriceColumns = extraPriceColumns;
     if (!raw.code) raw.code = apExtractProductCode(raw.name);
     const presentFields = AP_PRICE_IMPORT_FIELDS.filter((field) => {
       if (idx[field] < 0) return false;
       if (field === "id" || field === "family" || field === "code" || field === "name") {
         return String(raw[field] || "").length > 0;
       }
-      if (field === "bucketKg" || field === "drumKg" || field === "priceNoNdsPerKg" || field === "priceNdsPerKg") {
+      if (field === "jarSmallKg" || field === "jarBigKg" || field === "bucketKg" || field === "drumKg" || field === "priceNoNdsPerKg" || field === "priceNdsPerKg") {
         return raw[field] != null;
       }
       return false;
     });
     if (raw.code && !presentFields.includes("code")) presentFields.push("code");
-    if (raw.priceNdsPerKg == null) {
-      const total20 = apPriceNum(cellStr("total20Nds"));
-      const total50 = apPriceNum(cellStr("total50Nds"));
-      const rm =
-        typeof window.dpRoundMoney === "function"
-          ? window.dpRoundMoney
-          : (x) => (Number.isFinite(Number(x)) ? Math.round(Number(x) * 100) / 100 : null);
-      if (total20 != null && total20 > 0) {
-        const pk = rm(total20 / 19.4);
-        if (pk != null && pk >= 0) {
-          raw.priceNdsPerKg = pk;
-          presentFields.push("priceNdsPerKg");
-        }
-      } else if (total50 != null && total50 > 0) {
-        const pk = rm(total50 / 46.6);
-        if (pk != null && pk >= 0) {
-          raw.priceNdsPerKg = pk;
-          presentFields.push("priceNdsPerKg");
-        }
-      }
-    }
     if (!raw.id && !raw.code && !raw.name) continue;
     raw.family = raw.family || apPriceInferFamily(raw);
     raw._apPresent = presentFields;
     products.push(raw);
   }
   if (products.length === 0) throw new Error("Не удалось разобрать ни одной строки товара.");
+  products._apDynamicColumns = dynamicCols;
   return products;
 }
 
@@ -3317,6 +3412,16 @@ function mergeImportedPriceCatalog(imported) {
           target[field] = value;
         }
       }
+      if (raw.extraPriceColumns && typeof raw.extraPriceColumns === "object") {
+        if (!target.extraPriceColumns || typeof target.extraPriceColumns !== "object") target.extraPriceColumns = {};
+        for (const [k, v] of Object.entries(raw.extraPriceColumns)) {
+          const key = String(k || "").trim();
+          if (!key) continue;
+          const value = String(v || "").trim();
+          if (!value) continue;
+          target.extraPriceColumns[key] = value;
+        }
+      }
       updated += 1;
       continue;
     }
@@ -3331,11 +3436,16 @@ function mergeImportedPriceCatalog(imported) {
       family: apPriceInferFamily(raw),
       code: String(raw.code || "").trim(),
       name: String(raw.name || raw.code || "Новая позиция").trim(),
+      jarSmallKg: raw.jarSmallKg,
+      jarBigKg: raw.jarBigKg,
       bucketKg: raw.bucketKg,
       drumKg: raw.drumKg,
       priceNoNdsPerKg: raw.priceNoNdsPerKg,
       priceNdsPerKg: raw.priceNdsPerKg,
     };
+    if (raw.extraPriceColumns && typeof raw.extraPriceColumns === "object" && Object.keys(raw.extraPriceColumns).length) {
+      p.extraPriceColumns = { ...raw.extraPriceColumns };
+    }
     next.push(p);
     byId.set(p.id, p);
     added += 1;
@@ -3344,18 +3454,15 @@ function mergeImportedPriceCatalog(imported) {
 }
 
 function updateApPriceRowCalc(tr, p) {
-  const fn = window.dpComputePriceTablePackTotalsNds;
-  const arr = typeof fn === "function" ? fn(p.priceNdsPerKg) : null;
-  const fmt = window.dpFormatPackMoney;
-  const f = typeof fmt === "function" ? fmt : (n) => (Number(n) > 0 ? Number(n).toFixed(2) : "—");
-  tr.querySelectorAll("[data-ap-calc-idx]").forEach((el) => {
-    const i = Number(el.getAttribute("data-ap-calc-idx"));
-    if (!Number.isFinite(i) || i < 0 || !arr || arr[i] == null || !(Number(arr[i]) > 0)) {
-      el.textContent = "—";
-    } else {
-      el.textContent = f(arr[i]);
-    }
-  });
+  const small = tr.querySelector('[data-ap-pack-class="jarSmallKg"]');
+  if (small) small.textContent = apPackRangeLabelByKg(p?.jarSmallKg);
+  const big = tr.querySelector('[data-ap-pack-class="jarBigKg"]');
+  if (big) big.textContent = apPackRangeLabelByKg(p?.jarBigKg);
+  const bucketCell = tr.querySelector('[data-ap-pack-class="bucketKg"]');
+  if (bucketCell) bucketCell.textContent = apPackRangeLabelByKg(p?.bucketKg);
+  const drumCell = tr.querySelector('[data-ap-pack-class="drumKg"]');
+  if (drumCell) drumCell.textContent = apPackRangeLabelByKg(p?.drumKg);
+  apApplyPriceRangeValidationForRow(tr, p);
 }
 
 function apFilteredPriceProducts() {
@@ -3427,8 +3534,14 @@ function apFindNextPricePosition() {
 function renderApPriceTable() {
   const body = document.getElementById("ap-price-catalog-body");
   if (!body) return;
+  apRebuildDynamicColumns();
   const rows = apFilteredPriceProducts();
   const sorted = [...rows].sort(sortProductsAdmin);
+  const headRow = document.querySelector("#ap-view-prices .ap-price-edit-table thead tr");
+  if (headRow) {
+    const dynHead = apPriceDynamicColumns.map((c) => `<th>${escapeHtml(c)}</th>`).join("");
+    headRow.innerHTML = `<th>ID</th><th data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</th><th title="Числовой артикул, единый с каталогом и прайсом на сайте">Артикул</th><th>Наименование</th><th>Без НДС / кг</th><th>С НДС / кг</th><th title="Мала банка, кг">мал /кг/ банка</th><th title="Велика банка, кг">вел /кг/ банка</th><th title="Фасовка ведра, кг">Вага /кг/ відро</th><th title="Фасовка барабана, кг">Вага /кг/ барабан</th>${dynHead}`;
+  }
   body.innerHTML = sorted
     .map((p) => {
       const id = escapeHtml(p.id);
@@ -3438,6 +3551,12 @@ function renderApPriceTable() {
         typeof window.dpPriceFamilySelectOptionsInnerHtml === "function"
           ? `<select class="ap-price-field ap-price-family-select" data-ap-pid="${id}" data-ap-field="family">${window.dpPriceFamilySelectOptionsInnerHtml(escapeHtml, p.family)}</select>`
           : inp("family");
+      const dynCells = apPriceDynamicColumns
+        .map((col) => {
+          const val = p?.extraPriceColumns && typeof p.extraPriceColumns === "object" ? String(p.extraPriceColumns[col] || "") : "";
+          return `<td><input type="text" class="ap-price-field" data-ap-pid="${id}" data-ap-extra-label="${escapeHtml(col)}" value="${escapeHtml(val)}" inputmode="text" /></td>`;
+        })
+        .join("");
       return `<tr data-ap-pid="${id}">
         <td><code>${id}</code></td>
         <td>${familyCell}</td>
@@ -3445,10 +3564,11 @@ function renderApPriceTable() {
         <td>${inp("name", "ap-price-name-input")}</td>
         <td>${inp("priceNoNdsPerKg")}</td>
         <td>${inp("priceNdsPerKg")}</td>
-        <td data-ap-calc-idx="0">—</td>
-        <td data-ap-calc-idx="1">—</td>
-        <td data-ap-calc-idx="2">—</td>
-        <td><input type="text" class="ap-pack-back ap-price-field" data-ap-pid="${id}" data-kg="19.4" placeholder="20 кг →" title="Введите сумму с НДС за фасовку 20 кг — пересчитать грн/кг с НДС" inputmode="decimal" /></td>
+        <td>${inp("jarSmallKg")}</td>
+        <td>${inp("jarBigKg")}</td>
+        <td>${inp("bucketKg")}</td>
+        <td>${inp("drumKg")}</td>
+        ${dynCells}
       </tr>`;
     })
     .join("");
@@ -3467,8 +3587,8 @@ if (!window.__apDpLangPriceTableBound) {
 }
 
 function downloadApPriceCsvTemplate() {
-  const header = "id,family,code,name,bucketKg,drumKg,priceNoNdsPerKg,priceNdsPerKg\n";
-  const sample = 'sample-1,enamel,ПФ-000,"Эмаль ПФ-000 условная",20,50,50.00,60.00\n';
+  const header = "id,family,code,name,jarSmallKg,jarBigKg,bucketKg,drumKg,priceNoNdsPerKg,priceNdsPerKg\n";
+  const sample = 'sample-1,enamel,ПФ-000,"Эмаль ПФ-000 условная",0.9,2.8,20,50,50.00,60.00\n';
   const blob = new Blob([`\uFEFF${header}${sample}`], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -3488,7 +3608,7 @@ async function notifyPublicCatalogUpdated() {
       const pr = await fetch(window.dpApiUrl("/api/site/products"));
       if (pr.ok) {
         const d = await pr.json();
-        if (Array.isArray(d.products) && d.products.length) {
+        if (Array.isArray(d.products)) {
           window.PRODUCTS_DATA = d.products;
           if (typeof window.dpNormalizeCatalogProductsInPlace === "function") {
             window.dpNormalizeCatalogProductsInPlace(window.PRODUCTS_DATA);
@@ -3511,6 +3631,23 @@ async function notifyPublicCatalogUpdated() {
 async function saveApProductsCatalog() {
   const status = document.getElementById("ap-price-save-status");
   try {
+    const issues = apCollectPriceRangeIssues();
+    if (issues.length) {
+      renderApPriceTable();
+      const preview = issues
+        .slice(0, 8)
+        .map((it) => `${it.field}: id=${it.id || "?"}, значение=${it.value}`)
+        .join("\n");
+      const force = window.confirm(
+        `Есть значения фасовок вне диапазонов (${issues.length}).\n\nПервые примеры:\n${preview}${
+          issues.length > 8 ? `\n... и ещё ${issues.length - 8}` : ""
+        }\n\nНажмите OK, чтобы сохранить каталог всё равно, или Отмена — чтобы исправить подсвеченные поля.`
+      );
+      if (!force) {
+        setStatus(status, `Есть значения фасовок вне диапазонов (${issues.length}). Исправьте подсвеченные поля.`, "err");
+        return;
+      }
+    }
     if (typeof window.dpNormalizeCatalogProductsInPlace === "function") {
       window.dpNormalizeCatalogProductsInPlace(window.PRODUCTS_DATA);
     }
@@ -3526,6 +3663,79 @@ async function saveApProductsCatalog() {
   } catch (e) {
     setStatus(status, e.message, "err");
   }
+}
+
+function apRangeFieldByWeight(vRaw) {
+  const v = Number(vRaw);
+  if (!Number.isFinite(v) || v <= 0) return null;
+  if (v >= 0.1 && v <= 2.7) return "jarSmallKg";
+  if (v >= 2.8 && v <= 6) return "jarBigKg";
+  if (v >= 7 && v <= 30) return "bucketKg";
+  if (v >= 32 && v <= 50) return "drumKg";
+  return null;
+}
+
+function apAutoFixPackRanges() {
+  const status = document.getElementById("ap-price-save-status");
+  const list = Array.isArray(window.PRODUCTS_DATA) ? window.PRODUCTS_DATA : [];
+  if (!list.length) {
+    setStatus(status, "Каталог пуст: нечего автоисправлять.", null);
+    return;
+  }
+  let changedProducts = 0;
+  let movedValues = 0;
+  let outOfRangeValues = 0;
+  let duplicateRangeValues = 0;
+  for (const p of list) {
+    const fields = ["jarSmallKg", "jarBigKg", "bucketKg", "drumKg"];
+    const values = fields
+      .map((field) => ({ field, value: apPriceNum(p?.[field]) }))
+      .filter((x) => Number.isFinite(x.value) && x.value > 0);
+    const next = { jarSmallKg: null, jarBigKg: null, bucketKg: null, drumKg: null };
+    const prev = {
+      jarSmallKg: apPriceNum(p?.jarSmallKg),
+      jarBigKg: apPriceNum(p?.jarBigKg),
+      bucketKg: apPriceNum(p?.bucketKg),
+      drumKg: apPriceNum(p?.drumKg),
+    };
+    let productChanged = false;
+    for (const item of values) {
+      const targetField = apRangeFieldByWeight(item.value);
+      if (!targetField) {
+        outOfRangeValues += 1;
+        continue;
+      }
+      if (next[targetField] == null) {
+        next[targetField] = item.value;
+      } else {
+        duplicateRangeValues += 1;
+      }
+      if (item.field !== targetField) {
+        movedValues += 1;
+        productChanged = true;
+      }
+    }
+    for (const f of fields) {
+      if (next[f] !== prev[f]) {
+        productChanged = true;
+      }
+      p[f] = next[f];
+    }
+    if (productChanged) changedProducts += 1;
+  }
+  renderApPriceTable();
+  setApCatalogDirty(true);
+  const tail = [
+    outOfRangeValues ? `вне диапазона: ${outOfRangeValues}` : "",
+    duplicateRangeValues ? `дубликаты в одном диапазоне: ${duplicateRangeValues}` : "",
+  ]
+    .filter(Boolean)
+    .join("; ");
+  setStatus(
+    status,
+    `Автоисправление завершено: позиций изменено ${changedProducts}, перемещено значений ${movedValues}.${tail ? ` ${tail}.` : ""} Проверьте и сохраните каталог на сервер.`,
+    "ok"
+  );
 }
 
 function getProducts() {
@@ -5530,12 +5740,20 @@ function apSyncProductsDataFromCatalogFieldControl(t) {
   if (t instanceof HTMLSelectElement && t.getAttribute("data-ap-field") !== "family") return false;
   const pid = t.getAttribute("data-ap-pid");
   const field = t.getAttribute("data-ap-field");
-  if (!pid || !field) return false;
+  const extraLabel = t.getAttribute("data-ap-extra-label");
+  if (!pid || (!field && !extraLabel)) return false;
   const p = window.PRODUCTS_DATA.find((x) => String(x.id) === pid);
   if (!p) return false;
-  if (field === "name" || field === "code" || field === "family") {
+  if (extraLabel) {
+    const key = String(extraLabel || "").trim();
+    if (!key) return false;
+    if (!p.extraPriceColumns || typeof p.extraPriceColumns !== "object") p.extraPriceColumns = {};
+    const v = String(t.value || "").trim();
+    if (v) p.extraPriceColumns[key] = v;
+    else delete p.extraPriceColumns[key];
+  } else if (field === "name" || field === "code" || field === "family") {
     p[field] = t.value.trim();
-  } else if (field === "priceNdsPerKg" || field === "priceNoNdsPerKg") {
+  } else if (field === "priceNdsPerKg" || field === "priceNoNdsPerKg" || field === "jarSmallKg" || field === "jarBigKg" || field === "bucketKg" || field === "drumKg") {
     const n = Number(String(t.value).replace(",", "."));
     p[field] = Number.isFinite(n) && n >= 0 ? n : null;
   }
@@ -5581,6 +5799,7 @@ document.getElementById("ap-price-catalog-body")?.addEventListener("change", (e)
 });
 
 document.getElementById("ap-price-save")?.addEventListener("click", () => saveApProductsCatalog());
+document.getElementById("ap-price-autofix-ranges")?.addEventListener("click", () => apAutoFixPackRanges());
 
 document.getElementById("ap-price-reload")?.addEventListener("click", async () => {
   const status = document.getElementById("ap-price-save-status");
@@ -5612,6 +5831,7 @@ document.getElementById("ap-price-csv-file")?.addEventListener("change", (e) => 
     try {
       const isExcel = /\.(xlsx|xls)$/i.test(f.name || "");
       const imported = isExcel ? parseExcelPriceCatalog(reader.result) : parseCsvPriceCatalog(reader.result);
+      apRebuildDynamicColumns(imported._apDynamicColumns || []);
       const dedupRows = dedupeImportedPriceCatalogRows(imported);
       const merged = mergeImportedPriceCatalog(dedupRows.rows);
       const dedupIds = dedupeCatalogProductsById(merged.products);

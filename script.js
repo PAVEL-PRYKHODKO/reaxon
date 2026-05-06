@@ -1152,15 +1152,14 @@ function roundCatalogNum(v) {
 window.dpNormalizeProduct = normalizeProduct;
 
 function hydrateProductsFromData() {
-  if (Array.isArray(window.PRODUCTS_DATA) && window.PRODUCTS_DATA.length) {
-    PRODUCTS.length = 0;
-    const merge =
-      typeof window.dpMergeCatalogRaw === "function" ? window.dpMergeCatalogRaw : (r) => r;
-    if (typeof window.dpApplyNumericCodesToCatalogData === "function") {
-      window.dpApplyNumericCodesToCatalogData(window.PRODUCTS_DATA);
-    }
-    PRODUCTS.push(...window.PRODUCTS_DATA.map((raw) => normalizeProduct(merge(raw))));
+  if (!Array.isArray(window.PRODUCTS_DATA)) return;
+  PRODUCTS.length = 0;
+  const merge =
+    typeof window.dpMergeCatalogRaw === "function" ? window.dpMergeCatalogRaw : (r) => r;
+  if (typeof window.dpApplyNumericCodesToCatalogData === "function") {
+    window.dpApplyNumericCodesToCatalogData(window.PRODUCTS_DATA);
   }
+  PRODUCTS.push(...window.PRODUCTS_DATA.map((raw) => normalizeProduct(merge(raw))));
 }
 hydrateProductsFromData();
 
@@ -2312,7 +2311,7 @@ function renderAdviceRecommendations() {
 }
 
 function getSiteSearchCatalogRows() {
-  if (Array.isArray(window.PRODUCTS_DATA) && window.PRODUCTS_DATA.length) return window.PRODUCTS_DATA;
+  if (Array.isArray(window.PRODUCTS_DATA)) return window.PRODUCTS_DATA;
   return PRODUCTS;
 }
 

@@ -8,6 +8,17 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="redesign-shared.css" />
   <link rel="stylesheet" href="site-lang.css" />
+  <style>
+    #price-table th:nth-child(4),
+    #price-table td:nth-child(4) {
+      min-width: 360px;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      line-height: 1.25;
+      vertical-align: top;
+    }
+  </style>
 </head>
 <body data-page="price" class="catalog-open">
   <div class="page-bg page-bg--site">
@@ -79,7 +90,7 @@
         <div class="section-head">
           <div>
             <h2>Прайс-лист</h2>
-            <p class="lead" id="price-lead-admin-detail" hidden>Данные подгружаются с сервера (если запущен API) или из локального файла. То же содержание, что загружается в админ-панели: цены за кг с НДС и без НДС; для опорных фасовок 2,8 / 19,4 / 46,6&nbsp;кг — суммы в грн за упаковку (без НДС и с НДС) получаются умножением соответствующей цены за кг на массу.</p>
+            <p class="lead" id="price-lead-admin-detail" hidden>Данные подгружаются с сервера (если запущен API) или из локального файла. Таблица синхронизирована с разделом «Прайс-лист» в админ-панели: те же строки, базовые колонки фасовок и дополнительные колонки из загруженного файла.</p>
           </div>
           <div class="dp-price-download-wrap">
             <button
@@ -142,14 +153,12 @@
                     <th data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</th>
                     <th>Артикул</th>
                     <th>Наименование</th>
-                    <th>Без НДС /<br />кг</th>
-                    <th>С НДС /<br />кг</th>
-                    <th scope="col">2,8&nbsp;кг<br /><span class="price-th-sub">без НДС</span></th>
-                    <th scope="col">≈19,4&nbsp;кг<br /><span class="price-th-sub">без НДС</span></th>
-                    <th scope="col">≈46,6&nbsp;кг<br /><span class="price-th-sub">без НДС</span></th>
-                    <th scope="col">2,8&nbsp;кг<br /><span class="price-th-sub">с НДС</span></th>
-                    <th scope="col">≈19,4&nbsp;кг<br /><span class="price-th-sub">с НДС</span></th>
-                    <th scope="col">≈46,6&nbsp;кг<br /><span class="price-th-sub">с НДС</span></th>
+                    <th>Без НДС / кг</th>
+                    <th>С НДС / кг</th>
+                    <th title="Мала банка, кг">мал /кг/ банка</th>
+                    <th title="Велика банка, кг">вел /кг/ банка</th>
+                    <th title="Фасовка ведра, кг">Вага /кг/ відро</th>
+                    <th title="Фасовка барабана, кг">Вага /кг/ барабан</th>
                   </tr>
                 </thead>
                 <tbody id="price-table-body"></tbody>

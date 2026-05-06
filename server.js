@@ -1134,20 +1134,38 @@ function sanitizeCatalogProduct(raw) {
     const n = Number(v);
     return Number.isFinite(n) && n >= 0 ? n : null;
   };
+  const jarSmallKg = numOrNull(raw.jarSmallKg);
+  const jarBigKg = numOrNull(raw.jarBigKg);
   const bucketKg = numOrNull(raw.bucketKg);
   const drumKg = numOrNull(raw.drumKg);
   const priceNoNdsPerKg = numOrNull(raw.priceNoNdsPerKg);
   const priceNdsPerKg = numOrNull(raw.priceNdsPerKg);
+  let extraPriceColumns = null;
+  if (raw.extraPriceColumns && typeof raw.extraPriceColumns === "object" && !Array.isArray(raw.extraPriceColumns)) {
+    const cleaned = {};
+    for (const [k, v] of Object.entries(raw.extraPriceColumns)) {
+      const key = String(k || "").trim().slice(0, 120);
+      if (!key) continue;
+      const val = String(v ?? "").trim().slice(0, 500);
+      if (!val) continue;
+      cleaned[key] = val;
+      if (Object.keys(cleaned).length >= 60) break;
+    }
+    if (Object.keys(cleaned).length) extraPriceColumns = cleaned;
+  }
   const out = {
     id,
     family,
     code,
     name,
+    jarSmallKg,
+    jarBigKg,
     bucketKg,
     drumKg,
     priceNoNdsPerKg,
     priceNdsPerKg,
   };
+  if (extraPriceColumns) out.extraPriceColumns = extraPriceColumns;
   if (lineCode) out.lineCode = lineCode;
   if (series) out.series = series;
   return out;
@@ -1156,6 +1174,7 @@ function sanitizeCatalogProduct(raw) {
 function sanitizeProductsCatalogArray(body) {
   const list = body && Array.isArray(body.products) ? body.products : null;
   if (!list) return { error: "invalid_payload", message: "Ожидается { products: [...] }." };
+  if (list.length === 0) return { products: [] };
   const out = [];
   const seen = new Set();
   for (const row of list) {
