@@ -78,6 +78,8 @@ const previewPackBlobById = new Map();
 const pendingDeleteCatalogPackImages = new Set();
 /** @type {{ file: File, url: string, ids: string[], dataUrl?: string, dataUrlPromise?: Promise<string> } | null} */
 let bulkPreview = null;
+/** Массовые операции с фото в Каталоге отключены (оставлены только карточечные текстовые/bulk-операции). */
+const ENABLE_BULK_PHOTO_IN_CATALOG = false;
 /** @type {Set<string>} */
 const pendingDeleteImage = new Set();
 
@@ -1015,6 +1017,24 @@ function collectPackStagingRowsForBulk() {
   return collectPackOptionsFromDom("ap-bulk-pack-options-body");
 }
 
+function apSortPackRowsByTypeAndMass(rows) {
+  const list = Array.isArray(rows) ? rows.map((r) => ({ ...r })) : [];
+  const kindOrder = { jar: 0, bucket: 1, drum: 2 };
+  list.sort((a, b) => {
+    const ka = String(a?.kind || "jar").toLowerCase();
+    const kb = String(b?.kind || "jar").toLowerCase();
+    const oa = Object.prototype.hasOwnProperty.call(kindOrder, ka) ? kindOrder[ka] : 9;
+    const ob = Object.prototype.hasOwnProperty.call(kindOrder, kb) ? kindOrder[kb] : 9;
+    if (oa !== ob) return oa - ob;
+    const ma = Number(a?.jarKg);
+    const mb = Number(b?.jarKg);
+    const wa = Number.isFinite(ma) && ma > 0 ? ma : Number.POSITIVE_INFINITY;
+    const wb = Number.isFinite(mb) && mb > 0 ? mb : Number.POSITIVE_INFINITY;
+    return wa - wb;
+  });
+  return list;
+}
+
 function apBulkPackPanelFillTemplate() {
   const body = document.getElementById("ap-bulk-pack-options-body");
   if (!body) return;
@@ -1023,23 +1043,100 @@ function apBulkPackPanelFillTemplate() {
     typeof window.dpAggregateDefaultPackRowsForCatalog === "function"
       ? window.dpAggregateDefaultPackRowsForCatalog(pool)
       : [];
-  if (
-    !rows.length &&
-    pool.length &&
-    typeof window.dpDefaultPackOptionRows === "function" &&
-    typeof window.dpNormalizePackOptionRows === "function"
-  ) {
-    rows = window.dpNormalizePackOptionRows(window.dpDefaultPackOptionRows(pool[0]));
-  }
-  if (!rows.length) {
-    rows = [
-      { kind: "jar", jarKg: 0.9, label: "", sub: "", hidden: false },
-      { kind: "jar", jarKg: 19.7, label: "", sub: "", hidden: false },
-      { kind: "jar", jarKg: 46.6, label: "", sub: "", hidden: false },
-    ];
-  }
+  rows = apSortPackRowsByTypeAndMass(rows);
   body.innerHTML = rows.map((r) => apPackOptionRowHtml(r)).join("");
   apBulkPackOptionsUpdateHint();
+}
+
+function apBulkPackPanelRefreshFromPriceKeepManual() {
+  const body = document.getElementById("ap-bulk-pack-options-body");
+  if (!body) return;
+  const pool = getProducts();
+  const fromPrice =
+    typeof window.dpAggregateDefaultPackRowsForCatalog === "function"
+      ? window.dpAggregateDefaultPackRowsForCatalog(pool)
+      : [];
+  const current = collectPackOptionsFromDom("ap-bulk-pack-options-body");
+  const byKey = new Map();
+  const seenCurrent = new Set();
+  if (typeof window.dpPackOptionRowStableKey === "function") {
+    for (const row of current) {
+      const key = window.dpPackOptionRowStableKey(row);
+      if (!key || seenCurrent.has(key)) continue;
+      seenCurrent.add(key);
+      byKey.set(key, row);
+    }
+  }
+  const out = [];
+  const seenOut = new Set();
+  for (const row of fromPrice) {
+    const key = typeof window.dpPackOptionRowStableKey === "function" ? window.dpPackOptionRowStableKey(row) : "";
+    if (!key || seenOut.has(key)) continue;
+    seenOut.add(key);
+    const cur = byKey.get(key);
+    out.push({
+      ...row,
+      label: cur ? String(cur.label || "").trim() : String(row.label || "").trim(),
+      sub: cur ? String(cur.sub || "").trim() : String(row.sub || "").trim(),
+      hidden: cur ? Boolean(cur.hidden) : Boolean(row.hidden),
+    });
+  }
+  for (const row of current) {
+    const key = typeof window.dpPackOptionRowStableKey === "function" ? window.dpPackOptionRowStableKey(row) : "";
+    if (!key || seenOut.has(key)) continue;
+    seenOut.add(key);
+    out.push({ ...row });
+  }
+  const sorted = apSortPackRowsByTypeAndMass(out);
+  body.innerHTML = sorted.map((r) => apPackOptionRowHtml(r)).join("");
+  apBulkPackOptionsUpdateHint();
+  setBulkPanelStatus("Таблица обновлена из прайса: прайсовые строки обновлены, ручные сохранены.", "ok");
+}
+
+function apRebuildAllDraftPackOptionsFromCurrentPrice() {
+  const pool = getProducts();
+  if (!pool.length) {
+    setBulkPanelStatus("Нет позиций прайса для пересборки фасовок.", "err");
+    return;
+  }
+  if (typeof window.dpDefaultPackOptionRows !== "function") {
+    setBulkPanelStatus("Пересборка недоступна: нет функции фасовок из прайса.", "err");
+    return;
+  }
+  if (
+    !window.confirm(
+      `Пересобрать фасовки по текущему прайсу для всех ${pool.length} позиций в черновике? Ручные фасовки будут заменены прайсовыми.`
+    )
+  ) {
+    return;
+  }
+  let changed = 0;
+  for (const p of pool) {
+    const pid = String(p.id ?? "");
+    if (!pid) continue;
+    ensureDraftEntry(pid);
+    const baseRaw = window.dpDefaultPackOptionRows(p);
+    const base =
+      typeof window.dpNormalizePackOptionRows === "function"
+        ? window.dpNormalizePackOptionRows(baseRaw)
+        : Array.isArray(baseRaw)
+          ? baseRaw
+          : [];
+    const prev = JSON.stringify(draftOverrides[pid]?.detailPackOptions || []);
+    const next = JSON.stringify(base || []);
+    if (prev !== next) changed += 1;
+    if (Array.isArray(base) && base.length) draftOverrides[pid].detailPackOptions = base.map((x) => ({ ...x }));
+    else delete draftOverrides[pid].detailPackOptions;
+  }
+  apBulkPackPanelSyncFromDraft();
+  apBulkPackOptionsUpdateHint();
+  renderProductCatalog();
+  if (selectedProductId) {
+    const p = getProducts().find((x) => String(x.id) === String(selectedProductId));
+    if (p) apPackOptionsRender(p, draftOverrides[String(selectedProductId)] || {});
+  }
+  updateDraftToolbar();
+  setBulkPanelStatus(`Фасовки пересобраны из текущего прайса для ${pool.length} позиций (изменено: ${changed}).`, "ok");
 }
 
 function apBulkPackPanelSeedIfEmpty() {
@@ -1071,8 +1168,8 @@ function apBulkPackResolveRefForMassPanel() {
 }
 
 /**
- * Строки массовой таблицы: база — объединение всех фасовок из прайса по каталогу; поверх — сохранённый черновик
- * референсной позиции (подписи, скрытие, строки добавленные вручную).
+ * Строки массовой таблицы: база — объединение фасовок из прайса;
+ * поверх — черновик (подписи/скрытие), плюс ручные строки, добавленные админом.
  */
 function apBulkPackMergedRowsForMassPanelUi() {
   const pool = getProducts();
@@ -1091,9 +1188,7 @@ function apBulkPackMergedRowsForMassPanelUi() {
     draftNorm = window.dpNormalizePackOptionRows(ov.detailPackOptions);
   }
 
-  if (!draftNorm.length) {
-    return aggregate.length ? aggregate : ref ? apMergedPackOptionRows(ref.product, {}) : [];
-  }
+  if (!draftNorm.length) return aggregate;
 
   if (!aggregate.length || typeof window.dpPackOptionRowStableKey !== "function") {
     return draftNorm;
@@ -1129,14 +1224,16 @@ function apBulkPackMergedRowsForMassPanelUi() {
         : { ...base }
     );
   }
+  // Ручные строки, которых нет в прайсе, сохраняем в таблице (чтобы можно было применять массово).
   for (const r of draftNorm) {
     const rk = window.dpPackOptionRowStableKey(r);
     if (rk && !aggByKey.has(rk)) out.push({ ...r });
   }
-
-  return typeof window.dpNormalizePackOptionRows === "function"
-    ? window.dpNormalizePackOptionRows(out)
-    : out;
+  const normalized =
+    typeof window.dpNormalizePackOptionRows === "function"
+      ? window.dpNormalizePackOptionRows(out)
+      : out;
+  return apSortPackRowsByTypeAndMass(normalized);
 }
 
 /**
@@ -1175,9 +1272,22 @@ function apBulkPackOptionsUpdateHint() {
   const body = document.getElementById("ap-bulk-pack-options-body");
   const n = body ? apPackTableDataRows(body).length : 0;
   hint.textContent = n
-    ? `Строк в таблице: ${n}. Цели — отмеченные в каталоге, артикул или серию, фильтры сетки или все позиции (как у массового фото).`
-    : "Добавьте строки или нажмите «Как из прайса (шаблон)».";
+    ? `Строк в таблице: ${n}. Цели — отмеченные в каталоге, артикул или серию, фильтры сетки или все позиции.`
+    : "Добавьте строки вручную или нажмите «Как из прайса (шаблон)» для перечитывания.";
   updateDraftToolbar();
+}
+
+function apBulkPackNormalizeLegacyKinds() {
+  const body = document.getElementById("ap-bulk-pack-options-body");
+  if (!body) return;
+  const rows = collectPackOptionsFromDom("ap-bulk-pack-options-body");
+  if (!rows.length) {
+    setBulkPanelStatus("Таблица массовых фасовок пуста — нечего нормализовать.", "err");
+    return;
+  }
+  body.innerHTML = rows.map((r) => apPackOptionRowHtml(r)).join("");
+  apBulkPackOptionsUpdateHint();
+  setBulkPanelStatus("Legacy-типы фасовок нормализованы в текущей таблице.", "ok");
 }
 
 function apMergedPackOptionRows(product, ov) {
@@ -1620,7 +1730,13 @@ function apBulkPackDomDiffersFromEffectiveDraft() {
 }
 
 function isDraftDirty() {
-  if (previewBlobById.size || previewPackBlobById.size || bulkPreview || pendingDeleteImage.size || pendingDeleteCatalogPackImages.size)
+  if (
+    previewBlobById.size ||
+    previewPackBlobById.size ||
+    (ENABLE_BULK_PHOTO_IN_CATALOG && bulkPreview) ||
+    pendingDeleteImage.size ||
+    pendingDeleteCatalogPackImages.size
+  )
     return true;
   if (Object.keys(pickTextPatches()).length) return true;
   if (apBulkPackDomDiffersFromEffectiveDraft()) return true;
@@ -1967,7 +2083,7 @@ function adminPreviewUrl(p) {
   const id = String(p.id);
   if (pendingDeleteImage.has(id)) return adminStockImageForProduct(p);
   if (previewBlobById.has(id)) return previewBlobById.get(id).url;
-  if (bulkPreview && bulkPreview.ids.includes(id)) return bulkPreview.url;
+  if (ENABLE_BULK_PHOTO_IN_CATALOG && bulkPreview && bulkPreview.ids.includes(id)) return bulkPreview.url;
   const ov = draftOverrides[id] || {};
   const u = ov.cardImageUrl || ov.heroImageUrl;
   if (u) return adminProductOverrideImageSrc(u);
@@ -3432,7 +3548,7 @@ function renderProductCard(p) {
   const hasPublishedCustom = Boolean(pub.cardImageUrl || pub.heroImageUrl);
   const hasDraftCustom = Boolean(ov.cardImageUrl || ov.heroImageUrl);
   const hasStaging =
-    bulkPreview?.ids?.includes(id) ||
+    (ENABLE_BULK_PHOTO_IN_CATALOG && bulkPreview?.ids?.includes(id)) ||
     previewBlobById.has(id) ||
     (pendingDeleteImage.has(id) && hasPublishedCustom);
   const hasCustom = hasStaging || (hasDraftCustom && !pendingDeleteImage.has(id));
@@ -3461,8 +3577,8 @@ function renderProductCard(p) {
   return `
     <div class="ap-product-card${sel}${bulkPick}" role="button" tabindex="0" data-id="${escapeHtml(id)}" aria-label="Редактировать: ${escapeHtml(lineTitle)}">
       <div class="ap-product-card-media">
-        <label class="ap-product-card-pick" title="В массовое применение фото">
-          <input type="checkbox" class="ap-product-card-checkbox" data-ap-bulk-pick="${escapeHtml(id)}"${checked} aria-label="Отметить для массового применения фото" />
+        <label class="ap-product-card-pick" title="В массовые операции">
+          <input type="checkbox" class="ap-product-card-checkbox" data-ap-bulk-pick="${escapeHtml(id)}"${checked} aria-label="Отметить для массовых операций" />
         </label>
         <img src="${escapeHtml(imgUrl)}" alt="" loading="lazy" decoding="async" />
         ${flag}
@@ -4010,6 +4126,55 @@ function apSnapshotPackRowsForDraft(rows) {
   }));
 }
 
+function apClearPackValidationUi() {
+  ["ap-bulk-pack-options-body", "ap-pack-options-body"].forEach((id) => {
+    const body = document.getElementById(id);
+    if (!body) return;
+    body.querySelectorAll(".ap-pack-row-invalid").forEach((el) => el.classList.remove("ap-pack-row-invalid"));
+    body.querySelectorAll(".ap-pack-field-invalid").forEach((el) => el.classList.remove("ap-pack-field-invalid"));
+  });
+}
+
+/**
+ * Валидация таблицы фасовок перед массовым применением:
+ * у каждой строки должен собираться стабильный ключ (тип + масса).
+ */
+function apValidatePackRowsForApply(rows, bodyId) {
+  apClearPackValidationUi();
+  if (!Array.isArray(rows) || !rows.length) return null;
+  const body = document.getElementById(bodyId);
+  const domRows = body ? apPackTableDataRows(body) : [];
+  const validKinds = new Set(["jar", "bucket", "drum"]);
+  for (let i = 0; i < rows.length; i += 1) {
+    const row = rows[i] || {};
+    const tr = domRows[i] || null;
+    const kindEl = tr?.querySelector?.(".ap-pack-kind");
+    const jarEl = tr?.querySelector?.(".ap-pack-jar");
+    const kind = String(row.kind || "").toLowerCase();
+    if (!validKinds.has(kind)) {
+      tr?.classList?.add("ap-pack-row-invalid");
+      if (kindEl instanceof HTMLElement) kindEl.classList.add("ap-pack-field-invalid");
+      return `Строка ${i + 1}: выберите корректный тип фасовки (Банка/Ведро/Барабан).`;
+    }
+    if (typeof window.dpPackOptionRowStableKey === "function") {
+      const key = window.dpPackOptionRowStableKey(row);
+      if (!key) {
+        tr?.classList?.add("ap-pack-row-invalid");
+        if (jarEl instanceof HTMLElement) jarEl.classList.add("ap-pack-field-invalid");
+        return `Строка ${i + 1}: укажите массу фасовки больше 0.`;
+      }
+    } else {
+      const jarKg = Number(row.jarKg);
+      if (!Number.isFinite(jarKg) || jarKg <= 0) {
+        tr?.classList?.add("ap-pack-row-invalid");
+        if (jarEl instanceof HTMLElement) jarEl.classList.add("ap-pack-field-invalid");
+        return `Строка ${i + 1}: укажите массу фасовки больше 0.`;
+      }
+    }
+  }
+  return null;
+}
+
 /**
  * Перенести строки массовой таблицы из DOM в draftOverrides целей (только когда карточка позиции не открыта).
  * Вызывать только после того, как пользователь подтвердил «Сохранить на сайт» — до подтверждения черновик не менять.
@@ -4043,6 +4208,12 @@ function stageBulkPackOptionsApply() {
       "В таблице массовых фасовок нет строк — добавьте строки в блоке «Фасовки для сайта и каталога (массово)» или задайте их у выбранной позиции.",
       "err"
     );
+    return;
+  }
+  const validationBodyId = selectedProductId ? "ap-pack-options-body" : "ap-bulk-pack-options-body";
+  const validationError = apValidatePackRowsForApply(rows, validationBodyId);
+  if (validationError) {
+    setBulkPanelStatus(validationError, "err");
     return;
   }
   const snapshot = apSnapshotPackRowsForDraft(rows);
@@ -4084,6 +4255,56 @@ function stageBulkPackOptionsApply() {
   setBulkPanelStatus(`Фасовки в корзину в черновик: ${ids.length} поз. (${modeRu}).`, "ok");
   renderProductCatalog();
   updateDraftToolbar();
+}
+
+/**
+ * Быстрая локальная проверка фасовок до публикации:
+ * показывает, какие чипы реально попадут на сайт для текущего контекста.
+ */
+function previewPackOptionsBeforePublish() {
+  const rows = collectPackStagingRowsForBulk();
+  if (!rows.length) {
+    setBulkPanelStatus("Таблица фасовок пуста — добавьте хотя бы одну строку.", "err");
+    return;
+  }
+  const validationBodyId = selectedProductId ? "ap-pack-options-body" : "ap-bulk-pack-options-body";
+  const validationError = apValidatePackRowsForApply(rows, validationBodyId);
+  if (validationError) {
+    setBulkPanelStatus(validationError, "err");
+    return;
+  }
+  const product = selectedProductId
+    ? getProducts().find((x) => String(x.id) === String(selectedProductId))
+    : apBulkPackResolveRefForMassPanel()?.product || null;
+  if (!product || typeof window.dpApplyDetailPackChips !== "function") {
+    setBulkPanelStatus("Не удалось построить превью фасовок (нет опорной позиции).", "err");
+    return;
+  }
+  const chips = window.dpApplyDetailPackChips(product, { detailPackOptions: rows });
+  const hiddenRows = rows.filter((r) => r && r.hidden === true).length;
+  let noPriceRows = 0;
+  if (typeof window.dpResolvePackOptionRow === "function") {
+    for (const row of rows) {
+      if (!row || row.hidden === true) continue;
+      const resolved = window.dpResolvePackOptionRow(product, row);
+      if (!resolved || resolved.disabled) noPriceRows += 1;
+    }
+  }
+  const metaParts = [];
+  if (hiddenRows > 0) metaParts.push(`скрыто: ${hiddenRows}`);
+  if (noPriceRows > 0) metaParts.push(`без цены: ${noPriceRows}`);
+  const metaText = metaParts.length ? ` (${metaParts.join(", ")})` : "";
+  if (!chips.length) {
+    setBulkPanelStatus(`Превью: после фильтрации нет видимых фасовок${metaText}.`, "ok");
+    return;
+  }
+  const labels = chips
+    .slice(0, 6)
+    .map((c) => String(c.label || "").trim())
+    .filter(Boolean);
+  const tail = chips.length > labels.length ? ` + ещё ${chips.length - labels.length}` : "";
+  const labelPart = labels.length ? ` ${labels.join(",")}${tail}.` : "";
+  setBulkPanelStatus(`Превью: на сайте будет ${chips.length} фасовок${metaText}.${labelPart}`, "ok");
 }
 
 /** Удаляет detailPackOptions из черновика для выбранных целей (на сайте — расчёт фасовок из прайса). */
@@ -4184,6 +4405,66 @@ function stageBulkCardTitleFromString(rawTitle) {
   const statusText = title
     ? `Заголовок карточки в черновике: ${ids.length} поз. (${modeRu}).`
     : `Сброс заголовка карточки в черновике: ${ids.length} поз. (${modeRu}).`;
+  setBulkPanelStatus(statusText, "ok");
+  const pc = document.getElementById("ap-view-products");
+  const edStatus = document.getElementById("ap-product-status");
+  if (pc && !pc.classList.contains("ap-panel-hidden") && edStatus) {
+    setStatus(edStatus, statusText, "ok");
+  }
+  renderProductCatalog();
+  updateDraftToolbar();
+}
+
+/**
+ * Массово задаёт `cardFeatures` в черновике (буллеты карточки в каталоге).
+ * Пустой список = сброс своих пунктов (вернутся дефолтные по family на сайте).
+ * @param {string} rawFeatures
+ */
+function stageBulkCardFeaturesFromString(rawFeatures) {
+  const features = String(rawFeatures ?? "")
+    .split(/\r?\n/)
+    .map((s) => String(s || "").trim())
+    .filter(Boolean)
+    .slice(0, 6);
+  const { ids, mode } = resolveBulkDetailTextTargetIds();
+  if (!ids.length) {
+    if (getBulkCodeRaw() && mode === "code") {
+      setBulkPanelStatus("Нет позиций по указанному артикулу (проверьте режим «Точно» / «Содержит»).", "err");
+    } else if (mode === "group") {
+      setBulkPanelStatus("По текущим фильтрам каталога нет позиций — ослабьте фильтры или поиск.", "err");
+    } else {
+      setBulkPanelStatus(
+        "Нет целей: отметьте чекбоксами, либо укажите артикул или серию, либо сузьте фильтры — иначе подставятся все позиции каталога.",
+        "err"
+      );
+    }
+    return;
+  }
+  if (ids.length > 500) {
+    setBulkPanelStatus("Не более 500 позиций за раз.", "err");
+    return;
+  }
+  if (!features.length) {
+    if (!window.confirm(`Очистить свои пункты карточки в черновике для ${ids.length} поз.?`)) return;
+  } else if (mode === "all" && ids.length > 1) {
+    if (!window.confirm(`Подставить ${features.length} пунктов карточки всем ${ids.length} позициям каталога (черновик)?`)) return;
+  }
+  for (const pid of ids) {
+    ensureDraftEntry(pid);
+    if (features.length) draftOverrides[pid].cardFeatures = [...features];
+    else delete draftOverrides[pid].cardFeatures;
+  }
+  const modeRu =
+    mode === "picked"
+      ? "по чекбоксам"
+      : mode === "code"
+        ? "по артикулу серии"
+        : mode === "group"
+          ? "по фильтрам каталога"
+          : "по всем карточкам";
+  const statusText = features.length
+    ? `Пункты карточки (для всех фасовок позиции) в черновике: ${ids.length} поз. (${modeRu}).`
+    : `Сброс пунктов карточки (для всех фасовок позиции) в черновике: ${ids.length} поз. (${modeRu}).`;
   setBulkPanelStatus(statusText, "ok");
   const pc = document.getElementById("ap-view-products");
   const edStatus = document.getElementById("ap-product-status");
@@ -4318,6 +4599,10 @@ function stageProductImageFromFile(file) {
 }
 
 function stageBulkProductImages() {
+  if (!ENABLE_BULK_PHOTO_IN_CATALOG) {
+    setBulkPanelStatus("Массовые операции с фото в разделе «Каталог» отключены.", "err");
+    return;
+  }
   const summaryEl = document.getElementById("ap-bulk-summary");
   const fileInput = document.getElementById("ap-bulk-file");
   const validIds = new Set(getProducts().map((p) => String(p.id)));
@@ -4446,6 +4731,10 @@ function stageClearProductImage() {
 }
 
 function stageBulkClearPhotos() {
+  if (!ENABLE_BULK_PHOTO_IN_CATALOG) {
+    setBulkPanelStatus("Массовые операции с фото в разделе «Каталог» отключены.", "err");
+    return;
+  }
   const validIds = new Set(getProducts().map((p) => String(p.id)));
   const pickedRaw = [...adminBulkSelectedIds].filter((pid) => validIds.has(pid));
   const productIdsFromPick = [...new Set(pickedRaw)];
@@ -4526,8 +4815,9 @@ async function publishProductDraftToSite() {
   try {
     // Фото публикуются отдельной кнопкой «Опубликовать фото».
     // Верхняя «Сохранить на сайт» не должна выполнять image POST/DELETE по карточке, чтобы не перетирать результат.
-    const bulkIds = bulkPreview && bulkPreview.ids.length ? [...bulkPreview.ids] : [];
-    const bulkStaged = bulkPreview && bulkPreview.ids.length ? bulkPreview : null;
+    const bulkIds = ENABLE_BULK_PHOTO_IN_CATALOG && bulkPreview && bulkPreview.ids.length ? [...bulkPreview.ids] : [];
+    const bulkStaged =
+      ENABLE_BULK_PHOTO_IN_CATALOG && bulkPreview && bulkPreview.ids.length ? bulkPreview : null;
     if (bulkStaged && bulkIds.length) {
       const imageBase64 = await resolveStagedFileDataUrl(bulkStaged);
       if (!imageBase64) throw new Error("Не удалось прочитать файл массового фото");
@@ -4868,15 +5158,27 @@ document.getElementById("ap-card-product-filter")?.addEventListener("input", () 
 document.getElementById("ap-bulk-pack-options-add")?.addEventListener("click", () => {
   const body = document.getElementById("ap-bulk-pack-options-body");
   if (!body) return;
-  body.insertAdjacentHTML(
-    "beforeend",
-    apPackOptionRowHtml({ kind: "jar", jarKg: 1, label: "", sub: "", hidden: false })
-  );
+  const rows = collectPackOptionsFromDom("ap-bulk-pack-options-body");
+  rows.push({ kind: "jar", jarKg: 1, label: "", sub: "", hidden: false });
+  const sorted = apSortPackRowsByTypeAndMass(rows);
+  body.innerHTML = sorted.map((r) => apPackOptionRowHtml(r)).join("");
   apBulkPackOptionsUpdateHint();
 });
 
 document.getElementById("ap-bulk-pack-options-fill-template")?.addEventListener("click", () => {
   apBulkPackPanelFillTemplate();
+});
+document.getElementById("ap-bulk-pack-options-refresh-keep-manual")?.addEventListener("click", () => {
+  apBulkPackPanelRefreshFromPriceKeepManual();
+});
+document.getElementById("ap-bulk-pack-options-rebuild-all")?.addEventListener("click", () => {
+  apRebuildAllDraftPackOptionsFromCurrentPrice();
+});
+document.getElementById("ap-bulk-pack-options-selftest")?.addEventListener("click", () => {
+  previewPackOptionsBeforePublish();
+});
+document.getElementById("ap-bulk-pack-normalize-legacy")?.addEventListener("click", () => {
+  apBulkPackNormalizeLegacyKinds();
 });
 
 document.getElementById("ap-bulk-pack-apply-table")?.addEventListener("click", () => stageBulkPackOptionsApply());
@@ -4903,10 +5205,12 @@ document.getElementById("ap-bulk-pack-revert-table")?.addEventListener("click", 
 });
 
 document.getElementById("ap-bulk-pack-panel")?.addEventListener("input", () => {
+  apClearPackValidationUi();
   apBulkPackOptionsUpdateHint();
 });
 
 document.getElementById("ap-bulk-pack-panel")?.addEventListener("change", (e) => {
+  apClearPackValidationUi();
   const t = e.target;
   if (t instanceof HTMLSelectElement && t.classList.contains("ap-pack-kind")) {
     const tr = t.closest("tr");
@@ -4953,6 +5257,9 @@ document.getElementById("ap-pack-options-add")?.addEventListener("click", () => 
   if (p) apPackOptionsUpdateHint(p);
   apSyncPackOptionsToDraft();
 });
+document.getElementById("ap-pack-options-selftest")?.addEventListener("click", () => {
+  previewPackOptionsBeforePublish();
+});
 
 document.getElementById("ap-pack-options-reset")?.addEventListener("click", () => {
   if (!selectedProductId) return;
@@ -4975,6 +5282,7 @@ document.getElementById("ap-pack-publish-site")?.addEventListener("click", () =>
 });
 
 document.getElementById("ap-pack-options-section")?.addEventListener("input", () => {
+  apClearPackValidationUi();
   const p = getProducts().find((x) => String(x.id) === String(selectedProductId));
   if (p) apPackOptionsUpdateHint(p);
   apSyncPackOptionsToDraft();
@@ -5140,11 +5448,13 @@ document.getElementById("ap-bulk-filter-grid")?.addEventListener("click", () => 
   setBulkPanelStatus("", null);
 });
 
-document.getElementById("ap-bulk-apply")?.addEventListener("click", () => stageBulkProductImages());
-document.getElementById("ap-bulk-clear-photos")?.addEventListener("click", () => stageBulkClearPhotos());
 document.getElementById("ap-bulk-apply-card-title")?.addEventListener("click", () => {
   const bulkInp = document.getElementById("ap-bulk-card-title");
   stageBulkCardTitleFromString(bulkInp?.value ?? "");
+});
+document.getElementById("ap-bulk-apply-card-features")?.addEventListener("click", () => {
+  const bulkInp = document.getElementById("ap-bulk-card-features");
+  stageBulkCardFeaturesFromString(bulkInp?.value ?? "");
 });
 
 document.getElementById("ap-bulk-copy-card-title")?.addEventListener("click", () => {

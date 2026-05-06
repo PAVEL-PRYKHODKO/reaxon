@@ -337,6 +337,16 @@
     return mediaAbs(String(ov.cardImageUrl || ov.heroImageUrl || "").trim());
   }
 
+  function activePreviewRawUrl() {
+    const ov = currentOverride();
+    const pack = activePackKey();
+    if (pack) {
+      const map = ov && typeof ov.catalogPackImages === "object" ? ov.catalogPackImages : {};
+      return String(map[pack] || "").trim();
+    }
+    return String(ov.cardImageUrl || ov.heroImageUrl || "").trim();
+  }
+
   function togglePhotoEditor(on) {
     const wrap = document.getElementById("ap-cards-photo-editor");
     if (!wrap) return;
@@ -366,7 +376,8 @@
     ctx.fillRect(0, 0, cv.width, cv.height);
     if (!img) return;
     const scaleBase = Math.max(cv.width / img.width, cv.height / img.height);
-    const scale = scaleBase * Math.max(1, Number(state.photoEdit.zoom) || 1);
+    const zoom = Math.min(3, Math.max(0.35, Number(state.photoEdit.zoom) || 1));
+    const scale = scaleBase * zoom;
     const drawW = img.width * scale;
     const drawH = img.height * scale;
     const maxX = Math.max(0, (drawW - cv.width) / 2);
@@ -389,6 +400,15 @@
     });
   }
 
+  async function blobToDataUrl(blob) {
+    return await new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(String(fr.result || ""));
+      fr.onerror = () => reject(new Error("Не удалось прочитать blob изображения."));
+      fr.readAsDataURL(blob);
+    });
+  }
+
   async function startPhotoEditFromFile(file) {
     const dataUrl = await fileToDataUrl(file);
     const img = await loadImageFromDataUrl(dataUrl);
@@ -405,6 +425,33 @@
     if (!cv) return "";
     drawPhotoEditorCanvas();
     return cv.toDataURL("image/jpeg", 0.92);
+  }
+
+  async function openCurrentPhotoInEditor() {
+    const raw = activePreviewRawUrl();
+    const candidates = previewUrlCandidates(raw);
+    if (!candidates.length) {
+      throw new Error("Для выбранной фасовки нет загруженного фото.");
+    }
+    let lastErr = null;
+    for (const u of candidates) {
+      try {
+        const res = await fetch(u, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        const dataUrl = await blobToDataUrl(blob);
+        const img = await loadImageFromDataUrl(dataUrl);
+        state.photoEdit.sourceDataUrl = dataUrl;
+        state.photoEdit.image = img;
+        resetPhotoCropControls();
+        togglePhotoEditor(true);
+        drawPhotoEditorCanvas();
+        return;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw new Error(`Не удалось открыть текущее фото (${lastErr?.message || "unknown error"}).`);
   }
 
   function renderPhotoPreview() {
@@ -690,13 +737,13 @@
     }
     const fileEl = document.getElementById("ap-cards-photo-file");
     const f = fileEl?.files?.[0];
-    if (!f) {
-      setPhotoStatus("Выберите файл изображения.", "err");
+    if (!f && !state.photoEdit.image) {
+      setPhotoStatus("Выберите файл или нажмите «Редактировать текущее фото».", "err");
       return;
     }
     setPhotoStatus("Загрузка фото…", null);
     try {
-      const imageBase64 = buildEditedPhotoDataUrl() || (await fileToDataUrl(f));
+      const imageBase64 = state.photoEdit.image ? buildEditedPhotoDataUrl() : await fileToDataUrl(f);
       const pack = activePackKey();
       const data = await apiAdmin("POST", `/api/admin/products/${encodeURIComponent(String(p.id))}/image`, {
         imageBase64,
@@ -812,6 +859,14 @@
         state.photoEdit.image = null;
         togglePhotoEditor(false);
         setPhotoStatus(err?.message || "Не удалось подготовить фото.", "err");
+      }
+    });
+    document.getElementById("ap-cards-photo-edit-current")?.addEventListener("click", async () => {
+      try {
+        await openCurrentPhotoInEditor();
+        setPhotoStatus("Текущее фото открыто в редакторе кадра.", "ok");
+      } catch (e) {
+        setPhotoStatus(e?.message || "Не удалось открыть текущее фото.", "err");
       }
     });
     document.getElementById("ap-cards-photo-zoom")?.addEventListener("input", (e) => {

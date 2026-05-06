@@ -351,6 +351,23 @@
     return `${s.includes(".") ? s.replace(".", ",") : s} кг`;
   }
 
+  /**
+   * Классификация фасовки по массе (кг) для дефолтного вывода:
+   * 0.1–2.7 — банка мал
+   * 2.8–6   — банка бол
+   * 7–30    — ведро
+   * 32–50   — барабан
+   */
+  function dpPackClassByKg(kgRaw) {
+    const w = round2(Number(kgRaw));
+    if (w == null || !Number.isFinite(w) || w <= 0) return null;
+    if (w >= 0.1 && w <= 2.7) return { kind: "jar", sub: "банка мал" };
+    if (w >= 2.8 && w <= 6) return { kind: "jar", sub: "банка бол" };
+    if (w >= 7 && w <= 30) return { kind: "bucket", sub: "ведро" };
+    if (w >= 32 && w <= 50) return { kind: "drum", sub: "барабан" };
+    return null;
+  }
+
   window.dpPackChipSortKg = function dpPackChipSortKg(product, c) {
     if (!c) return 0;
     const pm = Number(c.packMassKg);
@@ -361,40 +378,32 @@
     return 0;
   };
 
-  /**
-   * Тип тары по массе (кг), границы включительно:
-   * банка 0.5–10 кг; ведро 12–24 кг; барабан 26–55 кг.
-   * Промежутки 10–12 и 24–26 не входят в стандартную сетку весов.
-   */
   window.dpInferPackKindFromKg = function dpInferPackKindFromKg(kgRaw) {
-    const w = round2(Number(kgRaw));
-    if (w == null || !Number.isFinite(w) || w <= 0) return null;
-    if (w < 0.5 || w > 55) return null;
-    if (w >= 0.5 && w <= 10) return "jar";
-    if (w >= 12 && w <= 24) return "bucket";
-    if (w >= 26 && w <= 55) return "drum";
-    return null;
+    const c = dpPackClassByKg(kgRaw);
+    return c ? c.kind : null;
   };
 
-  /** Все логические фасовки (в т.ч. без цены) — как на карточках каталога: только фиксированные веса. */
+  /** Все логические фасовки (в т.ч. без цены) — только из кг текущей позиции прайса. */
   window.dpBuildPackChipsRaw = function dpBuildPackChipsRaw(product) {
     if (!product) return [];
     const chips = [];
     if (Number(product.priceNdsPerKg) > 0) {
-      const std =
-        Array.isArray(window.dpStandardRetailJarKg) && window.dpStandardRetailJarKg.length
-          ? window.dpStandardRetailJarKg
-          : WEIGHTS;
-      for (const wRaw of std) {
+      const source = [Number(product.bucketKg), Number(product.drumKg)];
+      const seen = new Set();
+      for (const wRaw of source) {
         const w = round2(Number(wRaw));
         if (w == null || !Number.isFinite(w) || w <= 0) continue;
+        const keyMass = String(w);
+        if (seen.has(keyMass)) continue;
+        seen.add(keyMass);
         const inf =
           typeof window.dpInferPackKindFromKg === "function"
             ? window.dpInferPackKindFromKg(w)
             : null;
         if (!inf) continue;
         const total = dpRetailJarTotal(product, w);
-        const sub = inf === "jar" ? "фасовка" : inf === "bucket" ? "ведро" : "барабан";
+        const cls = dpPackClassByKg(w);
+        const sub = cls?.sub || (inf === "bucket" ? "ведро" : inf === "drum" ? "барабан" : "банка");
         chips.push({
           kind: inf,
           packType: inf === "jar" ? "jar" : inf,
@@ -413,24 +422,26 @@
 
   window.dpResolvePackOptionRow = function dpResolvePackOptionRow(product, row) {
     if (!product || !row) return null;
+    const sameKg = (a, b) => Math.abs(Number(a) - Number(b)) <= 0.05;
     const kind = String(row.kind || "").toLowerCase();
     const labelOv = String(row.label || "").trim();
     const subOv = String(row.sub || "").trim();
     if (kind === "bucket") {
       const ov = Number(row.jarKg);
       const cat = Number(product.bucketKg);
-      const baseKg = Number.isFinite(ov) && ov > 0 ? ov : cat;
-      if (baseKg == null || !Number.isFinite(Number(baseKg)) || Number(baseKg) <= 0) return null;
-      const w = Number(baseKg);
+      if (!Number.isFinite(cat) || cat <= 0) return null;
+      if (Number.isFinite(ov) && ov > 0 && !sameKg(ov, cat)) return null;
+      const w = Number(cat);
       const total = dpRetailJarTotal(product, w);
       const lbl = labelOv || dpFormatFixedJarLabel(w);
+      const cls = dpPackClassByKg(w);
       return {
         kind: "bucket",
         packType: "bucket",
         jarKg: null,
         packMassKg: w,
         label: lbl,
-        sub: subOv || "ведро",
+        sub: subOv || cls?.sub || "ведро",
         price: total,
         disabled: total == null,
       };
@@ -438,18 +449,19 @@
     if (kind === "drum") {
       const ov = Number(row.jarKg);
       const cat = Number(product.drumKg);
-      const baseKg = Number.isFinite(ov) && ov > 0 ? ov : cat;
-      if (baseKg == null || !Number.isFinite(Number(baseKg)) || Number(baseKg) <= 0) return null;
-      const w = Number(baseKg);
+      if (!Number.isFinite(cat) || cat <= 0) return null;
+      if (Number.isFinite(ov) && ov > 0 && !sameKg(ov, cat)) return null;
+      const w = Number(cat);
       const total = dpRetailJarTotal(product, w);
       const lbl = labelOv || dpFormatFixedJarLabel(w);
+      const cls = dpPackClassByKg(w);
       return {
         kind: "drum",
         packType: "drum",
         jarKg: null,
         packMassKg: w,
         label: lbl,
-        sub: subOv || "барабан",
+        sub: subOv || cls?.sub || "барабан",
         price: total,
         disabled: total == null,
       };
@@ -457,15 +469,20 @@
     if (kind === "jar") {
       const w = Number(row.jarKg);
       if (!Number.isFinite(w) || w <= 0) return null;
+      const bw = Number(product.bucketKg);
+      const dw = Number(product.drumKg);
+      const inPriceForProduct = (Number.isFinite(bw) && bw > 0 && sameKg(w, bw)) || (Number.isFinite(dw) && dw > 0 && sameKg(w, dw));
+      if (!inPriceForProduct) return null;
       const total = dpRetailJarTotal(product, w);
       const defLabel = dpFormatFixedJarLabel(w);
+      const cls = dpPackClassByKg(w);
       return {
         kind: "jar",
         packType: "jar",
         jarKg: w,
         packMassKg: w,
         label: labelOv || defLabel,
-        sub: subOv || "фасовка",
+        sub: subOv || cls?.sub || "банка",
         price: total,
         disabled: total == null,
       };
@@ -479,13 +496,19 @@
     if (!ov || !Array.isArray(ov.detailPackOptions) || ov.detailPackOptions.length === 0) {
       return raw;
     }
+    const rows =
+      typeof window.dpNormalizePackOptionRows === "function"
+        ? window.dpNormalizePackOptionRows(ov.detailPackOptions)
+        : ov.detailPackOptions;
     const out = [];
-    for (const row of ov.detailPackOptions) {
+    for (const row of rows) {
       if (!row || row.hidden === true) continue;
       const chip = window.dpResolvePackOptionRow(product, row);
       if (chip && !chip.disabled) out.push(chip);
     }
-    if (!out.length) return raw;
+    // Если detailPackOptions заданы, это явная настройка администратора:
+    // не откатываемся к default-списку из прайса, иначе скрытые фасовки снова появляются на сайте.
+    if (!out.length) return [];
     out.sort((a, b) => window.dpPackChipSortKg(product, a) - window.dpPackChipSortKg(product, b));
     return out;
   };
@@ -507,10 +530,17 @@
 
   window.dpNormalizePackOptionRows = function dpNormalizePackOptionRows(arr) {
     return (Array.isArray(arr) ? arr : []).map((r) => {
+      const hasKind = r && typeof r === "object" && Object.prototype.hasOwnProperty.call(r, "kind");
       const k = String(r.kind || "jar").toLowerCase();
-      const kind = k === "bucket" || k === "drum" ? k : "jar";
+      let kind = k === "bucket" || k === "drum" ? k : "jar";
       const n = Number(r.jarKg);
       const jarKg = Number.isFinite(n) && n > 0 ? n : null;
+      // Автоклассификация только для legacy-строк без явного типа:
+      // если админ вручную выбрал тип, сохраняем его как есть.
+      if (!hasKind && kind === "jar" && jarKg != null && typeof window.dpInferPackKindFromKg === "function") {
+        const inferred = window.dpInferPackKindFromKg(jarKg);
+        if (inferred === "bucket" || inferred === "drum") kind = inferred;
+      }
       return {
         kind,
         jarKg,
@@ -545,8 +575,8 @@
   };
 
   /**
-   * Объединение типовых фасовок по каталогу: union по dpDefaultPackOptionRows с дедупом по стабильному ключу
-   * (та же логика, что и у чипов каталога / PDP).
+   * Объединение фасовок по каталогу: только из данных прайса (bucketKg/drumKg) по всем позициям.
+   * Тип определяется по dpInferPackKindFromKg (текущая классификация диапазонов).
    */
   window.dpAggregateDefaultPackRowsForCatalog = function dpAggregateDefaultPackRowsForCatalog(products) {
     const list = Array.isArray(products) ? products : [];
@@ -567,21 +597,24 @@
     }
     for (const p of list) {
       if (!p || typeof p !== "object") continue;
-      if (Number(p.priceNdsPerKg) <= 0) continue;
-      if (typeof window.dpDefaultPackOptionRows !== "function" || typeof window.dpNormalizePackOptionRows !== "function")
-        continue;
-      const defs = window.dpNormalizePackOptionRows(window.dpDefaultPackOptionRows(p));
-      for (const r of defs) {
+      const weights = [Number(p.bucketKg), Number(p.drumKg)];
+      for (const wRaw of weights) {
+        const w = round2(wRaw);
+        if (!Number.isFinite(w) || w <= 0) continue;
+        const inferred = typeof window.dpInferPackKindFromKg === "function" ? window.dpInferPackKindFromKg(w) : null;
+        if (!inferred) continue;
+        const cls = dpPackClassByKg(w);
+        const r = {
+          kind: inferred,
+          jarKg: w,
+          label: "",
+          sub: cls?.sub || "",
+          hidden: false,
+        };
         const key = typeof window.dpPackOptionRowStableKey === "function" ? window.dpPackOptionRowStableKey(r) : "";
         if (!key || seen.has(key)) continue;
         seen.add(key);
-        acc.push({
-          kind: r.kind,
-          jarKg: r.jarKg,
-          label: "",
-          sub: "",
-          hidden: false,
-        });
+        acc.push(r);
       }
     }
     if (acc.length) return window.dpNormalizePackOptionRows(sortAgg(acc));

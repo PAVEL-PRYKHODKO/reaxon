@@ -205,7 +205,7 @@
               </div>
               <div class="ap-bulk-panel ap-bulk-panel--compact" aria-labelledby="ap-bulk-heading">
                 <div class="ap-bulk-panel-head">
-                  <strong id="ap-bulk-heading">Массовое фото (черновик)</strong>
+                  <strong id="ap-bulk-heading">Массовые операции с карточками (черновик)</strong>
                 </div>
                 <div class="ap-bulk-panel-row">
                   <label class="ap-bulk-label ap-bulk-label--inline">
@@ -221,12 +221,6 @@
                   </label>
                   <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-scan">Счёт</button>
                   <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-filter-grid">Показать в сетке</button>
-                  <label class="ap-bulk-label ap-bulk-label--inline ap-bulk-label--file-inline">
-                    Файл
-                    <input type="file" id="ap-bulk-file" accept="image/jpeg,image/png,image/webp" />
-                  </label>
-                  <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-bulk-apply">Одно фото в черновик</button>
-                  <button type="button" class="ap-btn ap-btn-danger ap-btn-sm" id="ap-bulk-clear-photos">Сбросить фото</button>
                 </div>
                 <div class="ap-bulk-panel-row ap-bulk-panel-row--card-title">
                   <label class="ap-bulk-label ap-bulk-label--inline ap-bulk-label--grow">
@@ -235,8 +229,16 @@
                   </label>
                   <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-bulk-apply-card-title">Заголовок в черновик</button>
                 </div>
-                <p class="ap-bulk-card-title-hint ap-muted ap-text-compact">Те же правила отбора, что у фото: сначала отмеченные чекбоксами, иначе артикул/серию в поле выше, иначе текущие фильтры, иначе <strong>все</strong> позиции. Пустое поле + кнопка — сброс своего заголовка (останется название из прайса).</p>
-                <p class="ap-muted ap-text-compact">Массовые фасовки — в разделе <strong>Каталог</strong>, блок «Фасовки для сайта и каталога» (по умолчанию свёрнут). Цели массовых операций — как у фото: чекбоксы → артикул/серия → фильтры → все.</p>
+                <div class="ap-bulk-panel-row ap-bulk-panel-row--card-title">
+                  <label class="ap-bulk-label ap-bulk-label--inline ap-bulk-label--grow">
+                    Пункты карточки в каталоге (по одному в строке, применяются ко всем фасовкам позиции)
+                    <textarea id="ap-bulk-card-features" class="ap-bulk-input" rows="5" maxlength="4000" placeholder="Например:&#10;Улучшает адгезию&#10;Подготовка основания&#10;Снижает риск коррозии"></textarea>
+                  </label>
+                  <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-bulk-apply-card-features">Пункты в черновик</button>
+                </div>
+                <p class="ap-bulk-card-title-hint ap-muted ap-text-compact">Правила отбора целей: сначала отмеченные чекбоксами, иначе артикул/серию в поле выше, иначе текущие фильтры, иначе <strong>все</strong> позиции. Пустое поле + кнопка — сброс своего заголовка.</p>
+                <p class="ap-bulk-card-title-hint ap-muted ap-text-compact">Для «Пунктов карточки»: пустой список + кнопка — сброс своих пунктов карточки (вернутся стандартные для family). Эти пункты едины для всей позиции и действуют на все фасовки.</p>
+                <p class="ap-muted ap-text-compact">Массовые фасовки — в блоке «Фасовки для сайта и каталога» ниже. Массовые операции с фото в этом интерфейсе отключены.</p>
                 <p id="ap-bulk-summary" class="ap-bulk-summary ap-muted" role="status"></p>
                 <p id="ap-bulk-status" class="ap-status ap-bulk-status-line" role="status"></p>
               </div>
@@ -270,11 +272,17 @@
                       </div>
                       <div class="ap-pack-options-actions">
                         <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-options-add">Добавить строку</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-options-selftest">Проверить перед публикацией</button>
                         <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-options-fill-template">Как из прайса (шаблон)</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-options-refresh-keep-manual">Обновить из прайса + сохранить ручные</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-options-rebuild-all">Пересобрать фасовки из прайса (все черновики)</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-normalize-legacy">Нормализовать legacy-типы</button>
                         <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-revert-table">Отменить правки таблицы</button>
                         <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-bulk-pack-apply-table">Таблицу фасовок в черновик</button>
                         <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-bulk-pack-reset-table">Сбросить свои фасовки у целей</button>
                       </div>
+                      <p class="ap-muted ap-text-compact">Ручные строки поддерживаются: добавьте тип и массу, далее цена фасовки на сайте рассчитывается автоматически от текущей цены за кг и указанной массы.</p>
+                      <p class="ap-muted ap-text-compact">Классификация фасовок по кг: 0.1–2.7 — Банка мал; 2.8–6 — Банка бол; 7–30 — Ведро; 32–50 — Барабан.</p>
                       <p id="ap-bulk-pack-options-hint" class="ap-muted ap-text-compact" role="status"></p>
                     </div>
                   </div>
@@ -304,6 +312,7 @@
                       </div>
                       <div class="ap-pack-options-actions">
                         <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-pack-options-add">Добавить строку</button>
+                        <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-pack-options-selftest">Проверить перед публикацией</button>
                         <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-pack-options-reset">Как по умолчанию из прайса</button>
                       </div>
                       <p id="ap-pack-options-hint" class="ap-muted ap-text-compact" role="status"></p>
@@ -369,41 +378,43 @@
               <label>Пункты карточки в каталоге (по одному в строке)
                 <textarea id="ap-cards-features" rows="6" maxlength="4000"></textarea>
               </label>
-              <h3 class="ap-product-editor-h3">Расширенный контент карточки товара</h3>
-              <label>Таблица характеристик (строки: <code>Название | Значение</code>)
-                <textarea id="ap-cards-detail-spec-rows" rows="7" maxlength="12000"></textarea>
-              </label>
-              <label>Вступление «Характеристики»
-                <textarea id="ap-cards-detail-characteristics-intro" rows="5" maxlength="12000"></textarea>
-              </label>
-              <label>Текст «Применение»
-                <textarea id="ap-cards-detail-application" rows="5" maxlength="12000"></textarea>
-              </label>
-              <label>Подготовка основания (по одному пункту в строке)
-                <textarea id="ap-cards-detail-prep-base" rows="5" maxlength="12000"></textarea>
-              </label>
-              <label>Подготовка материала (по одному пункту в строке)
-                <textarea id="ap-cards-detail-prep-product" rows="5" maxlength="12000"></textarea>
-              </label>
-              <label>Нанесение / окрашивание (по одному пункту в строке)
-                <textarea id="ap-cards-detail-painting" rows="5" maxlength="12000"></textarea>
-              </label>
-              <label>Верхние бейджи (по одному пункту в строке)
-                <textarea id="ap-cards-detail-top-badges" rows="4" maxlength="4000"></textarea>
-              </label>
-              <label>Советы эксперта (строки: <code>Заголовок | URL | Источник</code>)
-                <textarea id="ap-cards-detail-expert-tips" rows="6" maxlength="16000"></textarea>
-              </label>
-              <label>Файлы/документы (строки: <code>Название | Ссылка | Размер/тип</code>)
-                <textarea id="ap-cards-detail-files" rows="6" maxlength="16000"></textarea>
-              </label>
-              <label>Расширенный override (JSON: все поля карточки, включая detail*)
-                <textarea id="ap-cards-override-json" rows="14" spellcheck="false"></textarea>
-              </label>
-              <p class="ap-muted ap-text-compact">
-                Здесь можно редактировать полное содержимое карточки: <code>detailSpecRows</code>, <code>detailApplication</code>,
-                <code>detailPrepBase</code>, <code>detailExpertTips</code>, <code>detailFiles</code>, <code>detailPackOptions</code> и другие поля.
-              </p>
+              <details id="ap-cards-advanced-wrap">
+                <summary class="ap-product-editor-h3">Расширенный контент карточки товара</summary>
+                <label>Таблица характеристик (строки: <code>Название | Значение</code>)
+                  <textarea id="ap-cards-detail-spec-rows" rows="7" maxlength="12000"></textarea>
+                </label>
+                <label>Вступление «Характеристики»
+                  <textarea id="ap-cards-detail-characteristics-intro" rows="5" maxlength="12000"></textarea>
+                </label>
+                <label>Текст «Применение»
+                  <textarea id="ap-cards-detail-application" rows="5" maxlength="12000"></textarea>
+                </label>
+                <label>Подготовка основания (по одному пункту в строке)
+                  <textarea id="ap-cards-detail-prep-base" rows="5" maxlength="12000"></textarea>
+                </label>
+                <label>Подготовка материала (по одному пункту в строке)
+                  <textarea id="ap-cards-detail-prep-product" rows="5" maxlength="12000"></textarea>
+                </label>
+                <label>Нанесение / окрашивание (по одному пункту в строке)
+                  <textarea id="ap-cards-detail-painting" rows="5" maxlength="12000"></textarea>
+                </label>
+                <label>Верхние бейджи (по одному пункту в строке)
+                  <textarea id="ap-cards-detail-top-badges" rows="4" maxlength="4000"></textarea>
+                </label>
+                <label>Советы эксперта (строки: <code>Заголовок | URL | Источник</code>)
+                  <textarea id="ap-cards-detail-expert-tips" rows="6" maxlength="16000"></textarea>
+                </label>
+                <label>Файлы/документы (строки: <code>Название | Ссылка | Размер/тип</code>)
+                  <textarea id="ap-cards-detail-files" rows="6" maxlength="16000"></textarea>
+                </label>
+                <label>Расширенный override (JSON: все поля карточки, включая detail*)
+                  <textarea id="ap-cards-override-json" rows="14" spellcheck="false"></textarea>
+                </label>
+                <p class="ap-muted ap-text-compact">
+                  Здесь можно редактировать полное содержимое карточки: <code>detailSpecRows</code>, <code>detailApplication</code>,
+                  <code>detailPrepBase</code>, <code>detailExpertTips</code>, <code>detailFiles</code>, <code>detailPackOptions</code> и другие поля.
+                </p>
+              </details>
               <div class="ap-actions ap-actions--compact">
                 <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-cards-save">Сохранить на сайт</button>
               </div>
@@ -424,7 +435,7 @@
                 <p class="ap-muted ap-text-compact">Предпросмотр перед сохранением: масштаб и сдвиг кадра.</p>
                 <div class="ap-cards-photo-editor-controls">
                   <label>Масштаб
-                    <input type="range" id="ap-cards-photo-zoom" min="1" max="3" step="0.01" value="1" />
+                    <input type="range" id="ap-cards-photo-zoom" min="0.35" max="3" step="0.01" value="1" />
                   </label>
                   <label>Сдвиг X
                     <input type="range" id="ap-cards-photo-offset-x" min="-1" max="1" step="0.01" value="0" />
@@ -438,6 +449,7 @@
               </div>
               <div class="ap-actions ap-actions--compact">
                 <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-cards-photo-save">Сохранить фото</button>
+                <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-cards-photo-edit-current">Редактировать текущее фото</button>
                 <button type="button" class="ap-btn ap-btn-danger ap-btn-sm" id="ap-cards-photo-delete">Удалить фото фасовки</button>
                 <button type="button" class="ap-btn ap-btn-danger ap-btn-sm" id="ap-cards-photo-delete-common">Удалить общее фото</button>
               </div>

@@ -940,6 +940,59 @@ function readSiteContent() {
     raw.accountPayment = normalizeAccountPayment(raw.accountPayment);
     if ("deliveryLayout" in raw) delete raw.deliveryLayout;
     if ("deliverySectionsLocale" in raw) delete raw.deliverySectionsLocale;
+    let touched = false;
+    const exts = ["png", "jpg", "jpeg", "webp"];
+    const normalizeProductUploadUrl = (urlRaw) => {
+      const src = String(urlRaw || "").trim();
+      if (!src) return "";
+      const [pathOnly, query = ""] = src.split("?");
+      const m = pathOnly.match(/^\/uploads\/products\/([a-zA-Z0-9_.-]+)\.(png|jpg|jpeg|webp)$/i);
+      if (!m) return "";
+      const base = m[1];
+      const wantExt = String(m[2] || "").toLowerCase();
+      const sameFile = path.join(PRODUCT_IMAGES_DIR, `${base}.${wantExt}`);
+      if (fs.existsSync(sameFile)) return query ? `${pathOnly}?${query}` : pathOnly;
+      for (const ext of exts) {
+        const candidate = path.join(PRODUCT_IMAGES_DIR, `${base}.${ext}`);
+        if (!fs.existsSync(candidate)) continue;
+        const nextPath = `/uploads/products/${base}.${ext}`;
+        return query ? `${nextPath}?${query}` : nextPath;
+      }
+      return "";
+    };
+    for (const ov of Object.values(raw.productOverrides)) {
+      if (!ov || typeof ov !== "object") continue;
+      for (const key of ["cardImageUrl", "heroImageUrl"]) {
+        const cur = String(ov[key] || "").trim();
+        if (!cur) continue;
+        const fixed = normalizeProductUploadUrl(cur);
+        if (!fixed) {
+          delete ov[key];
+          touched = true;
+          continue;
+        }
+        if (fixed !== cur) {
+          ov[key] = fixed;
+          touched = true;
+        }
+      }
+      if (ov.catalogPackImages && typeof ov.catalogPackImages === "object") {
+        const next = {};
+        for (const [k, v] of Object.entries(ov.catalogPackImages)) {
+          const fixed = normalizeProductUploadUrl(v);
+          if (fixed) next[k] = fixed;
+          else touched = true;
+        }
+        if (Object.keys(next).length) {
+          if (JSON.stringify(next) !== JSON.stringify(ov.catalogPackImages)) touched = true;
+          ov.catalogPackImages = next;
+        } else if (Object.keys(ov.catalogPackImages).length) {
+          delete ov.catalogPackImages;
+          touched = true;
+        }
+      }
+    }
+    if (touched) writeSiteContent(raw);
     return raw;
   } catch {
     return {
@@ -1204,18 +1257,35 @@ function sanitizeCatalogPackImages(raw) {
   if (!raw || typeof raw !== "object") return {};
   const out = {};
   let n = 0;
+  const exts = ["png", "jpg", "jpeg", "webp"];
   for (const [k0, v0] of Object.entries(raw)) {
     if (n >= 18) break;
     const k = String(k0 || "").replace(/[^\w.:_-]/g, "").slice(0, 48);
     if (!k) continue;
     const uRaw = String(v0 || "").trim().slice(0, 520);
     const pathOnly = uRaw.split(/[?\s]/)[0];
-    if (!/^\/uploads\/products\/[^/?]+\.(png|jpg|jpeg|webp)$/i.test(pathOnly)) continue;
-    let safeUrl = pathOnly;
+    const m = pathOnly.match(/^\/uploads\/products\/([a-zA-Z0-9_.-]+)\.(png|jpg|jpeg|webp)$/i);
+    if (!m) continue;
+    const base = String(m[1] || "");
+    const extFromUrl = String(m[2] || "").toLowerCase();
+    let fixedPath = pathOnly;
+    const exact = path.join(PRODUCT_IMAGES_DIR, `${base}.${extFromUrl}`);
+    if (!fs.existsSync(exact)) {
+      let found = "";
+      for (const ext of exts) {
+        const p = path.join(PRODUCT_IMAGES_DIR, `${base}.${ext}`);
+        if (!fs.existsSync(p)) continue;
+        found = ext;
+        break;
+      }
+      if (!found) continue;
+      fixedPath = `/uploads/products/${base}.${found}`;
+    }
+    let safeUrl = fixedPath;
     const qIdx = uRaw.indexOf("?");
     if (qIdx >= 0) {
       const q = uRaw.slice(qIdx + 1).trim();
-      if (/^_=\d{6,}$/.test(q)) safeUrl = `${pathOnly}?${q}`;
+      if (/^_=\d{6,}$/.test(q)) safeUrl = `${fixedPath}?${q}`;
     }
     out[k] = safeUrl;
     n += 1;

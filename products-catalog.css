@@ -385,7 +385,7 @@ a.catalog-placeholder.catalog-placeholder--link:hover {
 
 #popular-products-grid.catalog-grid--grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
   gap: 1rem;
 }
 
@@ -445,7 +445,7 @@ a.catalog-placeholder.catalog-placeholder--link:hover {
 
 .catalog-row {
   display: grid;
-  grid-template-columns: 120px 1fr auto;
+  grid-template-columns: 150px 1fr auto;
   gap: 1rem 1.25rem;
   align-items: center;
   padding: 1rem 1.1rem;
@@ -487,8 +487,8 @@ a.catalog-placeholder.catalog-placeholder--link:hover {
 }
 
 .catalog-row-media {
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   border-radius: var(--radius-sm);
   background-size: cover;
   background-position: center;
@@ -690,9 +690,9 @@ a.catalog-placeholder.catalog-placeholder--link:hover {
   justify-content: center;
   width: 100%;
   min-height: 0;
-  height: clamp(178px, 20.37vw, 222px);
+  height: clamp(228px, 25vw, 282px);
   box-sizing: border-box;
-  padding: 0.35rem 0.5rem;
+  padding: 0.45rem 0.6rem;
   background: rgba(100, 116, 139, 0.06);
 }
 
@@ -718,17 +718,18 @@ a.catalog-placeholder.catalog-placeholder--link:hover {
 }
 
 .catalog-card-grid-body {
-  padding: 0.85rem;
+  padding: 1.05rem 1.05rem 0.95rem;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.6rem;
   flex: 1;
 }
 
 .catalog-card-grid-body h3 {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1.07rem;
   font-weight: 700;
+  line-height: 1.25;
 }
 
 .catalog-card-grid-body h3 a {
@@ -739,16 +740,17 @@ a.catalog-placeholder.catalog-placeholder--link:hover {
 .catalog-card-grid-body ul {
   margin: 0;
   padding-left: 1rem;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--muted);
   flex: 1;
+  line-height: 1.45;
 }
 
 .catalog-card-grid-footer {
-  padding: 0 0.85rem 0.85rem;
+  padding: 0 1.05rem 1.05rem;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.6rem;
 }
 
 .catalog-bottom-pagination {

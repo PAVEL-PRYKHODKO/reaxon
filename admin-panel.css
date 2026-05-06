@@ -1162,6 +1162,18 @@ body {
   outline-offset: -2px;
 }
 
+.ap-pack-options-table tbody tr.ap-pack-row-invalid {
+  outline: 2px solid color-mix(in srgb, #d11a2a 70%, white);
+  outline-offset: -2px;
+  background: color-mix(in srgb, #d11a2a 8%, transparent);
+}
+
+.ap-pack-options-table .ap-field-invalid,
+.ap-pack-options-table .ap-pack-field-invalid {
+  border-color: #d11a2a !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #d11a2a 20%, transparent);
+}
+
 .ap-product-catalog {
   max-height: calc(100vh - 15.5rem);
   overflow-y: auto;
