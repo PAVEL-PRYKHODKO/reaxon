@@ -480,6 +480,10 @@ function bindCatalogCatalogDelegation(cfg) {
       if (!row) return;
       row.querySelectorAll(".catalog-pack-chip").forEach((x) => x.classList.remove("is-selected"));
       packChip.classList.add("is-selected");
+      const qtyInput = row.querySelector(".catalog-qty-input");
+      if (qtyInput instanceof HTMLInputElement) {
+        qtyInput.value = "1";
+      }
       updateCatalogRowPrice(row);
       catalogUpdateRowPackImage(row);
       return;

@@ -613,14 +613,15 @@
       if (!p || typeof p !== "object") continue;
       const weights = dpProductPackMassesFromPrice(p);
       for (const w of weights) {
-        const inferred = typeof window.dpInferPackKindFromKg === "function" ? window.dpInferPackKindFromKg(w) : null;
+        let inferred = typeof window.dpInferPackKindFromKg === "function" ? window.dpInferPackKindFromKg(w) : null;
+        if (!inferred) inferred = "jar";
         if (!inferred) continue;
         const cls = dpPackClassByKg(w);
         const r = {
           kind: inferred,
           jarKg: w,
           label: "",
-          sub: cls?.sub || "",
+          sub: cls?.sub || (inferred === "bucket" ? "ведро" : inferred === "drum" ? "барабан" : "фасовка"),
           hidden: false,
         };
         const key = typeof window.dpPackOptionRowStableKey === "function" ? window.dpPackOptionRowStableKey(r) : "";

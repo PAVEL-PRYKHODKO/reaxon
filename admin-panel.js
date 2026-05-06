@@ -1081,16 +1081,10 @@ function apBulkPackPanelRefreshFromPriceKeepManual() {
       hidden: cur ? Boolean(cur.hidden) : Boolean(row.hidden),
     });
   }
-  for (const row of current) {
-    const key = typeof window.dpPackOptionRowStableKey === "function" ? window.dpPackOptionRowStableKey(row) : "";
-    if (!key || seenOut.has(key)) continue;
-    seenOut.add(key);
-    out.push({ ...row });
-  }
   const sorted = apSortPackRowsByTypeAndMass(out);
   body.innerHTML = sorted.map((r) => apPackOptionRowHtml(r)).join("");
   apBulkPackOptionsUpdateHint();
-  setBulkPanelStatus("Таблица обновлена из прайса: прайсовые строки обновлены, ручные сохранены.", "ok");
+  setBulkPanelStatus("Таблица обновлена из прайса: оставлены только строки базового набора.", "ok");
 }
 
 function apRebuildAllDraftPackOptionsFromCurrentPrice() {
@@ -1223,11 +1217,6 @@ function apBulkPackMergedRowsForMassPanelUi() {
           }
         : { ...base }
     );
-  }
-  // Ручные строки, которых нет в прайсе, сохраняем в таблице (чтобы можно было применять массово).
-  for (const r of draftNorm) {
-    const rk = window.dpPackOptionRowStableKey(r);
-    if (rk && !aggByKey.has(rk)) out.push({ ...r });
   }
   const normalized =
     typeof window.dpNormalizePackOptionRows === "function"
@@ -4469,6 +4458,30 @@ function apSnapshotPackRowsForDraft(rows) {
   }));
 }
 
+function apFilterSnapshotToProductBaseRows(product, snapshot) {
+  if (!Array.isArray(snapshot) || !snapshot.length) return [];
+  if (!product || typeof window.dpDefaultPackOptionRows !== "function" || typeof window.dpPackOptionRowStableKey !== "function") {
+    return snapshot;
+  }
+  const baseRowsRaw = window.dpDefaultPackOptionRows(product);
+  const baseRows =
+    typeof window.dpNormalizePackOptionRows === "function"
+      ? window.dpNormalizePackOptionRows(baseRowsRaw)
+      : Array.isArray(baseRowsRaw)
+      ? baseRowsRaw
+      : [];
+  if (!baseRows.length) return [];
+  const allowed = new Set();
+  for (const row of baseRows) {
+    const key = window.dpPackOptionRowStableKey(row);
+    if (key) allowed.add(key);
+  }
+  return snapshot.filter((row) => {
+    const key = window.dpPackOptionRowStableKey(row);
+    return Boolean(key && allowed.has(key));
+  });
+}
+
 function apClearPackValidationUi() {
   ["ap-bulk-pack-options-body", "ap-pack-options-body"].forEach((id) => {
     const body = document.getElementById(id);
@@ -4535,8 +4548,10 @@ function apMergeBulkPackDomIntoDraftBeforePublish() {
   }
   if (!ids.length) return;
   for (const pid of ids) {
+    const product = getProducts().find((x) => String(x.id) === String(pid));
+    const scoped = apFilterSnapshotToProductBaseRows(product, snapshot);
     ensureDraftEntry(pid);
-    draftOverrides[pid].detailPackOptions = snapshot.map((x) => ({ ...x }));
+    draftOverrides[pid].detailPackOptions = scoped.map((x) => ({ ...x }));
   }
 }
 
@@ -4583,9 +4598,13 @@ function stageBulkPackOptionsApply() {
       return;
     }
   }
+  let removedOutsideBase = 0;
   for (const pid of ids) {
+    const product = getProducts().find((x) => String(x.id) === String(pid));
+    const scoped = apFilterSnapshotToProductBaseRows(product, snapshot);
+    removedOutsideBase += Math.max(0, snapshot.length - scoped.length);
     ensureDraftEntry(pid);
-    draftOverrides[pid].detailPackOptions = snapshot.map((x) => ({ ...x }));
+    draftOverrides[pid].detailPackOptions = scoped.map((x) => ({ ...x }));
   }
   const modeRu =
     mode === "picked"
@@ -4595,7 +4614,12 @@ function stageBulkPackOptionsApply() {
         : mode === "group"
           ? "по фильтрам каталога"
           : "по всем карточкам";
-  setBulkPanelStatus(`Фасовки в корзину в черновик: ${ids.length} поз. (${modeRu}).`, "ok");
+  setBulkPanelStatus(
+    `Фасовки в корзину в черновик: ${ids.length} поз. (${modeRu}).${
+      removedOutsideBase ? ` Удалено вне базового набора: ${removedOutsideBase}.` : ""
+    }`,
+    "ok"
+  );
   renderProductCatalog();
   updateDraftToolbar();
 }
