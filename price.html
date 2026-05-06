@@ -9,14 +9,67 @@
   <link rel="stylesheet" href="redesign-shared.css" />
   <link rel="stylesheet" href="site-lang.css" />
   <style>
-    #price-table th:nth-child(4),
-    #price-table td:nth-child(4) {
+    #price-table th {
+      white-space: normal;
+      line-height: 1.2;
+      vertical-align: middle;
+      text-align: center;
+      padding: 10px 16px;
+      border-right: 1px solid rgba(15, 23, 42, 0.28);
+      box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+      min-height: 56px;
+    }
+
+    #price-table th:last-child {
+      border-right: none;
+    }
+
+    #price-table {
+      table-layout: fixed;
+      width: max-content;
+      min-width: 0;
+    }
+
+    body[data-page="price"] .price-table-wrap {
+      min-width: 0;
+      width: max-content;
+    }
+
+    #price-table td {
+      text-align: center;
+      vertical-align: middle;
+      padding: 8px 12px;
+    }
+
+    #price-table th:nth-child(3),
+    #price-table td:nth-child(3) {
       min-width: 360px;
       white-space: normal;
       word-break: break-word;
       overflow-wrap: anywhere;
       line-height: 1.25;
+    }
+
+    #price-table th:nth-child(3) {
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    #price-table td:nth-child(3) {
       vertical-align: top;
+    }
+
+    #price-table td:nth-child(2) {
+      text-align: left;
+      padding-left: 12px;
+      padding-right: 12px;
+      white-space: normal;
+      line-height: 1.25;
+    }
+
+    #price-table td:nth-child(1) {
+      text-align: center;
+      vertical-align: middle;
     }
   </style>
 </head>
@@ -90,7 +143,7 @@
         <div class="section-head">
           <div>
             <h2>Прайс-лист</h2>
-            <p class="lead" id="price-lead-admin-detail" hidden>Данные подгружаются с сервера (если запущен API) или из локального файла. Таблица синхронизирована с разделом «Прайс-лист» в админ-панели: те же строки, базовые колонки фасовок и дополнительные колонки из загруженного файла.</p>
+            <p class="lead">Данные подгружаются с сервера (если запущен API) или из локального файла. Таблица синхронизирована с разделом «Прайс-лист» в админ-панели: те же строки, базовые колонки фасовок и дополнительные колонки из загруженного файла.</p>
           </div>
           <div class="dp-price-download-wrap">
             <button
@@ -129,19 +182,6 @@
             data-uk-placeholder="Пошук за назвою, артикулом або типом покриття"
             placeholder="Поиск по названию, артикулу или типу покрытия"
           />
-        </div>
-        <div class="price-admin-bar" id="price-admin-bar" hidden>
-          <div class="price-admin-actions">
-            <button type="button" class="btn btn-ghost" id="price-discard-changes" disabled>
-              Сбросить изменения
-            </button>
-            <button type="button" class="btn btn-primary" id="price-confirm-changes" disabled>
-              Подтвердить изменения
-            </button>
-          </div>
-          <p class="price-admin-hint" id="price-admin-hint">
-            Правки не сохраняются автоматически. «Сбросить» отменяет черновик до последнего сохранения; «Подтвердить» записывает на сервер и обновляет каталог.
-          </p>
         </div>
         <div class="price-table-shell">
           <div class="price-table-scroll price-table-scroll--collapsed" id="price-table-scroll">

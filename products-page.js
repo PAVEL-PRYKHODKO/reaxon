@@ -1508,6 +1508,41 @@ window.dpRefreshProductsPortals = function dpRefreshProductsPortals() {
   });
 };
 
+function dpProductsViewerRole() {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) return "";
+    const user = JSON.parse(localStorage.getItem("authUser") || "null");
+    return String(user?.role || "").trim().toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+function dpCanSeeCatalogSyncNotice() {
+  const role = dpProductsViewerRole();
+  return role === "admin" || role === "accountant" || role === "bookkeeper" || role === "бухгалтер";
+}
+
+function dpShowCatalogSyncNotice() {
+  if (!dpCanSeeCatalogSyncNotice()) return;
+  const id = "dp-catalog-sync-notice";
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement("div");
+    el.id = id;
+    el.style.cssText =
+      "position:fixed;right:14px;bottom:14px;z-index:9999;padding:8px 11px;border-radius:10px;background:rgba(12,18,34,.9);color:#fff;font:500 12px/1.2 system-ui,-apple-system,Segoe UI,sans-serif;box-shadow:0 8px 22px rgba(0,0,0,.26)";
+    document.body.appendChild(el);
+  }
+  el.textContent = "Фасовки карточек обновлены из прайса";
+  el.hidden = false;
+  clearTimeout(dpShowCatalogSyncNotice._t);
+  dpShowCatalogSyncNotice._t = setTimeout(() => {
+    if (el) el.hidden = true;
+  }, 2400);
+}
+
 async function bootProductsPortals() {
   if (window.dpSiteReady && typeof window.dpSiteReady.then === "function") {
     try {
@@ -1524,3 +1559,9 @@ if (document.readyState === "loading") {
 } else {
   bootProductsPortals();
 }
+
+window.addEventListener("dp-catalog-updated", (e) => {
+  if (e?.detail?.source === "admin" || e?.detail?.source === "api") {
+    dpShowCatalogSyncNotice();
+  }
+});

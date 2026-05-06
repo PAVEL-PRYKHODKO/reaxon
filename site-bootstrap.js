@@ -82,7 +82,9 @@
       const pr = await fetch(window.dpApiUrl("/api/site/products"));
       if (!pr.ok) return false;
       const d = await pr.json();
-      if (!Array.isArray(d.products) || !d.products.length) return false;
+      if (!Array.isArray(d.products)) return false;
+      // Важный кейс: после очистки каталога на сервере массив может быть пустым.
+      // Всё равно нужно синхронизировать клиент и очистить таблицы/витрину.
       window.PRODUCTS_DATA = d.products;
       if (typeof window.dpNormalizeCatalogProductsInPlace === "function") {
         window.dpNormalizeCatalogProductsInPlace(window.PRODUCTS_DATA);

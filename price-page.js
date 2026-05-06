@@ -28,10 +28,6 @@ const DEFAULT_DP_PRICE_IDS = {
   downloadDropdownId: "download-price-dropdown",
   downloadCsvBtnId: "download-price-csv",
   downloadPdfBtnId: "download-price-pdf",
-  adminBarId: "price-admin-bar",
-  adminLeadId: "price-lead-admin-detail",
-  confirmChangesBtnId: "price-confirm-changes",
-  discardChangesBtnId: "price-discard-changes",
 };
 
 function ensureMergedPriceIds() {
@@ -66,28 +62,51 @@ function toMoney(value) {
   return Number.isFinite(num) && num > 0 ? num.toFixed(2) : "";
 }
 
-function getAuthUserRole() {
+function toMoneyOrDash(value) {
+  const num = Number(value);
+  return Number.isFinite(num) && num > 0 ? num.toFixed(2) : "—";
+}
+
+const DP_PRICE_BASE_LABELS_KEY = "dpPriceBaseColumnLabels";
+const DP_PRICE_BASE_LABELS_DEFAULT = {
+  family: "Тип покрытия",
+  code: "Артикул",
+  name: "Наименование",
+  priceNoNdsPerKg: "Без НДС / кг",
+  priceNdsPerKg: "С НДС / кг",
+  jarSmallKg: "мал /кг/ банка",
+  jarBigKg: "вел /кг/ банка",
+  bucketKg: "Вага /кг/ відро",
+  drumKg: "Вага /кг/ барабан",
+};
+
+function getPriceBaseLabels() {
+  const out = { ...DP_PRICE_BASE_LABELS_DEFAULT };
   try {
-    if (!localStorage.getItem("authToken")) return "";
-    const u = JSON.parse(localStorage.getItem("authUser") || "null");
-    return String(u?.role || "").trim().toLowerCase();
+    const raw = JSON.parse(localStorage.getItem(DP_PRICE_BASE_LABELS_KEY) || "{}");
+    if (!raw || typeof raw !== "object") return out;
+    for (const key of Object.keys(out)) {
+      const label = String(raw[key] || "").trim();
+      if (label) out[key] = label;
+    }
   } catch {
-    return "";
+    /* ignore */
   }
+  return out;
 }
 
-function isPriceEditorRole(role) {
-  const r = String(role || "").trim().toLowerCase();
-  return r === "admin" || r === "accountant" || r === "bookkeeper" || r === "бухгалтер";
+function headerLabelHtml(label) {
+  const raw = String(label || "").trim();
+  if (!raw) return "";
+  const withBreaks = raw
+    .replace(/(за\s*1\s*кг)\s+/giu, "$1\n")
+    .replace(/(\s*\/кг\/)\s*/giu, "$1\n");
+  return escAttr(withBreaks).replace(/\n/g, "<br>");
 }
 
-function isPriceAdmin() {
-  return isPriceEditorRole(getAuthUserRole());
-}
-
-/** Столбец ID — только для администратора, модератора и бухгалтера (тип покрытия виден всем, подпись RU/UA). */
+/** На публичной странице прайса столбец ID скрыт; поиск идёт по артикулу и названию. */
 function priceShowsIdFamilyColumns() {
-  return true;
+  return false;
 }
 
 function syncPriceTableColumnVisibility() {
@@ -191,6 +210,18 @@ function getRows() {
 }
 
 function getDynamicPriceColumns(rows) {
+  const blocked = new Set(
+    [
+      "№ п/п",
+      "дата перерахунку",
+      "мал /кг/ банка",
+      "вел /кг/ банка",
+      "вага /кг/ мал банка",
+      "вага /кг/ вел банка",
+      "вага /кг/ відро",
+      "вага /кг/ барабан",
+    ].map((s) => s.toLowerCase())
+  );
   const out = [];
   const seen = new Set();
   for (const p of rows) {
@@ -199,6 +230,7 @@ function getDynamicPriceColumns(rows) {
     for (const key of Object.keys(map)) {
       const label = String(key || "").trim();
       if (!label) continue;
+      if (blocked.has(label.toLowerCase())) continue;
       const k = label.toLowerCase();
       if (seen.has(k)) continue;
       seen.add(k);
@@ -213,19 +245,19 @@ function renderPriceTableHeader(dynamicCols) {
   if (!table) return;
   const row = table.querySelector("thead tr");
   if (!row) return;
+  const h = getPriceBaseLabels();
   const staticHeader = `
-    <th>ID</th>
-    <th data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</th>
-    <th>Артикул</th>
-    <th>Наименование</th>
-    <th>Без НДС / кг</th>
-    <th>С НДС / кг</th>
-    <th title="Мала банка, кг">мал /кг/ банка</th>
-    <th title="Велика банка, кг">вел /кг/ банка</th>
-    <th title="Фасовка ведра, кг">Вага /кг/ відро</th>
-    <th title="Фасовка барабана, кг">Вага /кг/ барабан</th>
+    <th>${headerLabelHtml(h.family)}</th>
+    <th>${headerLabelHtml(h.code)}</th>
+    <th>${headerLabelHtml(h.name)}</th>
+    <th>${headerLabelHtml(h.priceNoNdsPerKg)}</th>
+    <th>${headerLabelHtml(h.priceNdsPerKg)}</th>
+    <th>${headerLabelHtml(h.jarSmallKg)}</th>
+    <th>${headerLabelHtml(h.jarBigKg)}</th>
+    <th>${headerLabelHtml(h.bucketKg)}</th>
+    <th>${headerLabelHtml(h.drumKg)}</th>
   `;
-  const dynHeader = dynamicCols.map((label) => `<th>${escAttr(label)}</th>`).join("");
+  const dynHeader = dynamicCols.map((label) => `<th>${headerLabelHtml(label)}</th>`).join("");
   row.innerHTML = `${staticHeader}${dynHeader}`;
 }
 
@@ -233,29 +265,8 @@ function cellReadonly(text) {
   return `<span class="price-cell-text">${escAttr(text)}</span>`;
 }
 
-function cellInput(pid, field, value, type, extraAttrs) {
-  const v = value == null || value === "" ? "" : String(value);
-  const attrs = extraAttrs ? ` ${extraAttrs}` : "";
-  return `<input type="${type}" class="price-inline-edit" data-pid="${escAttr(pid)}" data-field="${field}" data-initial="${escAttr(v)}" value="${escAttr(v)}"${attrs} />`;
-}
-
-function cellFamilySelect(pid, rawFamily) {
-  const v = rawFamily == null || rawFamily === "" ? "" : String(rawFamily).trim();
-  const inner =
-    typeof window.dpPriceFamilySelectOptionsInnerHtml === "function"
-      ? window.dpPriceFamilySelectOptionsInnerHtml((x) => escAttr(String(x ?? "")), rawFamily)
-      : `<option value="">${escAttr(v)}</option>`;
-  return `<select class="price-inline-edit price-inline-family-select" data-pid="${escAttr(pid)}" data-field="family" data-initial="${escAttr(v)}">${inner}</select>`;
-}
-
-function renderPriceTable(options) {
+function renderPriceTable() {
   ensureMergedPriceIds();
-  const skipDirtyCheck = options && options.skipDirtyCheck;
-  const embeddedCrm = document.body.dataset.crmEmbeddedPriceTable === "1";
-  const admin = isPriceAdmin() && !embeddedCrm;
-  if (!skipDirtyCheck && admin && hasUnsavedPriceEdits()) {
-    if (!window.confirm("Есть несохранённые правки в таблице. Продолжить и отменить их?")) return;
-  }
 
   const body = priceEl("tbodyId");
   if (!body) return;
@@ -269,8 +280,8 @@ function renderPriceTable(options) {
       const code = p.code ?? p.series ?? "";
       const fam = p.family ?? "";
       const nm = p.name ?? p.fullName ?? "";
-      const pNo = toMoney(p.priceNoNdsPerKg);
-      const pNds = toMoney(p.priceNdsPerKg);
+      const pNo = toMoneyOrDash(p.priceNoNdsPerKg);
+      const pNds = toMoneyOrDash(p.priceNdsPerKg);
       const jarSmall = toMoney(p.jarSmallKg);
       const jarBig = toMoney(p.jarBigKg);
       const bucket = toMoney(p.bucketKg);
@@ -283,27 +294,8 @@ function renderPriceTable(options) {
         })
         .join("");
 
-      if (admin) {
-        return `
-        <tr data-product-id="${escAttr(id)}">
-          <td>${cellReadonly(id)}</td>
-          <td>${cellFamilySelect(id, fam)}</td>
-          <td>${cellInput(id, "code", code, "text")}</td>
-          <td>${cellReadonly(nm)}</td>
-          <td>${cellInput(id, "priceNoNdsPerKg", pNo, "number", 'step="0.01" min="0"')}</td>
-          <td>${cellInput(id, "priceNdsPerKg", pNds, "number", 'step="0.01" min="0"')}</td>
-          <td>${cellInput(id, "jarSmallKg", jarSmall, "number", 'step="0.01" min="0"')}</td>
-          <td>${cellInput(id, "jarBigKg", jarBig, "number", 'step="0.01" min="0"')}</td>
-          <td>${cellInput(id, "bucketKg", bucket, "number", 'step="0.01" min="0"')}</td>
-          <td>${cellInput(id, "drumKg", drum, "number", 'step="0.01" min="0"')}</td>
-          ${dynRow}
-        </tr>
-      `;
-      }
-
       return `
         <tr>
-          <td>${escAttr(id)}</td>
           <td>${escAttr(dpPriceFamilyCellLabel(fam))}</td>
           <td>${escAttr(code)}</td>
           <td>${escAttr(nm)}</td>
@@ -319,169 +311,8 @@ function renderPriceTable(options) {
     })
     .join("");
 
-  if (admin) bindPriceInlineEdits(body);
-  syncPriceAdminBarVisibility();
-  updatePriceActionButtons();
   syncPriceTableColumnVisibility();
   syncPriceExpandUI();
-}
-
-function syncPriceAdminBarVisibility() {
-  const admin = isPriceAdmin();
-  const bar = priceEl("adminBarId");
-  if (bar) bar.hidden = !admin;
-  const lead = priceEl("adminLeadId");
-  if (lead) lead.hidden = !admin;
-}
-
-function fieldValueMatchesInitial(field, currentValue, initialAttr) {
-  const a = String(currentValue ?? "").trim();
-  const b = String(initialAttr ?? "").trim();
-  if (field === "family" || field === "code" || field === "name") return a === b;
-  if (a === "" && b === "") return true;
-  const na = a === "" ? null : Number(a.replace(",", "."));
-  const nb = b === "" ? null : Number(b.replace(",", "."));
-  if (na === null && nb === null) return true;
-  if (!Number.isFinite(na) || !Number.isFinite(nb)) return a === b;
-  return Math.abs(na - nb) < 1e-9;
-}
-
-function hasUnsavedPriceEdits() {
-  if (document.body.dataset.crmEmbeddedPriceTable === "1") return false;
-  const tbody = priceEl("tbodyId");
-  if (!tbody || !isPriceAdmin()) return false;
-  for (const input of tbody.querySelectorAll(".price-inline-edit")) {
-    const field = input.dataset.field;
-    if (!field) continue;
-    if (!fieldValueMatchesInitial(field, input.value, input.getAttribute("data-initial"))) return true;
-  }
-  return false;
-}
-
-function updatePriceActionButtons() {
-  const dirty = hasUnsavedPriceEdits();
-  const confirmBtn = priceEl("confirmChangesBtnId");
-  const discardBtn = priceEl("discardChangesBtnId");
-  if (confirmBtn) confirmBtn.disabled = !dirty;
-  if (discardBtn) discardBtn.disabled = !dirty;
-}
-
-/** После сброса полей — обновить суммы по фасовкам из актуальных данных каталога. */
-function refreshAdminPricePackColumnsFromServer() {
-  return;
-}
-
-function discardPricePendingEdits() {
-  const tbody = priceEl("tbodyId");
-  if (!tbody || !hasUnsavedPriceEdits()) return;
-  for (const input of tbody.querySelectorAll(".price-inline-edit")) {
-    input.value = input.getAttribute("data-initial") ?? "";
-  }
-  refreshAdminPricePackColumnsFromServer();
-  updatePriceActionButtons();
-}
-
-function collectPendingProductOverrides(tbody) {
-  const byPid = {};
-  const errors = [];
-  for (const input of tbody.querySelectorAll(".price-inline-edit")) {
-    const pid = input.dataset.pid;
-    const field = input.dataset.field;
-    if (!pid || !field) continue;
-    const initial = input.getAttribute("data-initial") ?? "";
-    if (fieldValueMatchesInitial(field, input.value, initial)) continue;
-    const patch = buildPatchForField(field, input.value);
-    if (patch === null) {
-      errors.push({ field, input });
-      continue;
-    }
-    if (!byPid[pid]) byPid[pid] = {};
-    Object.assign(byPid[pid], patch);
-  }
-  return { byPid, errors };
-}
-
-async function confirmPriceChanges() {
-  const tbody = priceEl("tbodyId");
-  const btn = priceEl("confirmChangesBtnId");
-  const discardBtn = priceEl("discardChangesBtnId");
-  if (!tbody || !btn) return;
-
-  const { byPid, errors } = collectPendingProductOverrides(tbody);
-  if (errors.length) {
-    alert("Исправьте некорректные значения (числа должны быть ≥ 0).");
-    errors[0].input?.focus?.();
-    return;
-  }
-  if (!Object.keys(byPid).length) return;
-
-  const token = localStorage.getItem("authToken");
-  if (!token) {
-    alert("Сессия истекла. Войдите снова.");
-    return;
-  }
-
-  const url =
-    typeof window.dpApiUrl === "function" ? window.dpApiUrl("/api/admin/site-content") : "/api/admin/site-content";
-  btn.disabled = true;
-  if (discardBtn) discardBtn.disabled = true;
-  const prevText = btn.textContent;
-  btn.textContent = "Сохранение…";
-  try {
-    const res = await fetch(url, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ productOverrides: byPid }),
-    });
-    if (!res.ok) {
-      const t = await res.text();
-      throw new Error(t || res.statusText);
-    }
-    const data = await res.json();
-    if (data.productOverrides && typeof data.productOverrides === "object") {
-      window.DP_PRODUCT_OVERRIDES = data.productOverrides;
-    }
-    window.dispatchEvent(new CustomEvent("dp-catalog-updated", { detail: { source: "price-confirm" } }));
-    btn.textContent = prevText;
-  } catch (e) {
-    console.error(e);
-    alert("Не удалось сохранить. Проверьте права администратора и сеть.");
-    btn.textContent = prevText;
-    updatePriceActionButtons();
-  }
-}
-
-function parseFieldForPatch(field, rawStr) {
-  const raw = String(rawStr ?? "").trim();
-  if (field === "family" || field === "code" || field === "name") {
-    return raw === "" ? null : raw;
-  }
-  if (raw === "") return null;
-  const n = Number(raw.replace(",", "."));
-  if (!Number.isFinite(n) || n < 0) return undefined;
-  return n;
-}
-
-function buildPatchForField(field, value) {
-  const v = parseFieldForPatch(field, value);
-  if (v === undefined) return null;
-  return { [field]: v };
-}
-
-function bindPriceInlineEdits(tbody) {
-  if (tbody.dataset.priceInlineBound === "1") return;
-  tbody.dataset.priceInlineBound = "1";
-
-  const refreshDirty = (e) => {
-    const t = e.target;
-    if (!(t instanceof HTMLElement) || !t.classList.contains("price-inline-edit")) return;
-    updatePriceActionButtons();
-  };
-  tbody.addEventListener("input", refreshDirty);
-  tbody.addEventListener("change", refreshDirty);
 }
 
 function getFilteredRows() {
@@ -555,15 +386,16 @@ function initPriceFilters() {
 function getPriceExportTableData() {
   const rows = getFilteredRows();
   const dynamicCols = getDynamicPriceColumns(rows);
+  const h = getPriceBaseLabels();
   const showIdCol = priceShowsIdFamilyColumns();
-  const tailHeader = ["Без НДС за кг, грн", "С НДС за кг, грн", "мал /кг/ банка", "вел /кг/ банка", "Вага /кг/ відро", "Вага /кг/ барабан", ...dynamicCols];
+  const tailHeader = [h.priceNoNdsPerKg, h.priceNdsPerKg, h.jarSmallKg, h.jarBigKg, h.bucketKg, h.drumKg, ...dynamicCols];
   const typeCol =
     typeof window.dpCatalogPriceTypeColumnHeading === "function"
       ? window.dpCatalogPriceTypeColumnHeading()
       : "Тип покрытия";
   const header = showIdCol
-    ? ["ID", typeCol, "Артикул", "Наименование", ...tailHeader]
-    : ["Артикул", typeCol, "Наименование", ...tailHeader];
+    ? ["ID", typeCol, h.code, h.name, ...tailHeader]
+    : [h.code, typeCol, h.name, ...tailHeader];
 
   const body = rows.map((p) => {
     const code = p.code ?? p.series ?? "";
@@ -842,21 +674,13 @@ function bindPriceDownloadDropdowns() {
   });
 }
 
-let priceConfirmBound = false;
-
 function initPricePage() {
   ensureMergedPriceIds();
   if (!priceEl("tbodyId")) return;
 
   initPriceFilters();
   priceTableExpanded = false;
-  renderPriceTable({ skipDirtyCheck: true });
-
-  if (!priceConfirmBound) {
-    priceConfirmBound = true;
-    priceEl("confirmChangesBtnId")?.addEventListener("click", () => void confirmPriceChanges());
-    priceEl("discardChangesBtnId")?.addEventListener("click", discardPricePendingEdits);
-  }
+  renderPriceTable();
   const showBtn = priceEl("showMoreBtnId");
   if (!priceShowMoreBound && showBtn) {
     priceShowMoreBound = true;
@@ -876,7 +700,7 @@ if (!window.__dpPriceLangUiBound) {
     if (!priceEl("tbodyId")) return;
     refreshPriceFamilyOptions();
     priceTableExpanded = false;
-    renderPriceTable({ skipDirtyCheck: true });
+    renderPriceTable();
   });
 }
 
@@ -901,14 +725,11 @@ window.addEventListener("dp-catalog-updated", (e) => {
   refreshPriceFamilyOptions();
   if (e.detail?.skipPriceRender) return;
   priceTableExpanded = false;
-  const opts = e.detail?.source === "price-confirm" ? { skipDirtyCheck: true } : {};
-  renderPriceTable(opts);
+  renderPriceTable();
 });
 
 window.addEventListener("dp-auth-changed", () => {
   refreshPriceFamilyOptions();
   priceTableExpanded = false;
-  renderPriceTable({ skipDirtyCheck: true });
-  syncPriceAdminBarVisibility();
-  updatePriceActionButtons();
+  renderPriceTable();
 });

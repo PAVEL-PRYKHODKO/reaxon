@@ -2719,6 +2719,7 @@ async function loadAdminProductsCatalog() {
     const d = await apiAdmin("GET", "/api/admin/products-catalog");
     if (Array.isArray(d.products)) {
       window.PRODUCTS_DATA = d.products;
+      apNormalizeExtraColumnsIntoBaseFields();
       apEnsureUnifiedCatalogArticleCodes();
     }
   } catch {
@@ -2942,6 +2943,19 @@ async function restoreApPriceServerBackup(id) {
 
 const AP_PRICE_IMPORT_FIELDS = ["id", "family", "code", "name", "jarSmallKg", "jarBigKg", "bucketKg", "drumKg", "priceNoNdsPerKg", "priceNdsPerKg"];
 let apPriceDynamicColumns = [];
+const AP_PRICE_BASE_LABELS_KEY = "dpPriceBaseColumnLabels";
+const AP_PRICE_BASE_LABELS_DEFAULT = {
+  family: "Тип покрытия",
+  code: "Артикул",
+  name: "Наименование",
+  priceNoNdsPerKg: "Без НДС / кг",
+  priceNdsPerKg: "С НДС / кг",
+  jarSmallKg: "мал /кг/ банка",
+  jarBigKg: "вел /кг/ банка",
+  bucketKg: "Вага /кг/ відро",
+  drumKg: "Вага /кг/ барабан",
+};
+let apPriceBaseColumnLabels = { ...AP_PRICE_BASE_LABELS_DEFAULT };
 const AP_PRICE_IMPORT_ALIASES = {
   id: ["id", "ид", "ід", "identifier", "sku_id"],
   family: [
@@ -2970,8 +2984,30 @@ const AP_PRICE_IMPORT_ALIASES = {
     "продукція",
     "номенклатура",
   ],
-  jarSmallKg: ["jarsmallkg", "малкгбанка", "мал/кг/банка", "малбанка", "малабанка", "мал"],
-  jarBigKg: ["jarbigkg", "велкгбанка", "вел/кг/банка", "велбанка", "великабанка", "вел"],
+  jarSmallKg: [
+    "jarsmallkg",
+    "малкгбанка",
+    "мал/кг/банка",
+    "малбанка",
+    "малабанка",
+    "мал",
+    "вагакгмалбанка",
+    "вагакгмалабанка",
+    "вескгмалбанка",
+    "вескгмалабанка",
+  ],
+  jarBigKg: [
+    "jarbigkg",
+    "велкгбанка",
+    "вел/кг/банка",
+    "велбанка",
+    "великабанка",
+    "вел",
+    "вагакгвелбанка",
+    "вагакгвеликабанка",
+    "вескгвелбанка",
+    "вескгвеликабанка",
+  ],
   bucketKg: ["bucketkg", "ведрокг", "відрокг", "ведро", "відро", "фасовкаведро", "фасуваннявідро", "вагакгвідро", "вагакгведро"],
   drumKg: ["drumkg", "барабанкг", "бочкакг", "барабан", "бочка", "вагакгбарабан", "вагакгбочка"],
   priceNoNdsPerKg: [
@@ -3005,6 +3041,22 @@ const AP_PRICE_IMPORT_ALIASES = {
     "ціна",
   ],
 };
+
+const AP_PRICE_IMPORT_ALIAS_NORMALIZED = (() => {
+  const byField = {};
+  const all = new Set();
+  for (const [field, aliases] of Object.entries(AP_PRICE_IMPORT_ALIASES)) {
+    const s = new Set();
+    for (const a of aliases || []) {
+      const n = normalizeImportHeaderCell(a);
+      if (!n) continue;
+      s.add(n);
+      all.add(n);
+    }
+    byField[field] = s;
+  }
+  return { byField, all };
+})();
 
 function normalizeImportHeaderCell(h) {
   return normalizeHeaderCell(h).replace(/[\s._\-\/\\()[\]№#:+]+/g, "");
@@ -3090,6 +3142,8 @@ function apExtractDynamicColumnsFromHeader(headerCells, idx) {
     if (known.has(i)) continue;
     const raw = String(headerCells[i] || "").trim();
     if (!raw) continue;
+    const normalized = normalizeImportHeaderCell(raw);
+    if (AP_PRICE_IMPORT_ALIAS_NORMALIZED.all.has(normalized)) continue;
     const key = raw.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
@@ -3098,12 +3152,41 @@ function apExtractDynamicColumnsFromHeader(headerCells, idx) {
   return cols;
 }
 
+function apResolveBaseFieldByDynamicLabel(label) {
+  const n = normalizeImportHeaderCell(label);
+  for (const [field, set] of Object.entries(AP_PRICE_IMPORT_ALIAS_NORMALIZED.byField)) {
+    if (set.has(n)) return field;
+  }
+  return null;
+}
+
+function apNormalizeExtraColumnsIntoBaseFields() {
+  const list = Array.isArray(window.PRODUCTS_DATA) ? window.PRODUCTS_DATA : [];
+  for (const p of list) {
+    const map = p && p.extraPriceColumns && typeof p.extraPriceColumns === "object" ? p.extraPriceColumns : null;
+    if (!map) continue;
+    const next = {};
+    for (const [label, rawVal] of Object.entries(map)) {
+      const baseField = apResolveBaseFieldByDynamicLabel(label);
+      if (!baseField) {
+        next[label] = rawVal;
+        continue;
+      }
+      const parsed = apPriceNum(rawVal);
+      const current = apPriceNum(p?.[baseField]);
+      if (current == null && parsed != null) p[baseField] = parsed;
+    }
+    p.extraPriceColumns = next;
+  }
+}
+
 function apRebuildDynamicColumns(preferred = []) {
   const out = [];
   const seen = new Set();
   for (const c of preferred) {
     const label = String(c || "").trim();
     if (!label) continue;
+    if (apResolveBaseFieldByDynamicLabel(label)) continue;
     const k = label.toLowerCase();
     if (seen.has(k)) continue;
     seen.add(k);
@@ -3116,6 +3199,7 @@ function apRebuildDynamicColumns(preferred = []) {
     for (const key of Object.keys(map)) {
       const label = String(key || "").trim();
       if (!label) continue;
+      if (apResolveBaseFieldByDynamicLabel(label)) continue;
       const k = label.toLowerCase();
       if (seen.has(k)) continue;
       seen.add(k);
@@ -3123,6 +3207,52 @@ function apRebuildDynamicColumns(preferred = []) {
     }
   }
   apPriceDynamicColumns = out;
+}
+
+function apLoadPriceBaseColumnLabels() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(AP_PRICE_BASE_LABELS_KEY) || "{}");
+    if (!raw || typeof raw !== "object") return;
+    for (const key of Object.keys(AP_PRICE_BASE_LABELS_DEFAULT)) {
+      const label = String(raw[key] || "").trim();
+      if (label) apPriceBaseColumnLabels[key] = label;
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function apSavePriceBaseColumnLabels() {
+  try {
+    localStorage.setItem(AP_PRICE_BASE_LABELS_KEY, JSON.stringify(apPriceBaseColumnLabels));
+  } catch {
+    /* ignore */
+  }
+}
+
+function apExtractBaseColumnLabels(headerCells, idx) {
+  const out = {};
+  for (const key of Object.keys(AP_PRICE_BASE_LABELS_DEFAULT)) {
+    const i = Number(idx[key]);
+    if (!Number.isFinite(i) || i < 0 || i >= headerCells.length) continue;
+    const label = String(headerCells[i] || "").trim();
+    if (label) out[key] = label;
+  }
+  return out;
+}
+
+function apApplyBaseColumnLabels(labels) {
+  if (!labels || typeof labels !== "object") return;
+  let changed = false;
+  for (const key of Object.keys(AP_PRICE_BASE_LABELS_DEFAULT)) {
+    const label = String(labels[key] || "").trim();
+    if (!label) continue;
+    if (apPriceBaseColumnLabels[key] !== label) {
+      apPriceBaseColumnLabels[key] = label;
+      changed = true;
+    }
+  }
+  if (changed) apSavePriceBaseColumnLabels();
 }
 
 function apPriceInferFamily(row) {
@@ -3204,6 +3334,7 @@ function parseTablePriceCatalog(rawRows) {
   const idx = {};
   for (const field of Object.keys(AP_PRICE_IMPORT_ALIASES)) idx[field] = apAliasIndex(header, field);
   const dynamicCols = apExtractDynamicColumnsFromHeader(headerCells, idx);
+  const baseLabels = apExtractBaseColumnLabels(headerCells, idx);
   const products = [];
   for (let r = headerRow + 1; r < rows.length; r++) {
     const cells = rows[r];
@@ -3251,6 +3382,7 @@ function parseTablePriceCatalog(rawRows) {
   }
   if (products.length === 0) throw new Error("Не удалось разобрать ни одной строки товара.");
   products._apDynamicColumns = dynamicCols;
+  products._apBaseColumnLabels = baseLabels;
   return products;
 }
 
@@ -3540,7 +3672,8 @@ function renderApPriceTable() {
   const headRow = document.querySelector("#ap-view-prices .ap-price-edit-table thead tr");
   if (headRow) {
     const dynHead = apPriceDynamicColumns.map((c) => `<th>${escapeHtml(c)}</th>`).join("");
-    headRow.innerHTML = `<th>ID</th><th data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</th><th title="Числовой артикул, единый с каталогом и прайсом на сайте">Артикул</th><th>Наименование</th><th>Без НДС / кг</th><th>С НДС / кг</th><th title="Мала банка, кг">мал /кг/ банка</th><th title="Велика банка, кг">вел /кг/ банка</th><th title="Фасовка ведра, кг">Вага /кг/ відро</th><th title="Фасовка барабана, кг">Вага /кг/ барабан</th>${dynHead}`;
+    const h = apPriceBaseColumnLabels;
+    headRow.innerHTML = `<th>ID</th><th>${escapeHtml(h.family)}</th><th title="Числовой артикул, единый с каталогом и прайсом на сайте">${escapeHtml(h.code)}</th><th>${escapeHtml(h.name)}</th><th>${escapeHtml(h.priceNoNdsPerKg)}</th><th>${escapeHtml(h.priceNdsPerKg)}</th><th>${escapeHtml(h.jarSmallKg)}</th><th>${escapeHtml(h.jarBigKg)}</th><th>${escapeHtml(h.bucketKg)}</th><th>${escapeHtml(h.drumKg)}</th>${dynHead}`;
   }
   body.innerHTML = sorted
     .map((p) => {
@@ -5832,6 +5965,7 @@ document.getElementById("ap-price-csv-file")?.addEventListener("change", (e) => 
       const isExcel = /\.(xlsx|xls)$/i.test(f.name || "");
       const imported = isExcel ? parseExcelPriceCatalog(reader.result) : parseCsvPriceCatalog(reader.result);
       apRebuildDynamicColumns(imported._apDynamicColumns || []);
+      apApplyBaseColumnLabels(imported._apBaseColumnLabels || {});
       const dedupRows = dedupeImportedPriceCatalogRows(imported);
       const merged = mergeImportedPriceCatalog(dedupRows.rows);
       const dedupIds = dedupeCatalogProductsById(merged.products);
@@ -5848,6 +5982,7 @@ document.getElementById("ap-price-csv-file")?.addEventListener("change", (e) => 
         return;
       }
       window.PRODUCTS_DATA = merged.products;
+      apNormalizeExtraColumnsIntoBaseFields();
       apEnsureUnifiedCatalogArticleCodes();
       renderApPriceTable();
       renderProductCatalog();
@@ -5965,6 +6100,7 @@ document.getElementById("ap-price-admin-search")?.addEventListener("keydown", (e
   }
   setApCatalogDirty(false);
   renderApPriceImportHistory();
+apLoadPriceBaseColumnLabels();
   setApPriceLastFile(readApPriceImportHistory()[0] || null);
   if (apCan("catalog.restore")) await renderApPriceServerBackups();
   syncHash();

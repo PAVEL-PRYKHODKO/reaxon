@@ -1576,6 +1576,12 @@ body {
   font-size: 0.76rem;
 }
 
+.ap-price-edit-table th {
+  white-space: normal;
+  line-height: 1.2;
+  vertical-align: bottom;
+}
+
 .ap-price-edit-table tr {
   cursor: default;
 }

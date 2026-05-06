@@ -368,6 +368,41 @@
     return null;
   }
 
+  function dpLooksLikePackMassColumn(labelRaw) {
+    const label = String(labelRaw || "").toLowerCase();
+    // Считаем доп. колонку фасовкой, только если это явно колонка кг.
+    return /(^|[^a-zа-я])(кг|kg)([^a-zа-я]|$)/i.test(label);
+  }
+
+  function dpProductPackMassesFromPrice(product) {
+    const source = [
+      Number(product && product.jarSmallKg),
+      Number(product && product.jarBigKg),
+      Number(product && product.bucketKg),
+      Number(product && product.drumKg),
+    ];
+    const extra = product && product.extraPriceColumns && typeof product.extraPriceColumns === "object"
+      ? product.extraPriceColumns
+      : null;
+    if (extra) {
+      for (const [label, raw] of Object.entries(extra)) {
+        if (!dpLooksLikePackMassColumn(label)) continue;
+        source.push(Number(raw));
+      }
+    }
+    const out = [];
+    const seen = new Set();
+    for (const wRaw of source) {
+      const w = round2(Number(wRaw));
+      if (!Number.isFinite(w) || w <= 0) continue;
+      const key = String(w);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(w);
+    }
+    return out;
+  }
+
   window.dpPackChipSortKg = function dpPackChipSortKg(product, c) {
     if (!c) return 0;
     const pm = Number(c.packMassKg);
@@ -383,27 +418,22 @@
     return c ? c.kind : null;
   };
 
-  /** Все логические фасовки (в т.ч. без цены) — только из кг текущей позиции прайса. */
+  /** Все логические фасовки (в т.ч. без цены) — из всех кг текущей позиции прайса. */
   window.dpBuildPackChipsRaw = function dpBuildPackChipsRaw(product) {
     if (!product) return [];
     const chips = [];
     if (Number(product.priceNdsPerKg) > 0) {
-      const source = [Number(product.bucketKg), Number(product.drumKg)];
-      const seen = new Set();
-      for (const wRaw of source) {
-        const w = round2(Number(wRaw));
-        if (w == null || !Number.isFinite(w) || w <= 0) continue;
-        const keyMass = String(w);
-        if (seen.has(keyMass)) continue;
-        seen.add(keyMass);
-        const inf =
+      const source = dpProductPackMassesFromPrice(product);
+      for (const w of source) {
+        let inf =
           typeof window.dpInferPackKindFromKg === "function"
             ? window.dpInferPackKindFromKg(w)
             : null;
+        if (!inf) inf = "jar";
         if (!inf) continue;
         const total = dpRetailJarTotal(product, w);
         const cls = dpPackClassByKg(w);
-        const sub = cls?.sub || (inf === "bucket" ? "ведро" : inf === "drum" ? "барабан" : "банка");
+        const sub = cls?.sub || (inf === "bucket" ? "ведро" : inf === "drum" ? "барабан" : "фасовка");
         chips.push({
           kind: inf,
           packType: inf === "jar" ? "jar" : inf,
@@ -469,9 +499,7 @@
     if (kind === "jar") {
       const w = Number(row.jarKg);
       if (!Number.isFinite(w) || w <= 0) return null;
-      const bw = Number(product.bucketKg);
-      const dw = Number(product.drumKg);
-      const inPriceForProduct = (Number.isFinite(bw) && bw > 0 && sameKg(w, bw)) || (Number.isFinite(dw) && dw > 0 && sameKg(w, dw));
+      const inPriceForProduct = dpProductPackMassesFromPrice(product).some((x) => sameKg(w, x));
       if (!inPriceForProduct) return null;
       const total = dpRetailJarTotal(product, w);
       const defLabel = dpFormatFixedJarLabel(w);
@@ -493,24 +521,10 @@
   /** Чипы для каталога и PDP: с учётом черновика `detailPackOptions` в overrides. */
   window.dpApplyDetailPackChips = function dpApplyDetailPackChips(product, ov) {
     const raw = window.dpBuildPackChipsRaw(product);
-    if (!ov || !Array.isArray(ov.detailPackOptions) || ov.detailPackOptions.length === 0) {
-      return raw;
-    }
-    const rows =
-      typeof window.dpNormalizePackOptionRows === "function"
-        ? window.dpNormalizePackOptionRows(ov.detailPackOptions)
-        : ov.detailPackOptions;
-    const out = [];
-    for (const row of rows) {
-      if (!row || row.hidden === true) continue;
-      const chip = window.dpResolvePackOptionRow(product, row);
-      if (chip && !chip.disabled) out.push(chip);
-    }
-    // Если detailPackOptions заданы, это явная настройка администратора:
-    // не откатываемся к default-списку из прайса, иначе скрытые фасовки снова появляются на сайте.
-    if (!out.length) return [];
-    out.sort((a, b) => window.dpPackChipSortKg(product, a) - window.dpPackChipSortKg(product, b));
-    return out;
+    // Источник истины для витрины — прайс (jarSmall/jarBig/bucket/drum).
+    // Это гарантирует, что после импорта/изменения прайса фасовки на карточках
+    // автоматически совпадают с таблицей прайса для каждой позиции.
+    return Array.isArray(raw) ? raw : [];
   };
 
   window.dpDefaultPackOptionRows = function dpDefaultPackOptionRows(product) {
@@ -575,7 +589,7 @@
   };
 
   /**
-   * Объединение фасовок по каталогу: только из данных прайса (bucketKg/drumKg) по всем позициям.
+   * Объединение фасовок по каталогу: из всех кг-полей прайса по всем позициям.
    * Тип определяется по dpInferPackKindFromKg (текущая классификация диапазонов).
    */
   window.dpAggregateDefaultPackRowsForCatalog = function dpAggregateDefaultPackRowsForCatalog(products) {
@@ -597,10 +611,8 @@
     }
     for (const p of list) {
       if (!p || typeof p !== "object") continue;
-      const weights = [Number(p.bucketKg), Number(p.drumKg)];
-      for (const wRaw of weights) {
-        const w = round2(wRaw);
-        if (!Number.isFinite(w) || w <= 0) continue;
+      const weights = dpProductPackMassesFromPrice(p);
+      for (const w of weights) {
         const inferred = typeof window.dpInferPackKindFromKg === "function" ? window.dpInferPackKindFromKg(w) : null;
         if (!inferred) continue;
         const cls = dpPackClassByKg(w);
