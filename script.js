@@ -5524,6 +5524,12 @@ async function applyUnifiedLegalRequisites() {
     const corrLabel = lang === "uk" ? "адреса для кореспонденції" : "адрес для корреспонденции";
     const mfoLabel = "МФО";
     const phones = Array.isArray(cfg.contactPhones) ? cfg.contactPhones.filter(Boolean).slice(0, 3) : [];
+    const esc = (v) =>
+      String(v ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 
     const formatPhoneDisplay = (raw) => {
       const digits = String(raw || "").replace(/\D/g, "");
@@ -5534,16 +5540,31 @@ async function applyUnifiedLegalRequisites() {
     };
 
     document.querySelectorAll('[data-legal-requisites="contact-block"]').forEach((el) => {
-      el.innerHTML = [
-        company,
-        address,
-        `IBAN ${cfg.iban || ""}, ${bank}, ${mfoLabel} ${cfg.mfo || ""}`,
-        `код ${edrpouLabel} ${cfg.edrpou || ""} &nbsp; ${ipnLabel} ${cfg.ipn || ""} &nbsp; св-во № ${cfg.certificateNo || ""}`,
-        taxStatus,
-        `${corrLabel}: ${corr}, тел. ${cfg.phone || ""}`,
-      ]
-        .filter(Boolean)
-        .join("<br>");
+      const companyLabel = lang === "uk" ? "Компанія" : "Компания";
+      const addressLabel = lang === "uk" ? "Юридична адреса" : "Юридический адрес";
+      const bankLabel = lang === "uk" ? "Банківські реквізити" : "Банковские реквизиты";
+      const regLabel = lang === "uk" ? "Реєстраційні дані" : "Регистрационные данные";
+      const taxLabel = lang === "uk" ? "Податковий статус" : "Налоговый статус";
+      const corrRowLabel = lang === "uk" ? "Для кореспонденції" : "Для корреспонденции";
+      const regValue = `код ${edrpouLabel} ${cfg.edrpou || ""} · ${ipnLabel} ${cfg.ipn || ""} · св-во № ${cfg.certificateNo || ""}`;
+      const bankValue = `IBAN ${cfg.iban || ""}, ${bank}, ${mfoLabel} ${cfg.mfo || ""}`;
+      const corrValue = `${corr}${cfg.phone ? `, тел. ${cfg.phone}` : ""}`;
+      const rows = [
+        [companyLabel, company],
+        [addressLabel, address],
+        [bankLabel, bankValue],
+        [regLabel, regValue],
+        [taxLabel, taxStatus],
+        [corrRowLabel, corrValue],
+      ].filter(([, value]) => String(value || "").trim());
+      el.innerHTML = `<div class="contact-v2-req-grid">${rows
+        .map(
+          ([label, value]) =>
+            `<div class="contact-v2-req-row"><span class="contact-v2-req-key">${esc(label)}:</span><span class="contact-v2-req-val">${esc(
+              value
+            )}</span></div>`
+        )
+        .join("")}</div>`;
     });
 
     // Footer contacts on all pages

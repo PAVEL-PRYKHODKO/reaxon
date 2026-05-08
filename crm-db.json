@@ -267,14 +267,14 @@
         "lastName": "",
         "city": "Запорожье",
         "website": "",
-        "isLegalEntity": true,
+        "isLegalEntity": false,
         "siteInbox": [],
         "edrpou": "555456645465",
         "invoiceEmail": "webarn1@gmail.com",
         "billingIban": "UA00000000000000000000000000",
         "marketingOptIn": false
       },
-      "profileUpdatedAt": "2026-05-08T20:22:54.012Z"
+      "profileUpdatedAt": "2026-05-08T21:42:00.640Z"
     }
   ],
   "leads": [

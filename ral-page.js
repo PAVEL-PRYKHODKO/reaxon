@@ -110,15 +110,28 @@ const POPULAR_RAL_CODES = [
 ];
 
 const RAL_SERIES_LABELS = {
-  "1xxx": "Жёлто-бежевые",
-  "2xxx": "Оранжевые",
-  "3xxx": "Красные",
-  "4xxx": "Фиолетовые",
-  "5xxx": "Синие",
-  "6xxx": "Зелёные",
-  "7xxx": "Серые",
-  "8xxx": "Коричневые",
-  "9xxx": "Белые и чёрные",
+  ru: {
+    "1xxx": "Жёлто-бежевые",
+    "2xxx": "Оранжевые",
+    "3xxx": "Красные",
+    "4xxx": "Фиолетовые",
+    "5xxx": "Синие",
+    "6xxx": "Зелёные",
+    "7xxx": "Серые",
+    "8xxx": "Коричневые",
+    "9xxx": "Белые и чёрные",
+  },
+  uk: {
+    "1xxx": "Жовто-бежеві",
+    "2xxx": "Помаранчеві",
+    "3xxx": "Червоні",
+    "4xxx": "Фіолетові",
+    "5xxx": "Сині",
+    "6xxx": "Зелені",
+    "7xxx": "Сірі",
+    "8xxx": "Коричневі",
+    "9xxx": "Білі та чорні",
+  },
 };
 
 function ralLang() {
@@ -147,6 +160,7 @@ function ralT(key) {
         "Ниже — популярные RAL. Избранное, тёмные и светлые группы и все серии откройте кнопкой «Показать ещё». Слева — поиск и фильтр по серии.",
       showMore: "Показать ещё",
       showLess: "Свернуть",
+      fallbackTable: "Используется встроенная таблица RAL.",
     },
     uk: {
       copy: "Копіювати код",
@@ -168,6 +182,7 @@ function ralT(key) {
         "Нижче — популярні RAL. Обране, темні й світлі групи та всі серії відкрийте кнопкою «Показати ще». Зліва — пошук і фільтр за серією.",
       showMore: "Показати ще",
       showLess: "Згорнути",
+      fallbackTable: "Використовується вбудована таблиця RAL.",
     },
     en: {
       copy: "Copy code",
@@ -189,10 +204,17 @@ function ralT(key) {
         "Popular RAL shades are listed below. Favorites, dark/light groups and all series are behind “Show more”. Use the left column to search and filter.",
       showMore: "Show more",
       showLess: "Show less",
+      fallbackTable: "Built-in RAL table is used.",
     },
   };
   const lang = ralLang();
   return (dict[lang] || dict.ru)[key] || key;
+}
+
+function ralSeriesLabel(group) {
+  const lang = ralLang();
+  const byLang = RAL_SERIES_LABELS[lang] || RAL_SERIES_LABELS.ru;
+  return byLang[group] || RAL_SERIES_LABELS.ru[group] || group;
 }
 
 function readFavorites() {
@@ -289,13 +311,14 @@ function filterByQueryAndSeries(items, q, series) {
 async function loadModernRalPalette() {
   const status = document.getElementById("ral-status");
   const sources = [
-    "https://cdn.jsdelivr.net/gh/yisibl/ral-color-table@master/ral-classic.json",
-    "https://cdn.jsdelivr.net/npm/ral-colors@latest/ral-classic.json",
+    "data/ral-classic.json",
+    "https://gist.githubusercontent.com/edwinwebb/4af6edeb743156e1c89fcfb25366f9d9/raw/RalCodes.json",
+    "https://gist.githubusercontent.com/edwinwebb/4af6edeb743156e1c89fcfb25366f9d9/raw",
   ];
 
   for (const url of sources) {
     try {
-      const res = await fetch(url);
+      const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) continue;
       const data = await res.json();
       const rows = Array.isArray(data)
@@ -306,7 +329,15 @@ async function loadModernRalPalette() {
               hex: x.hex || x.color || "",
             }))
             .filter((x) => x.code && x.hex)
-        : [];
+        : data && typeof data === "object"
+          ? Object.values(data)
+              .map((x) => ({
+                code: x?.code || x?.ral || x?.id || "",
+                name: x?.name || x?.title || "",
+                hex: x?.hex || x?.color || "",
+              }))
+              .filter((x) => x.code && x.hex)
+          : [];
       if (rows.length >= 50) {
         ralColors = rows.map((r) => ({
           code: String(r.code).toUpperCase().startsWith("RAL") ? String(r.code).toUpperCase() : `RAL ${String(r.code).replace(/[^\d]/g, "")}`,
@@ -320,7 +351,7 @@ async function loadModernRalPalette() {
       // continue
     }
   }
-  if (status) status.textContent = "Используется встроенная таблица RAL.";
+  if (status) status.textContent = ralT("fallbackTable");
 }
 
 let selectedSeries = "all";
@@ -331,7 +362,7 @@ function buildSeriesChips() {
   const groups = [...new Set(ralColors.map((c) => getGroup(c.code)))].filter((g) => g !== "other").sort();
   const chips = [
     { value: "all", label: ralT("seriesAll") },
-    ...groups.map((g) => ({ value: g, label: `${g} · ${RAL_SERIES_LABELS[g] || g}` })),
+    ...groups.map((g) => ({ value: g, label: `${g} · ${ralSeriesLabel(g)}` })),
   ];
   wrap.innerHTML = chips
     .map(
@@ -391,8 +422,15 @@ function renderRalPage() {
   const q = searchEl.value.trim().toLowerCase();
   const favorites = readFavorites();
   const base = filterByQueryAndSeries(ralColors, q, selectedSeries);
-
-  const popularItems = popularOrderedFromBase(base);
+  let popularItems = popularOrderedFromBase(base);
+  // Ensure enough visible choices for each selected series:
+  // keep popular items first, then fill with other matching shades.
+  const targetPopularCount = selectedSeries === "all" ? 18 : 24;
+  if (popularItems.length < targetPopularCount) {
+    const used = new Set(popularItems.map((c) => normRalCode(c.code)));
+    const extra = base.filter((c) => !used.has(normRalCode(c.code)));
+    popularItems = [...popularItems, ...extra].slice(0, targetPopularCount);
+  }
   popularRoot.innerHTML = popularItems.length
     ? popularItems.map((c) => cardHtml(c, favorites)).join("")
     : `<p class="ral-empty-hint">${ralT("emptySection")}</p>`;
@@ -408,7 +446,7 @@ function renderRalPage() {
     .map((g) => {
       const inGroup = base.filter((c) => getGroup(c.code) === g);
       if (!inGroup.length) return "";
-      const label = `${g} — ${RAL_SERIES_LABELS[g] || g}`;
+      const label = `${g} — ${ralSeriesLabel(g)}`;
       return `
         <section class="ral-series-block" id="ral-series-${g.replace(/x/g, "")}">
           <h4 class="ral-series-title">${label}</h4>
