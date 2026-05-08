@@ -891,6 +891,10 @@ function parsePortalRoot(root) {
     loadMoreSidebar: document.getElementById("catalog-load-more-sidebar"),
     loadMoreBottom: document.getElementById("catalog-load-more-bottom"),
     catalogNameSearchInput: catalogLayout ? document.getElementById("catalog-name-search") : null,
+    aiSearchInput: catalogLayout ? document.getElementById("catalog-ai-search-input") : null,
+    aiSearchRunBtn: catalogLayout ? document.getElementById("catalog-ai-search-run") : null,
+    aiSearchResetBtn: catalogLayout ? document.getElementById("catalog-ai-search-reset") : null,
+    aiSearchStatus: catalogLayout ? document.getElementById("catalog-ai-search-status") : null,
   };
 }
 
@@ -916,7 +920,38 @@ function initPortal(root) {
     catalogPage: 1,
     catalogMoreBatches: 0,
     viewMode: "list",
+    aiQuery: "",
+    aiProvider: "",
+    aiProductIds: null,
   };
+
+  function aiApiUrls() {
+    if (window.location.protocol !== "file:") return ["/api/ai/catalog-search"];
+    return ["http://localhost:3000/api/ai/catalog-search", "http://localhost:3001/api/ai/catalog-search"];
+  }
+
+  async function postAiSearch(payload) {
+    let lastErr = null;
+    let lastResp = null;
+    let lastData = null;
+    for (const url of aiApiUrls()) {
+      try {
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await resp.json().catch(() => ({}));
+        lastResp = resp;
+        lastData = data;
+        if (resp.ok) return { resp, data };
+      } catch (err) {
+        lastErr = err;
+      }
+    }
+    if (lastResp) return { resp: lastResp, data: lastData || {} };
+    throw lastErr || new Error("ai_search_network_error");
+  }
 
   let catalogGridViewportExpanded = false;
   /** Одноразово: после первого рендера прокрутить и подсветить карточку из ?id= */
@@ -1036,6 +1071,10 @@ function initPortal(root) {
     if (cfg.catalogLayout && state.catalogNameSearch && state.catalogNameSearch.trim()) {
       const raw = state.catalogNameSearch.trim();
       list = list.filter((p) => catalogProductMatchesNameQuery(p, raw));
+    }
+
+    if (cfg.catalogLayout && state.aiProductIds && state.aiProductIds.size > 0) {
+      list = list.filter((p) => state.aiProductIds.has(String(p.id)));
     }
 
     return list;
@@ -1247,6 +1286,9 @@ function initPortal(root) {
     state.sort = "code-asc";
     state.seriesCode = "all";
     state.positionId = "all";
+    state.aiQuery = "";
+    state.aiProvider = "";
+    state.aiProductIds = null;
     if (cfg.catalogLayout) {
       catalogGridViewportExpanded = false;
       state.catalogPage = 1;
@@ -1269,6 +1311,8 @@ function initPortal(root) {
     if (nameInp) nameInp.value = "";
     const codeInpReset = document.getElementById("catalog-price-code-input");
     if (codeInpReset) codeInpReset.value = "";
+    if (cfg.aiSearchInput) cfg.aiSearchInput.value = "";
+    if (cfg.aiSearchStatus) cfg.aiSearchStatus.textContent = "";
     try {
       const u = new URL(location.href);
       if (u.searchParams.has("q")) {
@@ -1287,6 +1331,68 @@ function initPortal(root) {
     if (cfg.selSeriesProduct) cfg.selSeriesProduct.value = "all";
     syncFamilySeriesPickers();
     renderAll();
+  }
+
+  async function runAiCatalogSearch() {
+    if (!cfg.catalogLayout || !cfg.aiSearchInput) return;
+    const query = String(cfg.aiSearchInput.value || "").trim();
+    if (query.length < 3) {
+      if (cfg.aiSearchStatus) cfg.aiSearchStatus.textContent = "Введите запрос минимум из 3 символов.";
+      return;
+    }
+    if (cfg.aiSearchStatus) cfg.aiSearchStatus.textContent = "ИИ анализирует запрос...";
+    cfg.aiSearchRunBtn?.setAttribute("disabled", "disabled");
+    try {
+      const { resp, data } = await postAiSearch({ query, strictAi: true });
+      if (!resp.ok || !data || data.error) {
+        const msg = String(data?.message || "Не удалось выполнить ИИ-поиск.");
+        if (cfg.aiSearchStatus) cfg.aiSearchStatus.textContent = msg;
+        return;
+      }
+      if (String(data.provider || "") !== "google-gemini") {
+        if (cfg.aiSearchStatus) cfg.aiSearchStatus.textContent = "Результаты доступны только после обработки Google AI.";
+        return;
+      }
+      const ids = Array.isArray(data.productIds) ? data.productIds.map((x) => String(x)) : [];
+      state.aiQuery = query;
+      state.aiProvider = String(data.provider || "");
+      state.aiProductIds = new Set(ids);
+      state.family = "all";
+      state.purpose = "all";
+      state.seriesCode = "all";
+      state.positionId = "all";
+      state.catalogNameSearch = "";
+      state.catalogPriceCode = "";
+      if (cfg.selFamily) cfg.selFamily.value = "all";
+      if (cfg.selPurpose) cfg.selPurpose.value = "all";
+      if (cfg.selSeriesCode) cfg.selSeriesCode.value = "all";
+      if (cfg.selSeriesProduct) cfg.selSeriesProduct.value = "all";
+      if (cfg.catalogNameSearchInput) cfg.catalogNameSearchInput.value = "";
+      if (cfg.catalogPriceCodeInput) cfg.catalogPriceCodeInput.value = "";
+      cfg.root.querySelectorAll('input[name="catalog-purpose"]').forEach((el) => {
+        el.checked = false;
+      });
+      catalogGridViewportExpanded = false;
+      state.catalogPage = 1;
+      state.catalogMoreBatches = 0;
+      syncFamilySeriesPickers();
+      renderAll();
+      const count = ids.length;
+      if (cfg.aiSearchStatus) {
+        cfg.aiSearchStatus.textContent = count
+          ? `ИИ-поиск (Google AI): найдено ${count} позиций.`
+          : "ИИ-поиск (Google AI): ничего не найдено, уточните запрос.";
+      }
+    } catch {
+      const fileMode = window.location.protocol === "file:";
+      if (cfg.aiSearchStatus) {
+        cfg.aiSearchStatus.textContent = fileMode
+          ? "API недоступен в режиме file://. Откройте сайт через http://localhost:3000."
+          : "Ошибка сети при ИИ-поиске.";
+      }
+    } finally {
+      cfg.aiSearchRunBtn?.removeAttribute("disabled");
+    }
   }
 
   cfg.selFamily.addEventListener("change", () => {
@@ -1364,6 +1470,25 @@ function initPortal(root) {
     });
     cfg.catalogPriceCodeInput?.addEventListener("input", () => {
       state.catalogPriceCode = cfg.catalogPriceCodeInput.value || "";
+      catalogGridViewportExpanded = false;
+      state.catalogPage = 1;
+      state.catalogMoreBatches = 0;
+      renderAll();
+    });
+    cfg.aiSearchRunBtn?.addEventListener("click", () => {
+      runAiCatalogSearch();
+    });
+    cfg.aiSearchInput?.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      runAiCatalogSearch();
+    });
+    cfg.aiSearchResetBtn?.addEventListener("click", () => {
+      state.aiQuery = "";
+      state.aiProvider = "";
+      state.aiProductIds = null;
+      if (cfg.aiSearchInput) cfg.aiSearchInput.value = "";
+      if (cfg.aiSearchStatus) cfg.aiSearchStatus.textContent = "";
       catalogGridViewportExpanded = false;
       state.catalogPage = 1;
       state.catalogMoreBatches = 0;

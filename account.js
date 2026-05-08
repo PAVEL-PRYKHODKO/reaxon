@@ -46,6 +46,14 @@
     return data;
   }
 
+  async function notifyServerLogout() {
+    try {
+      await fetch(apiUrl("/api/auth/logout"), { method: "POST" });
+    } catch {
+      /* ignore */
+    }
+  }
+
   function setStatus(el, msg, kind) {
     if (!el) return;
     el.textContent = msg || "";
@@ -100,9 +108,10 @@
   const statusEl = document.getElementById("account-form-status");
   const avatarInput = document.getElementById("account-avatar-input");
   const avatarRemove = document.getElementById("account-avatar-remove");
-  document.getElementById("account-logout-btn")?.addEventListener("click", (e) => {
+  document.getElementById("account-logout-btn")?.addEventListener("click", async (e) => {
     e.preventDefault();
     if (!window.confirm("Выйти из аккаунта?")) return;
+    await notifyServerLogout();
     localStorage.removeItem("authToken");
     localStorage.removeItem("authUser");
     window.location.href = "index.html";

@@ -140,6 +140,151 @@
   gap: 14px;
 }
 
+.apay-order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.apay-order-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.apay-order-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 59, 126, 0.18);
+  background: rgba(0, 59, 126, 0.05);
+  font-size: 0.8rem;
+  color: #0f172a;
+}
+
+.apay-order-badge strong {
+  color: #003b7e;
+}
+
+.apay-order-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.apay-order-empty-action {
+  margin: 2px 0 0;
+}
+
+.apay-order-catalog-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 38px;
+  text-decoration: none;
+}
+
+.apay-order-item {
+  border: 1px solid rgba(0, 59, 126, 0.14);
+  border-radius: 12px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.apay-order-item img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 59, 126, 0.14);
+  background: #fff;
+}
+
+.apay-order-item-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.apay-order-item-meta {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.apay-order-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.apay-order-qty-btn,
+.apay-order-remove {
+  border: 1px solid rgba(0, 59, 126, 0.2);
+  background: #fff;
+  color: #003b7e;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.apay-order-qty-btn {
+  width: 28px;
+  height: 28px;
+  line-height: 1;
+}
+
+.apay-order-remove {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.apay-order-item-sum {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.apay-order-total-row {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.apay-order-total-row span {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.apay-order-total-row strong {
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.apay-offer a {
+  color: #003b7e;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.apay-delivery-hint {
+  margin: -4px 0 2px;
+}
+
 .apay-field span {
   display: block;
   font-size: 0.82rem;
@@ -148,7 +293,8 @@
   margin-bottom: 4px;
 }
 
-.apay-field input {
+.apay-field input,
+.apay-field select {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;

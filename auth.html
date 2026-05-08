@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="redesign-shared.css" />
   <link rel="stylesheet" href="site-lang.css" />
+  <style>
+    #auth-policy-modal:not([hidden]) {
+      display: grid !important;
+    }
+  </style>
 </head>
 <body data-page="auth">
   <div class="page-bg page-bg--site">
@@ -21,6 +26,7 @@
           <a href="index.html" data-i18n="navHome">Главная</a>
           <a href="products.html" data-i18n="navCatalog">Каталог</a>
           <a href="price.html" data-i18n="navPrice">Прайс</a>
+          <a href="intelligent-selection.html" data-i18n="navIntelligentSelection">Помощник ИИ</a>
           <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
           <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
           <a href="news.html" data-i18n="navNews">Новости</a>
@@ -130,6 +136,20 @@
             </label>
             <div class="auth-reg-grid">
               <label class="auth-form-field">
+                <span class="auth-form-label" data-ru="ЄДРПОУ / РНОКПП (8–10 цифр) *" data-uk="ЄДРПОУ / РНОКПП (8–10 цифр) *">ЄДРПОУ / РНОКПП (8–10 цифр) *</span>
+                <input name="edrpou" type="text" inputmode="numeric" maxlength="12" placeholder="12345678" autocomplete="off" />
+              </label>
+              <label class="auth-form-field">
+                <span class="auth-form-label" data-ru="Расчётный IBAN (UA…) *" data-uk="Поточний рахунок IBAN (UA…) *">Расчётный IBAN (UA…) *</span>
+                <input name="billingIban" type="text" maxlength="34" placeholder="UA..." spellcheck="false" autocomplete="off" />
+              </label>
+            </div>
+            <label class="auth-form-field auth-form-field--full">
+              <span class="auth-form-label" data-ru="Email для счетов и счёт-фактур *" data-uk="Email для рахунків і податкових *">Email для счетов и счёт-фактур *</span>
+              <input name="invoiceEmail" type="email" maxlength="120" placeholder="buh@yourcompany.ua" autocomplete="email" />
+            </label>
+            <div class="auth-reg-grid">
+              <label class="auth-form-field">
                 <span class="auth-form-label" data-ru="Сайт" data-uk="Сайт">Сайт</span>
                 <input name="website" type="text" inputmode="url" placeholder="https://…" data-ru-placeholder="https://…" data-uk-placeholder="https://…" />
               </label>
@@ -139,6 +159,33 @@
               </label>
             </div>
           </div>
+          <label class="auth-legal-check">
+            <input type="checkbox" name="termsAccepted" value="1" id="reg-terms" required />
+            <span>
+              <span data-ru="Я принимаю" data-uk="Я приймаю">Я принимаю</span>
+              <a href="privacy-policy.html" target="_blank" rel="noopener" data-ru="Политику конфиденциальности и правила использования сайта" data-uk="Політику конфіденційності та правила використання сайту">Политику конфиденциальности и правила использования сайта</a>
+            </span>
+          </label>
+          <p class="auth-status" style="margin-top:-2px;font-size:13px;">
+            <button type="button" class="auth-switch-btn" id="auth-open-policy-brief">Кратко о данных и согласии</button>
+          </p>
+          <label class="auth-legal-check">
+            <input type="checkbox" name="marketingOptIn" value="1" id="reg-marketing" />
+            <span data-ru="Согласен(на) получать информационные сообщения о новых продуктах и предложениях (необязательно)." data-uk="Погоджуюся отримувати інформаційні повідомлення про нові продукти та пропозиції (необов'язково).">
+              Согласен(на) получать информационные сообщения о новых продуктах и предложениях (необязательно).
+            </span>
+          </label>
+          <p class="auth-status" id="reg-marketing-consent-hint" hidden style="margin-top:-4px;font-size:12px;">
+            <button
+              type="button"
+              class="auth-switch-btn"
+              id="reg-cookie-settings"
+              data-ru="Разрешить маркетинговые cookie"
+              data-uk="Дозволити маркетингові cookie"
+            >
+              Разрешить маркетинговые cookie
+            </button>
+          </p>
           <button class="btn btn-primary auth-reg-submit" type="submit">Создать аккаунт</button>
         </form>
 
@@ -151,6 +198,22 @@
       <p id="auth-status" class="auth-status" role="status" aria-live="polite"></p>
     </div>
   </main>
+  <div id="auth-policy-modal" hidden aria-hidden="true" style="position:fixed;inset:0;background:rgba(2,8,23,.58);z-index:9998;place-items:center;padding:16px;">
+    <section style="max-width:680px;width:100%;background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:18px;">
+      <h2 style="margin:0 0 8px;">Кратко о данных и согласии</h2>
+      <ul id="auth-policy-brief-list" style="margin:0 0 12px 18px;">
+        <li>Обязательные данные нужны для регистрации, заказа и безопасности.</li>
+        <li>Аналитика включается только после отдельного согласия.</li>
+        <li>Вы можете изменить согласие в любой момент в настройках cookie.</li>
+      </ul>
+      <p style="margin:0 0 12px;">
+        Полный текст: <a href="privacy-policy.html" target="_blank" rel="noopener">Политика конфиденциальности и правила сайта</a>.
+      </p>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button type="button" class="btn btn-ghost" id="auth-policy-modal-close">Закрыть</button>
+      </div>
+    </section>
+  </div>
 
   <footer class="footer footer--site-laconic" aria-label="Подвал">
     <div class="container footer-site-laconic-inner">

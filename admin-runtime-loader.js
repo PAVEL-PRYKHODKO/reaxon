@@ -1,4 +1,7 @@
 (function () {
+  const API_BASE_KEY = "dp_api_base";
+  const API_LAST_GOOD_KEY = "dp_api_last_good_base";
+
   function getToken() {
     return localStorage.getItem("authToken") || "";
   }
@@ -10,7 +13,7 @@
           <h1 style="margin:0 0 10px;font-size:20px">Доступ в админ-панель</h1>
           <p style="margin:0 0 14px;color:#94a3b8;line-height:1.45">${text}</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="auth.html?next=admin-panel.html" style="padding:9px 13px;border-radius:9px;background:#1d4ed8;color:#fff;text-decoration:none">Войти</a>
+            <a href="auth.html?next=admin.html" style="padding:9px 13px;border-radius:9px;background:#1d4ed8;color:#fff;text-decoration:none">Войти</a>
             <a href="index.html" style="padding:9px 13px;border-radius:9px;border:1px solid #475569;color:#e2e8f0;text-decoration:none">На главную</a>
           </div>
         </section>
@@ -25,13 +28,109 @@
     }
   }
 
+  function trimBase(value) {
+    return String(value || "").trim().replace(/\/+$/, "");
+  }
+
+  function uniqueBases(list) {
+    const out = [];
+    const seen = new Set();
+    for (const raw of list) {
+      const base = trimBase(raw);
+      const key = base || "__root__";
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(base);
+    }
+    return out;
+  }
+
+  function resolveApiBases() {
+    let storedBase = "";
+    let lastGood = "";
+    try {
+      storedBase = trimBase(localStorage.getItem(API_BASE_KEY));
+      lastGood = trimBase(localStorage.getItem(API_LAST_GOOD_KEY));
+    } catch {
+      /* ignore */
+    }
+    const configured = trimBase(window.DP_API_BASE);
+    const rawOrigin = String(location.origin || "").trim();
+    const origin = rawOrigin === "null" ? "" : trimBase(rawOrigin);
+    const dir = String(location.pathname || "/").replace(/\/[^/]*$/, "");
+    const withDir = dir && dir !== "/" ? `${origin}${dir}` : origin;
+    const localFallbacks =
+      location.protocol === "file:" ? ["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000"] : [];
+    return uniqueBases([configured, lastGood, storedBase, ...localFallbacks, withDir, origin, ""]);
+  }
+
+  function makeUrl(base, path) {
+    const p = path.startsWith("/") ? path : `/${path}`;
+    return base ? `${base}${p}` : p;
+  }
+
+  async function ensureHttpAdminEntry() {
+    if (location.protocol !== "file:") return false;
+    const candidates = ["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000"];
+    for (const base of candidates) {
+      try {
+        const resp = await fetch(`${base}/api/auth/me`, { method: "GET", cache: "no-store" });
+        if (!resp || (resp.status !== 401 && !resp.ok)) continue;
+        try {
+          localStorage.setItem(API_BASE_KEY, base);
+          localStorage.setItem(API_LAST_GOOD_KEY, base);
+        } catch {
+          /* ignore */
+        }
+        const next = `${base}/admin.html${location.search || ""}${location.hash || ""}`;
+        location.replace(next);
+        return true;
+      } catch {
+        /* try next candidate */
+      }
+    }
+    return false;
+  }
+
+  async function fetchWithApiBaseFallback(path, init) {
+    const bases = resolveApiBases();
+    let lastError = null;
+    let lastResponse = null;
+    for (const base of bases) {
+      try {
+        const response = await fetch(makeUrl(base, path), init);
+        if (response.ok) {
+          const normalized = trimBase(base);
+          if (normalized) {
+            window.DP_API_BASE = normalized;
+            try {
+              localStorage.setItem(API_BASE_KEY, normalized);
+              localStorage.setItem(API_LAST_GOOD_KEY, normalized);
+            } catch {
+              /* ignore */
+            }
+          }
+          return response;
+        }
+        // Auth and rate-limit errors are terminal and should not trigger base switching.
+        if (response.status === 401 || response.status === 403 || response.status === 429) {
+          return response;
+        }
+        lastResponse = response;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    if (lastResponse) return lastResponse;
+    throw lastError || new Error("api_unreachable");
+  }
+
   async function resolveUser() {
     const token = getToken();
     const cached = parseUser();
     if (!token) return cached;
     try {
-      const meUrl = typeof window.dpApiUrl === "function" ? window.dpApiUrl("/api/auth/me") : "/api/auth/me";
-      const res = await fetch(meUrl, {
+      const res = await fetchWithApiBaseFallback("/api/auth/me", {
         method: "GET",
         cache: "no-store",
         headers: { Authorization: `Bearer ${token}` },
@@ -52,8 +151,7 @@
 
   async function fetchRuntimeScript(name) {
     const token = getToken();
-    const url = window.dpApiUrl(`/api/admin/runtime-script/${encodeURIComponent(name)}`);
-    const res = await fetch(url, {
+    const res = await fetchWithApiBaseFallback(`/api/admin/runtime-script/${encodeURIComponent(name)}`, {
       method: "GET",
       cache: "no-store",
       headers: {
@@ -94,6 +192,8 @@
 
   (async () => {
     try {
+      const redirected = await ensureHttpAdminEntry();
+      if (redirected) return;
       const token = getToken();
       if (!token) {
         renderAccessMessage("Сессия не найдена. Войдите под администратором.");

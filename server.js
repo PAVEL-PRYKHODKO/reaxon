@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { randomUUID, randomBytes, createHash, timingSafeEqual } from "crypto";
+import { randomUUID, randomBytes, createHash, createHmac, timingSafeEqual } from "crypto";
 import { fileURLToPath } from "url";
 import { DEFAULT_DELIVERY_PAGE_V2 } from "./delivery-v2-defaults.js";
 import { initCrmBackend, crmSnapshot, crmUpdate, crmUsesPostgres } from "./lib/crm-backend.js";
@@ -19,6 +19,7 @@ import {
   sendWelcomeMail,
   sendSiteInboxMessageMail,
   sendPasswordResetMail,
+  sendPaymentReceiptMail,
 } from "./lib/transactional-mail.mjs";
 import { notifyTelegramBannerLead } from "./lib/telegram-banner-notify.mjs";
 
@@ -35,6 +36,7 @@ const PRODUCTS_CATALOG_PATH = path.join(__dirname, "products-catalog.json");
 const PRODUCTS_CATALOG_BACKUP_DIR = path.join(__dirname, "data", "catalog-backups");
 const PRODUCTS_DATA_JS_PATH = path.join(__dirname, "products-data.js");
 const ANALYTICS_PATH = path.join(__dirname, "analytics-store.json");
+const PRIVACY_POLICY_CONFIG_PATH = path.join(__dirname, "privacy-policy-config.json");
 const ANALYTICS_MAX_EVENTS = 25000;
 const isProd = process.env.NODE_ENV === "production";
 
@@ -48,13 +50,22 @@ const CRM_WEBHOOK_URL = process.env.CRM_WEBHOOK_URL || "";
 
 const LIQPAY_PUBLIC_KEY = String(process.env.LIQPAY_PUBLIC_KEY || "").trim();
 const LIQPAY_PRIVATE_KEY = String(process.env.LIQPAY_PRIVATE_KEY || "").trim();
+const FONDY_MERCHANT_ID = String(process.env.FONDY_MERCHANT_ID || "").trim();
+const FONDY_SECRET_KEY = String(process.env.FONDY_SECRET_KEY || "").trim();
+const WAYFORPAY_MERCHANT_ACCOUNT = String(process.env.WAYFORPAY_MERCHANT_ACCOUNT || "").trim();
+const WAYFORPAY_SECRET_KEY = String(process.env.WAYFORPAY_SECRET_KEY || "").trim();
 const LIQPAY_SANDBOX =
   process.env.LIQPAY_SANDBOX === "1" || String(process.env.LIQPAY_SANDBOX || "").toLowerCase() === "true";
 const PUBLIC_BASE_URL = String(process.env.PUBLIC_BASE_URL || "").trim();
 const NOVAPOSHTA_API_KEY = String(process.env.NOVAPOSHTA_API_KEY || "").trim();
+const GEMINI_API_KEY = String(process.env.GEMINI_API_KEY || "").trim();
+const AUTH_DEBUG_RESET_URLS =
+  process.env.AUTH_DEBUG_RESET_URLS === "1" ||
+  String(process.env.AUTH_DEBUG_RESET_URLS || "").toLowerCase() === "true";
 const JWT_EXPIRES_IN_ADMIN = String(process.env.JWT_EXPIRES_IN_ADMIN || "7d").trim() || "7d";
 const JWT_EXPIRES_IN_USER = String(process.env.JWT_EXPIRES_IN_USER || "30d").trim() || "30d";
 const UA_MAJOR_CITIES_PATH = path.join(__dirname, "data", "ua-major-cities.json");
+const AUTH_COOKIE_NAME = "dp_auth";
 
 let uaMajorCitiesCache = null;
 function readUaMajorCities() {
@@ -69,8 +80,30 @@ function readUaMajorCities() {
   return uaMajorCitiesCache;
 }
 
+function readPrivacyPolicyConfig() {
+  try {
+    const raw = fs.readFileSync(PRIVACY_POLICY_CONFIG_PATH, "utf8");
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+const PRIVACY_POLICY_CONFIG = readPrivacyPolicyConfig() || {};
+const PRIVACY_POLICY_VERSION = String(PRIVACY_POLICY_CONFIG.version || "2026-05-08").trim() || "2026-05-08";
+
 function liqpayConfigured() {
   return Boolean(LIQPAY_PUBLIC_KEY && LIQPAY_PRIVATE_KEY);
+}
+
+function fondyConfigured() {
+  return Boolean(FONDY_MERCHANT_ID && FONDY_SECRET_KEY);
+}
+
+function wayforpayConfigured() {
+  return Boolean(WAYFORPAY_MERCHANT_ACCOUNT && WAYFORPAY_SECRET_KEY);
 }
 
 let JWT_SECRET = String(process.env.JWT_SECRET || "").trim();
@@ -273,6 +306,7 @@ function defaultProfile() {
     deliveryAddress: "",
     accountManagerId: null,
     avatarUrl: null,
+    marketingOptIn: false,
     privacy: defaultPrivacy(),
   };
 }
@@ -1188,6 +1222,170 @@ function sanitizeProductsCatalogArray(body) {
   return { products: out };
 }
 
+function aiNormText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[^\p{L}\p{N}\s.-]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function aiTokenize(value) {
+  return aiNormText(value)
+    .split(" ")
+    .map((s) => s.trim())
+    .filter((s) => s && s.length > 1);
+}
+
+function aiSafeJsonParse(raw) {
+  if (!raw || typeof raw !== "string") return null;
+  const direct = raw.trim();
+  if (!direct) return null;
+  try {
+    return JSON.parse(direct);
+  } catch {
+    const m = direct.match(/\{[\s\S]*\}/);
+    if (!m) return null;
+    try {
+      return JSON.parse(m[0]);
+    } catch {
+      return null;
+    }
+  }
+}
+
+function aiHeuristicIntent(query) {
+  const q = aiNormText(query);
+  const purpose = [];
+  if (/(внутри|интерьер|комнат|дом|квартир|стен|потол)/i.test(q)) purpose.push("interior");
+  if (/(фасад|наруж|улиц|снаружи)/i.test(q)) purpose.push("facade");
+  if (/(металл|цех|станок|пром|антикор|корроз)/i.test(q)) purpose.push("industrial");
+  if (/(дерев|деревн|дос|лаги|террас)/i.test(q)) purpose.push("wood-protection");
+  if (/(огн|пожар)/i.test(q)) purpose.push("fire-retardant");
+  if (/(растворител|разбавител|уайт-спирит|ацетон)/i.test(q)) purpose.push("solvents");
+  const family =
+    /(эмаль|эмал)/i.test(q)
+      ? "enamel"
+      : /(грунт|грунтов)/i.test(q)
+        ? "primer"
+        : /(лак)/i.test(q)
+          ? "lacquer"
+          : "";
+  return {
+    query: String(query || "").trim(),
+    needs: [],
+    useCase: q,
+    surfaces: [],
+    purpose,
+    family,
+    exclude: [],
+    keywords: aiTokenize(query).slice(0, 12),
+  };
+}
+
+async function aiParseIntentWithGemini(query) {
+  if (!GEMINI_API_KEY) return { intent: null, error: "GEMINI_API_KEY не задан." };
+  const prompt = [
+    "Ты помощник по подбору лакокрасочных материалов.",
+    "Верни только JSON без пояснений.",
+    'Формат JSON: {"needs":[],"useCase":"","surfaces":[],"purpose":[],"family":"","exclude":[],"keywords":[]}',
+    "purpose может содержать: interior, facade, industrial, wd-dispersion, wood-protection, fire-retardant, surface-prep, disinfectant, solvents",
+    "family: короткое значение группы товара (например enamel, primer, lacquer) или пустая строка.",
+    "keywords: 5-12 ключевых слов из запроса пользователя.",
+    `Запрос пользователя: "${String(query || "").slice(0, 600)}"`,
+  ].join("\n");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 9000);
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.15,
+            responseMimeType: "application/json",
+          },
+        }),
+        signal: controller.signal,
+      }
+    );
+    if (!resp.ok) {
+      const errJson = await resp.json().catch(() => null);
+      const errMsg =
+        errJson?.error?.message ||
+        (resp.status === 429
+          ? "Превышена квота Gemini API (429). Проверьте лимиты/биллинг в Google AI Studio."
+          : `Gemini API вернул ошибку ${resp.status}.`);
+      return { intent: null, error: String(errMsg).slice(0, 500) };
+    }
+    const data = await resp.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const parsed = aiSafeJsonParse(text);
+    if (!parsed || typeof parsed !== "object") {
+      return { intent: null, error: "Gemini вернул ответ в неожиданном формате." };
+    }
+    const intent = {
+      query: String(query || "").trim(),
+      needs: Array.isArray(parsed.needs) ? parsed.needs.map((x) => String(x).trim()).filter(Boolean).slice(0, 12) : [],
+      useCase: String(parsed.useCase || "").trim().slice(0, 300),
+      surfaces: Array.isArray(parsed.surfaces)
+        ? parsed.surfaces.map((x) => String(x).trim()).filter(Boolean).slice(0, 12)
+        : [],
+      purpose: Array.isArray(parsed.purpose) ? parsed.purpose.map((x) => aiNormText(x)).filter(Boolean).slice(0, 8) : [],
+      family: String(parsed.family || "").trim().slice(0, 64),
+      exclude: Array.isArray(parsed.exclude) ? parsed.exclude.map((x) => String(x).trim()).filter(Boolean).slice(0, 12) : [],
+      keywords: Array.isArray(parsed.keywords)
+        ? parsed.keywords.map((x) => aiNormText(x)).filter(Boolean).slice(0, 14)
+        : aiTokenize(query).slice(0, 12),
+    };
+    return { intent, error: null };
+  } catch {
+    return { intent: null, error: "Не удалось связаться с Gemini API." };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function aiScoreCatalogProducts(products, intent) {
+  const familyNeed = aiNormText(intent?.family || "");
+  const purposeNeed = Array.isArray(intent?.purpose) ? intent.purpose.map((x) => aiNormText(x)).filter(Boolean) : [];
+  const kw = Array.isArray(intent?.keywords) ? intent.keywords.map((x) => aiNormText(x)).filter(Boolean) : [];
+  const scored = [];
+  for (const p of products) {
+    const family = aiNormText(p?.family || "");
+    const code = aiNormText(p?.code || p?.series || "");
+    const name = aiNormText(p?.name || p?.fullName || "");
+    const hay = `${family} ${code} ${name}`;
+    let score = 0;
+    if (familyNeed && family.includes(familyNeed)) score += 30;
+    for (const pr of purposeNeed) {
+      if (!pr) continue;
+      if (hay.includes(pr)) score += 18;
+      if (pr === "interior" && /(стен|интерьер|внутр)/i.test(hay)) score += 12;
+      if (pr === "facade" && /(фасад|наруж)/i.test(hay)) score += 12;
+      if (pr === "industrial" && /(пром|металл|антикор)/i.test(hay)) score += 12;
+      if (pr === "wood-protection" && /(дерев)/i.test(hay)) score += 12;
+      if (pr === "solvents" && /(растворител|разбав)/i.test(hay)) score += 12;
+    }
+    let kwHits = 0;
+    for (const t of kw) {
+      if (!t || t.length < 2) continue;
+      if (hay.includes(t)) {
+        kwHits += 1;
+        score += 6;
+      }
+    }
+    if (!score && kwHits === 0) continue;
+    scored.push({ score, product: p });
+  }
+  scored.sort((a, b) => b.score - a.score || String(a.product?.code || "").localeCompare(String(b.product?.code || "")));
+  return scored.slice(0, 24);
+}
+
 function sanitizeDetailSpecRows(raw) {
   if (!Array.isArray(raw)) return undefined;
   const out = [];
@@ -1620,6 +1818,52 @@ function signToken(user) {
   );
 }
 
+function parseCookiesFromHeader(headerValue) {
+  const out = {};
+  const raw = String(headerValue || "");
+  if (!raw) return out;
+  for (const pair of raw.split(";")) {
+    const idx = pair.indexOf("=");
+    if (idx <= 0) continue;
+    const k = pair.slice(0, idx).trim();
+    const v = pair.slice(idx + 1).trim();
+    if (!k) continue;
+    out[k] = decodeURIComponent(v || "");
+  }
+  return out;
+}
+
+function extractAuthToken(req) {
+  const header = req.headers.authorization || "";
+  if (header.startsWith("Bearer ")) {
+    const bearer = header.slice(7).trim();
+    if (bearer) return bearer;
+  }
+  const cookies = parseCookiesFromHeader(req.headers.cookie || "");
+  const fromCookie = String(cookies[AUTH_COOKIE_NAME] || "").trim();
+  return fromCookie || "";
+}
+
+function setAuthCookie(res, token, maxAgeMs) {
+  const safeMaxAge = Number.isFinite(maxAgeMs) && maxAgeMs > 0 ? Math.floor(maxAgeMs) : 30 * 24 * 60 * 60 * 1000;
+  res.cookie(AUTH_COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isProd,
+    path: "/",
+    maxAge: safeMaxAge,
+  });
+}
+
+function clearAuthCookie(res) {
+  res.clearCookie(AUTH_COOKIE_NAME, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isProd,
+    path: "/",
+  });
+}
+
 const loginAttemptState = new Map();
 const LOGIN_ATTEMPT_TTL_MS = 15 * 60 * 1000;
 const LOGIN_MAX_FAILED = isProd ? 8 : 30;
@@ -1686,8 +1930,7 @@ function equalHashSafe(a, b) {
 }
 
 function authMiddleware(req, res, next) {
-  const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  const token = extractAuthToken(req);
   if (!token) return res.status(401).json({ error: "auth_required" });
   try {
     req.user = jwt.verify(token, JWT_SECRET);
@@ -1700,8 +1943,7 @@ function authMiddleware(req, res, next) {
 /** Устанавливает req.user при валидном Bearer; иначе req.user = null. Для публичных POST (заявки). */
 function optionalAuthMiddleware(req, res, next) {
   req.user = null;
-  const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  const token = extractAuthToken(req);
   if (!token) return next();
   try {
     req.user = jwt.verify(token, JWT_SECRET);
@@ -1881,7 +2123,13 @@ app.use(
               styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
               imgSrc: ["'self'", "data:", "blob:", "https:"],
               connectSrc: ["'self'"],
-              formAction: ["'self'", "https://www.liqpay.ua", "https://liqpay.ua"],
+              formAction: [
+                "'self'",
+                "https://www.liqpay.ua",
+                "https://liqpay.ua",
+                "https://pay.fondy.eu",
+                "https://secure.wayforpay.com",
+              ],
               fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
               frameAncestors: ["'none'"],
             },
@@ -1974,6 +2222,105 @@ const adminRuntimeLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+const aiCatalogSearchLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: isProd ? 30 : 300,
+  message: { error: "rate_limited", message: "Слишком много запросов к ИИ-поиску. Повторите через минуту." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+function paymentProviderFromInput(raw) {
+  const p = String(raw || "").trim().toLowerCase();
+  if (p === "fondy" || p === "wayforpay" || p === "liqpay") return p;
+  return "fondy";
+}
+
+function paymentProviderAvailability() {
+  return {
+    fondy: { configured: fondyConfigured(), label: "Fondy" },
+    wayforpay: { configured: wayforpayConfigured(), label: "WayForPay" },
+    liqpay: { configured: liqpayConfigured(), label: "LiqPay" },
+  };
+}
+
+function isProviderConfigured(provider) {
+  if (provider === "fondy") return fondyConfigured();
+  if (provider === "wayforpay") return wayforpayConfigured();
+  return liqpayConfigured();
+}
+
+function providerConfigHint(provider) {
+  if (provider === "fondy") return "Додайте FONDY_MERCHANT_ID і FONDY_SECRET_KEY в .env.";
+  if (provider === "wayforpay") return "Додайте WAYFORPAY_MERCHANT_ACCOUNT і WAYFORPAY_SECRET_KEY в .env.";
+  return "Додайте LIQPAY_PUBLIC_KEY і LIQPAY_PRIVATE_KEY в .env.";
+}
+
+function buildAccountPaymentLeadSource(provider) {
+  return `account_${provider}`;
+}
+
+function createFondySignature(requestObj) {
+  const keys = Object.keys(requestObj)
+    .filter((k) => k !== "signature" && requestObj[k] !== null && requestObj[k] !== undefined && requestObj[k] !== "")
+    .sort();
+  const parts = [FONDY_SECRET_KEY, ...keys.map((k) => String(requestObj[k]))];
+  return createHash("sha1").update(parts.join("|"), "utf8").digest("hex");
+}
+
+function createWayforpaySignature(payload) {
+  const base = [
+    payload.merchantAccount,
+    payload.merchantDomainName,
+    payload.orderReference,
+    payload.orderDate,
+    payload.amount,
+    payload.currency,
+    ...(Array.isArray(payload.productName) ? payload.productName : []),
+    ...(Array.isArray(payload.productCount) ? payload.productCount.map((x) => String(x)) : []),
+    ...(Array.isArray(payload.productPrice) ? payload.productPrice.map((x) => String(x)) : []),
+  ]
+    .map((x) => String(x))
+    .join(";");
+  return createHmac("md5", WAYFORPAY_SECRET_KEY).update(base, "utf8").digest("hex");
+}
+
+function verifyFondyCallbackSignature(payload) {
+  if (!payload || typeof payload !== "object") return false;
+  const given = String(payload.signature || "").trim();
+  if (!given) return false;
+  const clone = { ...payload };
+  delete clone.signature;
+  const expected = createFondySignature(clone);
+  return Boolean(expected && equalHashSafe(given, expected));
+}
+
+function verifyWayforpayCallbackSignature(payload) {
+  if (!payload || typeof payload !== "object") return false;
+  const given = String(payload.merchantSignature || payload.signature || "").trim().toLowerCase();
+  if (!given) return false;
+  const merchantAccount = String(payload.merchantAccount || WAYFORPAY_MERCHANT_ACCOUNT || "").trim();
+  const orderReference = String(payload.orderReference || "").trim();
+  const amount = String(payload.amount != null ? payload.amount : "").trim();
+  const currency = String(payload.currency || "").trim();
+  const transactionStatus = String(payload.transactionStatus || "").trim();
+  const reasonCode = String(payload.reasonCode != null ? payload.reasonCode : "").trim();
+  const authCode = String(payload.authCode || "").trim();
+  const cardPan = String(payload.cardPan || "").trim();
+  const candidates = [
+    [merchantAccount, orderReference, amount, currency, authCode, cardPan, transactionStatus, reasonCode],
+    [merchantAccount, orderReference, amount, currency, transactionStatus, reasonCode],
+  ];
+  return candidates.some((parts) => {
+    if (parts.some((x) => !x)) return false;
+    const expected = createHmac("md5", WAYFORPAY_SECRET_KEY)
+      .update(parts.join(";"), "utf8")
+      .digest("hex")
+      .toLowerCase();
+    return equalHashSafe(given, expected);
+  });
+}
 
 app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -2077,110 +2424,305 @@ app.get("/api/payment/config", (req, res) => {
     ? (String(ap.offerHtmlRu || d.offerHtmlRu).trim() || d.offerHtmlRu)
     : (ap.offerHtml || d.offerHtml);
   res.set("Cache-Control", "no-store");
+  const providers = paymentProviderAvailability();
   res.json({
-    liqpayEnabled: liqpayConfigured(),
+    liqpayEnabled: providers.liqpay.configured,
     liqpaySandbox: LIQPAY_SANDBOX,
-    liqpayPublicKey: liqpayConfigured() ? LIQPAY_PUBLIC_KEY : null,
+    liqpayPublicKey: providers.liqpay.configured ? LIQPAY_PUBLIC_KEY : null,
+    paymentProviders: providers,
+    defaultProvider: providers.fondy.configured
+      ? "fondy"
+      : providers.wayforpay.configured
+        ? "wayforpay"
+        : providers.liqpay.configured
+          ? "liqpay"
+          : "fondy",
     offerTitle,
     offerHtml,
     iban: ap.iban,
   });
 });
 
-app.post(
-  "/api/payments/liqpay/invoice",
-  authMiddleware,
-  liqpayInvoiceLimiter,
-  async (req, res) => {
-    if (!liqpayConfigured()) {
-      return res.status(503).json({
-        error: "liqpay_unconfigured",
-        message: "LiqPay не налаштовано. Додайте LIQPAY_PUBLIC_KEY і LIQPAY_PRIVATE_KEY в .env.",
-      });
-    }
-    const { amount, description, acceptOffer } = req.body || {};
-    if (!acceptOffer) {
-      return res.status(400).json({
-        error: "accept_required",
-        message: "Потрібна згода з офертою (acceptOffer: true).",
-      });
-    }
-    const amt = Number(amount);
-    if (!Number.isFinite(amt) || amt < 1) {
-      return res.status(400).json({ error: "invalid_amount", message: "Сума від 1 UAH." });
-    }
-    if (amt > 1_000_000) {
-      return res.status(400).json({ error: "amount_too_large", message: "Сума занадто велика." });
-    }
-    const uid = req.user.sub;
-    const db0 = await crmSnapshot();
-    const user = db0.users.find((u) => u.id === uid);
-    if (!user) {
-      return res.status(404).json({ error: "not_found", message: "Користувача не знайдено." });
-    }
-    const phone = String(user.profile?.phone || "").trim();
-    if (!phone || phone.length < 9) {
-      return res.status(400).json({
-        error: "phone_required",
-        message: "Вкажіть номер телефону в профілі кабінету перед оплатою.",
-      });
-    }
-    const customerName = String(user.name || user.email || "Клієнт").trim();
-    const orderLabel = (String(description || "").trim() || `Онлайн-оплата, акаунт #${user.id}`).slice(0, 400);
-
-    const baseForUrls =
-      PUBLIC_BASE_URL || `${req.protocol}://${req.get("host") || "localhost"}`;
-
-    let lead;
-    let orderId;
-    let leadId;
-    await crmUpdate(async (db) => {
-      const assignee = pickAssignee(db);
-      leadId = db.meta.nextLeadId;
-      orderId = `DPC-LIQ-${leadId}-${Date.now()}`;
-      const descText = [orderLabel, `Акаунт: ${user.email || ""}`.trim()].filter(Boolean).join(" · ");
-      const fullComment = `Онлайн-оплата LiqPay (створення інвойсу). ${descText}`.trim();
-      lead = {
-        id: leadId,
-        status: "new",
-        priority: "normal",
-        customerName,
-        phone,
-        email: String(user.email || "").trim(),
-        comment: fullComment,
-        source: "account_liqpay",
-        customerType: "retail",
-        cart: [],
-        orderTotal: Math.round(amt * 100) / 100,
-        cartSnapshot: [],
-        deliveryMethod: null,
-        paymentMethod: "liqpay",
-        paymentNote: "LiqPay: очікування оплати",
-        crm: {
-          stage: "new",
-          tags: ["liqpay", "account_payment"],
-          managerNote: "",
-          managerNotes: [],
-          assigneeId: assignee?.id || null,
-          assigneeName: assignee?.name || null,
-          accountUserId: uid,
-          liqpayOrderId: orderId,
-          payment: {
-            status: "pending",
-            provider: "liqpay",
-            amount: Math.round(amt * 100) / 100,
-            currency: "UAH",
-            orderId,
-            userId: uid,
-            createdAt: new Date().toISOString(),
-          },
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+function normalizeAccountPaymentCartItems(input) {
+  const arr = Array.isArray(input) ? input : [];
+  return arr
+    .slice(0, 200)
+    .map((it) => {
+      const productId = String(it?.productId || "").trim().slice(0, 120);
+      const packTypeRaw = String(it?.packType || "jar").trim().toLowerCase();
+      const packType = packTypeRaw === "bucket" || packTypeRaw === "drum" ? packTypeRaw : "jar";
+      const qty = Math.max(1, Math.min(999, Number(it?.qty || 1) || 1));
+      const customKg = Number(it?.customKg || 0);
+      if (!productId) return null;
+      return {
+        productId,
+        packType,
+        qty,
+        customKg: Number.isFinite(customKg) && customKg > 0 ? customKg : null,
       };
-      db.meta.nextLeadId++;
-      db.leads.unshift(lead);
+    })
+    .filter(Boolean);
+}
+
+function computeAccountPaymentAmountByCart(cartItems, isLegalEntityBuyer) {
+  const catalog = readProductsCatalog();
+  const byId = new Map();
+  for (const p of catalog) {
+    const id = String(p?.id || "").trim();
+    if (!id) continue;
+    byId.set(id, p);
+  }
+  const lines = [];
+  const invalidItems = [];
+  let total = 0;
+  for (const item of cartItems) {
+    const p = byId.get(item.productId);
+    if (!p) {
+      invalidItems.push({ productId: item.productId, reason: "product_not_found" });
+      continue;
+    }
+    const priceNoNds = Number(p.priceNoNdsPerKg ?? 0);
+    const priceNds = Number(p.priceNdsPerKg ?? 0);
+    const unit = isLegalEntityBuyer
+      ? Number.isFinite(priceNds) && priceNds > 0
+        ? priceNds
+        : priceNoNds
+      : Number.isFinite(priceNoNds) && priceNoNds > 0
+        ? priceNoNds
+        : priceNds;
+    if (!Number.isFinite(unit) || unit < 0) {
+      invalidItems.push({ productId: item.productId, reason: "invalid_unit_price" });
+      continue;
+    }
+    let weightKg = 0;
+    if (item.packType === "bucket") weightKg = Number(p.bucketKg || 0);
+    else if (item.packType === "drum") weightKg = Number(p.drumKg || 0);
+    else {
+      const allowedJarWeights = [Number(p.jarSmallKg || 0), Number(p.jarBigKg || 0), Number(p.jarKg || 0)]
+        .filter((n) => Number.isFinite(n) && n > 0)
+        .filter((n, idx, arr) => arr.indexOf(n) === idx);
+      const requestedJarWeight = Number(item.customKg || 0);
+      if (Number.isFinite(requestedJarWeight) && requestedJarWeight > 0) {
+        if (allowedJarWeights.length > 0 && !allowedJarWeights.includes(requestedJarWeight)) {
+          invalidItems.push({
+            productId: item.productId,
+            packType: "jar",
+            reason: "jar_weight_not_allowed",
+            requestedWeight: requestedJarWeight,
+            allowedWeights: allowedJarWeights,
+          });
+          continue;
+        }
+        weightKg = requestedJarWeight;
+      } else {
+        weightKg = Number(allowedJarWeights[0] || 0);
+      }
+    }
+    if (!Number.isFinite(weightKg) || weightKg <= 0) {
+      invalidItems.push({ productId: item.productId, packType: item.packType, reason: "invalid_weight" });
+      continue;
+    }
+    const lineTotal = Math.round(unit * weightKg * item.qty * 100) / 100;
+    total += lineTotal;
+    lines.push({
+      productId: item.productId,
+      packType: item.packType,
+      qty: item.qty,
+      weightKg,
+      unit,
+      lineTotal,
+      name: String(p.name || p.id || "—"),
     });
+  }
+  return { lines, invalidItems, total: Math.round(total * 100) / 100 };
+}
+
+function sanitizeAccountPaymentDelivery(input) {
+  const d = input && typeof input === "object" ? input : {};
+  const methodRaw = String(d.method || "nova_poshta").trim().toLowerCase();
+  const method = methodRaw === "courier" || methodRaw === "pickup" ? methodRaw : "nova_poshta";
+  const city = String(d.city || "").trim().slice(0, 120);
+  const cityRef = String(d.cityRef || "").trim().slice(0, 120);
+  const warehouse = String(d.warehouse || "").trim().slice(0, 180);
+  const warehouseRef = String(d.warehouseRef || "").trim().slice(0, 180);
+  const address = String(d.address || "").trim().slice(0, 220);
+  const courierNpConfirmed =
+    d.courierNpConfirmed === true ||
+    d.courierNpConfirmed === "true" ||
+    d.courierNpConfirmed === 1 ||
+    d.courierNpConfirmed === "1";
+  const comment = String(d.comment || "").trim().slice(0, 220);
+  if (method !== "pickup" && !city) return { error: "delivery_city_required", message: "Вкажіть місто доставки." };
+  if (method === "nova_poshta" && !warehouse) {
+    return { error: "delivery_warehouse_required", message: "Вкажіть відділення Нової Пошти." };
+  }
+  if (method === "courier" && !address) {
+    return { error: "delivery_address_required", message: "Вкажіть номер або коментар заявки кур'єра НП." };
+  }
+  if (method === "courier" && !courierNpConfirmed) {
+    return { error: "delivery_courier_np_confirm_required", message: "Підтвердіть оформлення доставки через сервіс Нової Пошти." };
+  }
+  return {
+    value: {
+      method,
+      city: method === "pickup" ? null : city,
+      cityRef: method === "nova_poshta" ? (cityRef || null) : null,
+      warehouse: method === "nova_poshta" ? warehouse : null,
+      warehouseRef: method === "nova_poshta" ? (warehouseRef || null) : null,
+      address: method === "courier" ? address : null,
+      courierNpConfirmed: method === "courier" ? courierNpConfirmed : null,
+      comment: method === "pickup" ? (comment || null) : null,
+    },
+  };
+}
+
+async function createAccountPaymentInvoice(req, res, providerInput) {
+  const provider = paymentProviderFromInput(providerInput || req.body?.provider);
+  if (!isProviderConfigured(provider)) {
+    return res.status(503).json({
+      error: "provider_unconfigured",
+      provider,
+      message: providerConfigHint(provider),
+    });
+  }
+  const { amount, description, acceptOffer } = req.body || {};
+  const requestedAmount = Number(amount);
+  const cartItems = normalizeAccountPaymentCartItems(req.body?.cartItems);
+  const deliverySanitized = sanitizeAccountPaymentDelivery(req.body?.delivery);
+  if (deliverySanitized.error) {
+    return res.status(400).json({ error: deliverySanitized.error, message: deliverySanitized.message });
+  }
+  const delivery = deliverySanitized.value;
+  const cartSnapshotIn = Array.isArray(req.body?.cartSnapshot) ? req.body.cartSnapshot : [];
+  const cartSnapshot = cartSnapshotIn
+    .slice(0, 100)
+    .map((x) => ({
+      title: String(x?.title || "").trim().slice(0, 240),
+      details: String(x?.details || "").trim().slice(0, 500),
+      qty: Math.max(1, Math.min(999, Number(x?.qty || 1) || 1)),
+      lineTotal: Math.max(0, Math.round((Number(x?.lineTotal || 0) || 0) * 100) / 100),
+    }))
+    .filter((x) => x.title);
+  if (!acceptOffer) {
+    return res.status(400).json({
+      error: "accept_required",
+      message: "Потрібна згода з офертою (acceptOffer: true).",
+    });
+  }
+  if (cartItems.length === 0) {
+    return res.status(400).json({ error: "cart_empty", message: "Кошик порожній. Додайте товари перед оплатою." });
+  }
+  const uid = req.user.sub;
+  const db0 = await crmSnapshot();
+  const user = db0.users.find((u) => u.id === uid);
+  if (!user) {
+    return res.status(404).json({ error: "not_found", message: "Користувача не знайдено." });
+  }
+  const phone = String(user.profile?.phone || "").trim();
+  if (!phone || phone.length < 9) {
+    return res.status(400).json({
+      error: "phone_required",
+      message: "Вкажіть номер телефону в профілі кабінету перед оплатою.",
+    });
+  }
+  const isLegalEntityBuyer =
+    user?.profile?.isLegalEntity === true ||
+    user?.profile?.isLegalEntity === "true" ||
+    user?.profile?.isLegalEntity === 1 ||
+    user?.profile?.isLegalEntity === "1";
+  const priceByCart = computeAccountPaymentAmountByCart(cartItems, isLegalEntityBuyer);
+  if (Array.isArray(priceByCart.invalidItems) && priceByCart.invalidItems.length) {
+    return res.status(400).json({
+      error: "invalid_cart_item",
+      message: "У кошику є товари з невалідною фасовкою або вагою. Перевірте позиції та спробуйте ще раз.",
+      invalidItems: priceByCart.invalidItems.slice(0, 20),
+    });
+  }
+  const amt = Number(priceByCart.total || 0);
+  if (!Number.isFinite(amt) || amt < 1) {
+    return res.status(400).json({ error: "invalid_amount", message: "Сума від 1 UAH." });
+  }
+  if (Number.isFinite(requestedAmount) && Math.abs(requestedAmount - amt) > 0.01) {
+    return res.status(400).json({
+      error: "amount_mismatch",
+      message: "Сума замовлення змінилась. Оновіть сторінку оплати.",
+      expectedAmount: amt,
+    });
+  }
+  if (amt > 1_000_000) {
+    return res.status(400).json({ error: "amount_too_large", message: "Сума занадто велика." });
+  }
+  const customerType = isLegalEntityBuyer ? "legal" : "individual";
+  const legalCompanyName = String(user.profile?.companyName || "").trim();
+  const customerName = String(
+    (isLegalEntityBuyer && legalCompanyName) || user.name || user.email || "Клієнт"
+  ).trim();
+  const orderLabel = (String(description || "").trim() || `Онлайн-оплата, акаунт #${user.id}`).slice(0, 400);
+  const providerTag = provider === "liqpay" ? "LIQ" : provider === "wayforpay" ? "WFP" : "FON";
+  const baseForUrls = PUBLIC_BASE_URL || `${req.protocol}://${req.get("host") || "localhost"}`;
+
+  let lead;
+  let orderId;
+  let leadId;
+  await crmUpdate(async (db) => {
+    const assignee = pickAssignee(db);
+    leadId = db.meta.nextLeadId;
+    orderId = `DPC-${providerTag}-${leadId}-${Date.now()}`;
+    const descText = [orderLabel, `Акаунт: ${user.email || ""}`.trim()].filter(Boolean).join(" · ");
+    const deliveryLabel =
+      delivery.method === "pickup"
+        ? `Самовивіз${delivery.comment ? `, коментар: ${delivery.comment}` : ""}`
+        : delivery.method === "courier"
+          ? `Кур'єр НП (оформлено користувачем через сайт НП), м. ${delivery.city}, заявка: ${delivery.address || "—"}`
+          : `Нова Пошта, м. ${delivery.city}, відділення: ${delivery.warehouse || "—"}`;
+    const fullComment = `Онлайн-оплата ${provider.toUpperCase()} (створення інвойсу, тип платника: ${customerType}). ${descText}. Доставка: ${deliveryLabel}`.trim();
+    lead = {
+      id: leadId,
+      status: "new",
+      priority: "normal",
+      customerName,
+      phone,
+      email: String(user.email || "").trim(),
+      comment: fullComment,
+      source: buildAccountPaymentLeadSource(provider),
+      customerType,
+      cart: cartItems,
+      orderTotal: Math.round(amt * 100) / 100,
+      cartSnapshot,
+      deliveryMethod: delivery.method,
+      paymentMethod: provider,
+      paymentNote: `${provider.toUpperCase()}: очікування оплати`,
+      crm: {
+        stage: "new",
+        tags: [provider, "account_payment"],
+        managerNote: "",
+        managerNotes: [],
+        assigneeId: assignee?.id || null,
+        assigneeName: assignee?.name || null,
+        accountUserId: uid,
+        liqpayOrderId: provider === "liqpay" ? orderId : null,
+        payment: {
+          status: "pending",
+          provider,
+          amount: Math.round(amt * 100) / 100,
+          currency: "UAH",
+          orderId,
+          userId: uid,
+          customerType,
+          isLegalEntityBuyer,
+          createdAt: new Date().toISOString(),
+        },
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    db.meta.nextLeadId++;
+    db.leads.unshift(lead);
+  });
+
+  sendWebhook("lead_created", lead);
+
+  if (provider === "liqpay") {
     const dataObj = {
       version: 3,
       public_key: LIQPAY_PUBLIC_KEY,
@@ -2190,22 +2732,87 @@ app.post(
       description: `Заявка #${leadId} — ${orderLabel}`.slice(0, 400),
       order_id: orderId,
       sandbox: LIQPAY_SANDBOX ? 1 : 0,
-      result_url: `${baseForUrls.replace(/\/+$/, "")}/account-payment.html?liqpay=return`,
+      result_url: `${baseForUrls.replace(/\/+$/, "")}/account-payment.html?pay=return&provider=liqpay`,
       server_url: `${baseForUrls.replace(/\/+$/, "")}/api/payments/liqpay/callback`,
       phone: phone.replace(/\D/g, "").slice(-12),
     };
     const dataB64 = Buffer.from(JSON.stringify(dataObj), "utf8").toString("base64");
     const signature = liqpaySign(LIQPAY_PRIVATE_KEY, dataB64);
-    sendWebhook("lead_created", lead);
-    res.json({
-      data: dataB64,
-      signature,
+    return res.json({
+      provider,
       action: "https://www.liqpay.ua/api/3/checkout",
+      method: "POST",
+      fields: { data: dataB64, signature },
       orderId,
       leadId,
     });
   }
-);
+
+  if (provider === "fondy") {
+    const fondyRequest = {
+      merchant_id: Number(FONDY_MERCHANT_ID),
+      order_id: orderId,
+      order_desc: `Заявка #${leadId} — ${orderLabel}`.slice(0, 400),
+      amount: Math.round(amt * 100),
+      currency: "UAH",
+      response_url: `${baseForUrls.replace(/\/+$/, "")}/account-payment.html?pay=return&provider=fondy`,
+      server_callback_url: `${baseForUrls.replace(/\/+$/, "")}/api/payments/fondy/callback`,
+      sender_email: String(user.email || "").trim().slice(0, 120),
+      sender_cell_phone: phone.replace(/\D/g, "").slice(-12),
+      lang: "uk",
+    };
+    fondyRequest.signature = createFondySignature(fondyRequest);
+    const fr = await fetch("https://pay.fondy.eu/api/checkout/url/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ request: fondyRequest }),
+    });
+    const fj = await fr.json().catch(() => ({}));
+    const checkoutUrl = fj?.response?.checkout_url || "";
+    if (!fr.ok || !checkoutUrl) {
+      const msg = String(fj?.response?.error_message || "Не вдалося створити платіж Fondy.");
+      return res.status(502).json({ error: "fondy_create_failed", message: msg });
+    }
+    return res.json({ provider, redirectUrl: checkoutUrl, orderId, leadId });
+  }
+
+  const wayforpayPayload = {
+    merchantAccount: WAYFORPAY_MERCHANT_ACCOUNT,
+    merchantDomainName: String((PUBLIC_BASE_URL || `${req.protocol}://${req.get("host") || "localhost"}`)
+      .replace(/^https?:\/\//, "")
+      .replace(/\/+$/, "")),
+    orderReference: orderId,
+    orderDate: Math.floor(Date.now() / 1000),
+    amount: Math.round(amt * 100) / 100,
+    currency: "UAH",
+    productName: [`Заявка #${leadId}`],
+    productCount: [1],
+    productPrice: [Math.round(amt * 100) / 100],
+    returnUrl: `${baseForUrls.replace(/\/+$/, "")}/account-payment.html?pay=return&provider=wayforpay`,
+    serviceUrl: `${baseForUrls.replace(/\/+$/, "")}/api/payments/wayforpay/callback`,
+    clientFirstName: customerName.slice(0, 60),
+    clientEmail: String(user.email || "").trim().slice(0, 120),
+    clientPhone: phone.replace(/\D/g, "").slice(-12),
+    language: "UA",
+  };
+  wayforpayPayload.merchantSignature = createWayforpaySignature(wayforpayPayload);
+  return res.json({
+    provider,
+    action: "https://secure.wayforpay.com/pay",
+    method: "POST",
+    fields: wayforpayPayload,
+    orderId,
+    leadId,
+  });
+}
+
+app.post("/api/payments/invoice", authMiddleware, liqpayInvoiceLimiter, async (req, res) => {
+  return createAccountPaymentInvoice(req, res, null);
+});
+
+app.post("/api/payments/liqpay/invoice", authMiddleware, liqpayInvoiceLimiter, async (req, res) => {
+  return createAccountPaymentInvoice(req, res, "liqpay");
+});
 
 app.post("/api/payments/liqpay/callback", async (req, res) => {
   if (!liqpayConfigured()) {
@@ -2232,6 +2839,7 @@ app.post("/api/payments/liqpay/callback", async (req, res) => {
   const payStatus = String(payload.status || "");
   const success = payStatus === "success" || payStatus === "sandbox" || payStatus === "subscribed";
   const err = payload.err_code != null && payload.err_code !== "" ? String(payload.err_code) : null;
+  let receiptData = null;
   await crmUpdate(async (db) => {
     const lead = db.leads.find((l) => l.crm && String(l.crm.liqpayOrderId) === orderId);
     if (!lead) return;
@@ -2242,6 +2850,19 @@ app.post("/api/payments/liqpay/callback", async (req, res) => {
     if (success) {
       lead.crm.payment.paidAt = new Date().toISOString();
       lead.crm.payment.transactionId = payload.transaction_id != null ? String(payload.transaction_id) : null;
+      if (!lead.crm.payment.receiptSentAt && lead.email) {
+        receiptData = {
+          toEmail: String(lead.email || "").trim(),
+          customerName: String(lead.customerName || "").trim(),
+          leadId: lead.id,
+          orderId,
+          provider: "liqpay",
+          amount: Number(lead.crm.payment.amount || payload.amount || 0) || 0,
+          currency: String(lead.crm.payment.currency || payload.currency || "UAH"),
+          cartSnapshot: Array.isArray(lead.cartSnapshot) ? lead.cartSnapshot : [],
+        };
+        lead.crm.payment.receiptSentAt = new Date().toISOString();
+      }
       const note = `LiqPay: оплачено (${payStatus})${payload.amount != null ? `, сума ${payload.amount} ${payload.currency || "UAH"}` : ""}`;
       if (!lead.paymentNote || !String(lead.paymentNote).includes("LiqPay: оплачено")) {
         lead.paymentNote = [lead.paymentNote, note].filter(Boolean).join("\n");
@@ -2249,6 +2870,102 @@ app.post("/api/payments/liqpay/callback", async (req, res) => {
     }
     lead.updatedAt = new Date().toISOString();
   });
+  if (receiptData) {
+    const ap = (readSiteContent().accountPayment || defaultAccountPayment()).iban || {};
+    sendPaymentReceiptMail({ ...receiptData, sellerIban: ap }).catch((e) =>
+      console.warn("[mail] payment receipt failed:", e && e.message ? e.message : e)
+    );
+  }
+  res.send("OK");
+});
+
+app.post("/api/payments/fondy/callback", async (req, res) => {
+  if (!fondyConfigured()) return res.status(503).send("unconfigured");
+  const payload = req.body && req.body.order_id ? req.body : req.body?.response || req.body?.request || {};
+  if (!verifyFondyCallbackSignature(payload)) return res.status(400).send("invalid_signature");
+  const orderId = String(payload.order_id || "").trim();
+  if (!orderId) return res.status(400).send("no_order");
+  const status = String(payload.order_status || payload.payment_status || "").toLowerCase();
+  const success = ["approved", "declined_waiting", "processing"].includes(status) ? status === "approved" : false;
+  let receiptData = null;
+  await crmUpdate(async (db) => {
+    const lead = db.leads.find((l) => String(l?.crm?.payment?.orderId || "") === orderId);
+    if (!lead) return;
+    normalizeLeadCrm(lead);
+    if (!lead.crm.payment) lead.crm.payment = {};
+    lead.crm.payment.provider = "fondy";
+    lead.crm.payment.status = success ? "success" : status || "unknown";
+    lead.crm.payment.fondyStatus = status || null;
+    if (success) {
+      lead.crm.payment.paidAt = new Date().toISOString();
+      if (!lead.crm.payment.receiptSentAt && lead.email) {
+        receiptData = {
+          toEmail: String(lead.email || "").trim(),
+          customerName: String(lead.customerName || "").trim(),
+          leadId: lead.id,
+          orderId,
+          provider: "fondy",
+          amount: Number(lead.crm.payment.amount || 0) || 0,
+          currency: String(lead.crm.payment.currency || "UAH"),
+          cartSnapshot: Array.isArray(lead.cartSnapshot) ? lead.cartSnapshot : [],
+        };
+        lead.crm.payment.receiptSentAt = new Date().toISOString();
+      }
+      lead.paymentNote = [lead.paymentNote, `Fondy: оплачено (${status})`].filter(Boolean).join("\n");
+    }
+    lead.updatedAt = new Date().toISOString();
+  });
+  if (receiptData) {
+    const ap = (readSiteContent().accountPayment || defaultAccountPayment()).iban || {};
+    sendPaymentReceiptMail({ ...receiptData, sellerIban: ap }).catch((e) =>
+      console.warn("[mail] payment receipt failed:", e && e.message ? e.message : e)
+    );
+  }
+  res.send("OK");
+});
+
+app.post("/api/payments/wayforpay/callback", async (req, res) => {
+  if (!wayforpayConfigured()) return res.status(503).send("unconfigured");
+  const body = req.body || {};
+  if (!verifyWayforpayCallbackSignature(body)) return res.status(400).send("invalid_signature");
+  const orderId = String(body.orderReference || "").trim();
+  if (!orderId) return res.status(400).send("no_order");
+  const txStatus = String(body.transactionStatus || "").toLowerCase();
+  const success = txStatus === "approved";
+  let receiptData = null;
+  await crmUpdate(async (db) => {
+    const lead = db.leads.find((l) => String(l?.crm?.payment?.orderId || "") === orderId);
+    if (!lead) return;
+    normalizeLeadCrm(lead);
+    if (!lead.crm.payment) lead.crm.payment = {};
+    lead.crm.payment.provider = "wayforpay";
+    lead.crm.payment.status = success ? "success" : txStatus || "unknown";
+    lead.crm.payment.wayforpayStatus = txStatus || null;
+    if (success) {
+      lead.crm.payment.paidAt = new Date().toISOString();
+      if (!lead.crm.payment.receiptSentAt && lead.email) {
+        receiptData = {
+          toEmail: String(lead.email || "").trim(),
+          customerName: String(lead.customerName || "").trim(),
+          leadId: lead.id,
+          orderId,
+          provider: "wayforpay",
+          amount: Number(lead.crm.payment.amount || 0) || 0,
+          currency: String(lead.crm.payment.currency || "UAH"),
+          cartSnapshot: Array.isArray(lead.cartSnapshot) ? lead.cartSnapshot : [],
+        };
+        lead.crm.payment.receiptSentAt = new Date().toISOString();
+      }
+      lead.paymentNote = [lead.paymentNote, `WayForPay: оплачено (${txStatus})`].filter(Boolean).join("\n");
+    }
+    lead.updatedAt = new Date().toISOString();
+  });
+  if (receiptData) {
+    const ap = (readSiteContent().accountPayment || defaultAccountPayment()).iban || {};
+    sendPaymentReceiptMail({ ...receiptData, sellerIban: ap }).catch((e) =>
+      console.warn("[mail] payment receipt failed:", e && e.message ? e.message : e)
+    );
+  }
   res.send("OK");
 });
 
@@ -2268,6 +2985,20 @@ app.post("/api/auth/register", authRegisterLimiter, async (req, res) => {
   const legalAdrIn = String(
     b.legalAddress != null ? b.legalAddress : (b.profile && b.profile.legalAddress) || ""
   ).trim();
+  const edrpouIn = String(b.edrpou != null ? b.edrpou : (b.profile && b.profile.edrpou) || "")
+    .replace(/\s+/g, "")
+    .trim();
+  const billingIbanIn = String(
+    b.billingIban != null ? b.billingIban : (b.profile && b.profile.billingIban) || ""
+  )
+    .replace(/\s+/g, "")
+    .toUpperCase()
+    .trim();
+  const invoiceEmailIn = String(
+    b.invoiceEmail != null ? b.invoiceEmail : (b.profile && b.profile.invoiceEmail) || ""
+  )
+    .trim()
+    .toLowerCase();
   const deliveryIn = String(
     b.deliveryAddress != null ? b.deliveryAddress : (b.profile && b.profile.deliveryAddress) || ""
   ).trim();
@@ -2276,6 +3007,16 @@ app.post("/api/auth/register", authRegisterLimiter, async (req, res) => {
     b.isLegalEntity === "true" ||
     b.isLegalEntity === 1 ||
     b.isLegalEntity === "1";
+  const marketingOptIn =
+    b.marketingOptIn === true ||
+    b.marketingOptIn === "true" ||
+    b.marketingOptIn === 1 ||
+    b.marketingOptIn === "1";
+  const termsAccepted =
+    b.termsAccepted === true ||
+    b.termsAccepted === "true" ||
+    b.termsAccepted === 1 ||
+    b.termsAccepted === "1";
 
   const extendedReg = firstName.length > 0 || cityIn.length > 0;
   let cleanName = [firstName, lastName].filter(Boolean).join(" ").trim() || String(name || "").trim();
@@ -2289,6 +3030,12 @@ app.post("/api/auth/register", authRegisterLimiter, async (req, res) => {
     return res.status(400).json({
       error: "invalid_payload",
       message: !cleanEmail || !cleanEmail.includes("@") ? "Укажите корректный email." : registerPasswordError,
+    });
+  }
+  if (!termsAccepted) {
+    return res.status(400).json({
+      error: "terms_required",
+      message: "Для регистрации необходимо принять Политику конфиденциальности и условия использования сайта.",
     });
   }
 
@@ -2308,12 +3055,33 @@ app.post("/api/auth/register", authRegisterLimiter, async (req, res) => {
         message: "Для юридического лица укажите название предприятия.",
       });
     }
+    if (isLegalEntity && !/^\d{8,10}$/.test(edrpouIn)) {
+      return res.status(400).json({
+        error: "invalid_payload",
+        message: "Для юридического лица укажите ЄДРПОУ/РНОКПП (8–10 цифр).",
+      });
+    }
+    if (isLegalEntity && !/^UA\d{2}[A-Z0-9]{5,30}$/.test(billingIbanIn)) {
+      return res.status(400).json({
+        error: "invalid_payload",
+        message: "Для юридического лица укажите корректный IBAN (UA...).",
+      });
+    }
+    if (isLegalEntity && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invoiceEmailIn)) {
+      return res.status(400).json({
+        error: "invalid_payload",
+        message: "Для юридического лица укажите email для счетов.",
+      });
+    }
   }
+  const newProfile = defaultProfile();
+  newProfile.privacyConsentAcceptedAt = new Date().toISOString();
+  newProfile.privacyConsentVersion = PRIVACY_POLICY_VERSION;
+  newProfile.marketingOptIn = Boolean(marketingOptIn);
 
   const passwordHash = await bcrypt.hash(cleanPassword, 10);
   const requested = String(role || "client").trim();
   const safeRole = PUBLIC_REGISTER_ROLES.has(requested) ? requested : "client";
-  const newProfile = defaultProfile();
   if (extendedReg) {
     newProfile.lastName = lastName.slice(0, 200);
     newProfile.city = cityIn.slice(0, 200);
@@ -2322,6 +3090,9 @@ app.post("/api/auth/register", authRegisterLimiter, async (req, res) => {
     newProfile.phone = phoneIn.slice(0, 80);
     newProfile.isLegalEntity = Boolean(isLegalEntity);
     newProfile.companyName = companyIn.slice(0, 200);
+    newProfile.edrpou = edrpouIn.slice(0, 20);
+    newProfile.billingIban = billingIbanIn.slice(0, 34);
+    newProfile.invoiceEmail = invoiceEmailIn.slice(0, 120);
     newProfile.legalAddress = legalAdrIn.slice(0, 500);
     newProfile.deliveryAddress = deliveryIn.slice(0, 500);
   }
@@ -2349,6 +3120,7 @@ app.post("/api/auth/register", authRegisterLimiter, async (req, res) => {
   }
 
   const token = signToken(user);
+  setAuthCookie(res, token, 30 * 24 * 60 * 60 * 1000);
   if (isTransactionalMailConfigured()) {
     void sendWelcomeMail(user).catch((err) => console.error("[mail] welcome failed:", err?.message || err));
   }
@@ -2389,6 +3161,9 @@ app.post("/api/auth/login", authLoginLimiter, async (req, res) => {
   }
 
   const token = signToken(user);
+  const role = String(user.role || "client").toLowerCase();
+  const ttlMs = role === "admin" ? 7 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
+  setAuthCookie(res, token, ttlMs);
   clearLoginFailures(req, identifier);
   res.json({
     token,
@@ -2405,9 +3180,13 @@ app.post("/api/auth/forgot-password", authForgotPasswordLimiter, async (req, res
   const now = Date.now();
   let targetUser = null;
   let resetUrl = "";
+  let hasLeadWithEmail = false;
   await crmUpdate(async (db) => {
     const user = db.users.find((u) => String(u.email || "").toLowerCase() === cleanEmail);
-    if (!user) return;
+    if (!user) {
+      hasLeadWithEmail = (db.leads || []).some((l) => String(l?.email || "").trim().toLowerCase() === cleanEmail);
+      return;
+    }
     const rawToken = randomBytes(PASSWORD_RESET_TOKEN_BYTES).toString("hex");
     const tokenHash = hashPasswordResetToken(rawToken);
     user.passwordResetTokenHash = tokenHash;
@@ -2417,15 +3196,53 @@ app.post("/api/auth/forgot-password", authForgotPasswordLimiter, async (req, res
     const baseForLinks = PUBLIC_BASE_URL || `${req.protocol}://${req.get("host") || "localhost"}`;
     resetUrl = `${baseForLinks.replace(/\/+$/, "")}/auth.html?reset_token=${encodeURIComponent(rawToken)}`;
   });
-  if (targetUser && resetUrl && isTransactionalMailConfigured()) {
-    void sendPasswordResetMail({
-      toEmail: targetUser.email,
-      customerName: targetUser.name || "",
-      resetUrl,
-      ttlMinutes: Math.round(PASSWORD_RESET_TOKEN_TTL_MS / 60000),
-    }).catch((err) => console.error("[mail] password reset failed:", err?.message || err));
+  if (!targetUser) {
+    if (hasLeadWithEmail) {
+      return res.status(404).json({
+        error: "account_not_found",
+        message:
+          "Email найден в заказах/заявках, но аккаунт с таким email не зарегистрирован. Сначала пройдите регистрацию.",
+      });
+    }
+    return res.status(404).json({
+      error: "account_not_found",
+      message: "Аккаунт с таким email не найден. Проверьте email или зарегистрируйтесь.",
+    });
   }
-  return res.json({ ok: true, message: "Если аккаунт с таким email существует, мы отправили ссылку для восстановления." });
+  if (!isTransactionalMailConfigured()) {
+    return res.status(503).json({
+      error: "mail_not_configured",
+      message: "Восстановление недоступно: почтовый сервер не настроен.",
+    });
+  }
+  if (targetUser && resetUrl && isTransactionalMailConfigured()) {
+    try {
+      const info = await sendPasswordResetMail({
+        toEmail: targetUser.email,
+        customerName: targetUser.name || "",
+        resetUrl,
+        ttlMinutes: Math.round(PASSWORD_RESET_TOKEN_TTL_MS / 60000),
+      });
+      if (!isProd) {
+        console.log("[mail] password reset sent:", {
+          to: targetUser.email,
+          accepted: info?.accepted || [],
+          response: info?.response || "",
+        });
+      }
+    } catch (err) {
+      console.error("[mail] password reset failed:", err?.message || err);
+      return res.status(502).json({
+        error: "mail_send_failed",
+        message: "Не удалось отправить письмо для восстановления. Попробуйте позже.",
+      });
+    }
+  }
+  return res.json({
+    ok: true,
+    message: "Если аккаунт с таким email существует, мы отправили ссылку для восстановления.",
+    ...(AUTH_DEBUG_RESET_URLS && !isProd ? { debugResetUrl: resetUrl || undefined } : {}),
+  });
 });
 
 app.post("/api/auth/reset-password", authForgotPasswordLimiter, async (req, res) => {
@@ -2472,7 +3289,13 @@ app.post("/api/auth/reset-password", authForgotPasswordLimiter, async (req, res)
   if (notFound || expired || !userOut || !newToken) {
     return res.status(400).json({ error: "invalid_or_expired_token", message: "Ссылка восстановления устарела или недействительна." });
   }
+  setAuthCookie(res, newToken, 30 * 24 * 60 * 60 * 1000);
   return res.json({ ok: true, token: newToken, user: userOut });
+});
+
+app.post("/api/auth/logout", (_req, res) => {
+  clearAuthCookie(res);
+  res.json({ ok: true });
 });
 
 app.get("/api/auth/me", authMiddleware, async (req, res) => {
@@ -3613,6 +4436,45 @@ app.get("/api/site/products", (_req, res) => {
   res.json({ products: readProductsCatalog() });
 });
 
+app.post("/api/ai/catalog-search", aiCatalogSearchLimiter, async (req, res) => {
+  const query = String(req.body?.query || "").trim();
+  const strictAi = Boolean(req.body?.strictAi);
+  if (!query || query.length < 3) {
+    return res.status(400).json({ error: "invalid_query", message: "Введите запрос минимум из 3 символов." });
+  }
+  const products = readProductsCatalog();
+  const aiResult = await aiParseIntentWithGemini(query);
+  const aiIntent = aiResult?.intent || null;
+  if (strictAi && !aiIntent) {
+    return res.status(503).json({
+      error: "ai_unavailable",
+      message:
+        String(aiResult?.error || "").trim() ||
+        "ИИ-подбор временно недоступен. Проверьте GEMINI_API_KEY и подключение к сети.",
+    });
+  }
+  const intent = aiIntent || aiHeuristicIntent(query);
+  const scored = aiScoreCatalogProducts(products, intent);
+  const productIds = scored.map((x) => String(x.product?.id || "")).filter(Boolean);
+  const rows = scored.map((x) => ({
+    id: x.product?.id ?? "",
+    family: x.product?.family ?? "",
+    code: x.product?.code ?? "",
+    name: x.product?.name ?? "",
+    score: x.score,
+  }));
+  return res.json({
+    ok: true,
+    provider: aiIntent ? "google-gemini" : "local-fallback",
+    intent,
+    productIds,
+    products: rows,
+    message: rows.length
+      ? `Найдено ${rows.length} подходящих позиций.`
+      : "Подходящие позиции не найдены. Уточните запрос (поверхность, назначение, условия эксплуатации).",
+  });
+});
+
 /** Админка не должна получать устаревший site-content / каталог из кэша браузера (иначе фото «не меняется» после публикации). */
 app.use("/api/admin", (_req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate");
@@ -3872,7 +4734,7 @@ app.post("/api/admin/products/:id/image", authMiddleware, permissionMiddleware("
   const ov = content.productOverrides[pid];
   const packRaw = req.body && req.body.catalogPackKey;
   const hasPackKey = packRaw !== undefined && packRaw !== null && String(packRaw).trim() !== "";
-  let relUrl = "";
+  let relUrl;
   let catalogPackKey = null;
   if (hasPackKey) {
     const k = sanitizeCatalogPackImageKey(packRaw);
@@ -4031,6 +4893,60 @@ app.use(
     },
   })
 );
+
+app.get("/robots.txt", (req, res) => {
+  const host = req.get("host") || "";
+  const proto = req.protocol || "https";
+  const sitemapUrl = host ? `${proto}://${host}/sitemap.xml` : "/sitemap.xml";
+  res.type("text/plain; charset=utf-8");
+  res.send(`User-agent: *\nAllow: /\nSitemap: ${sitemapUrl}\n`);
+});
+
+app.get("/sitemap.xml", (req, res) => {
+  const host = req.get("host") || "";
+  const proto = req.protocol || "https";
+  const base = host ? `${proto}://${host}` : "";
+  const pages = [
+    { url: "/", file: "index.html", changefreq: "daily", priority: "1.0" },
+    { url: "/index.html", file: "index.html", changefreq: "daily", priority: "0.9" },
+    { url: "/products.html", file: "products.html", changefreq: "daily", priority: "0.9" },
+    { url: "/product.html", file: "product.html", changefreq: "daily", priority: "0.8" },
+    { url: "/price.html", file: "price.html", changefreq: "daily", priority: "0.8" },
+    { url: "/delivery.html", file: "delivery.html", changefreq: "weekly", priority: "0.7" },
+    { url: "/contact.html", file: "contact.html", changefreq: "weekly", priority: "0.7" },
+    { url: "/about.html", file: "about.html", changefreq: "monthly", priority: "0.5" },
+    { url: "/offer.html", file: "offer.html", changefreq: "monthly", priority: "0.4" },
+    { url: "/payment.html", file: "payment.html", changefreq: "weekly", priority: "0.6" },
+    { url: "/checkout.html", file: "checkout.html", changefreq: "weekly", priority: "0.5" },
+    { url: "/news.html", file: "news.html", changefreq: "daily", priority: "0.7" },
+    { url: "/advice.html", file: "advice.html", changefreq: "weekly", priority: "0.6" },
+    { url: "/ral.html", file: "ral.html", changefreq: "monthly", priority: "0.6" },
+    { url: "/auth.html", file: "auth.html", changefreq: "monthly", priority: "0.4" },
+    { url: "/account.html", file: "account.html", changefreq: "weekly", priority: "0.4" },
+    { url: "/account-payment.html", file: "account-payment.html", changefreq: "weekly", priority: "0.4" },
+    { url: "/intelligent-selection.html", file: "intelligent-selection.html", changefreq: "weekly", priority: "0.6" },
+    { url: "/privacy-policy.html", file: "privacy-policy.html", changefreq: "yearly", priority: "0.3" },
+  ];
+
+  function isoDateByFile(fileName) {
+    try {
+      const st = fs.statSync(path.join(__dirname, fileName));
+      return new Date(st.mtimeMs).toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  }
+
+  const rows = pages
+    .map((p) => {
+      const loc = `${base}${p.url}`;
+      const lastmod = isoDateByFile(p.file);
+      return `<url><loc>${loc}</loc><lastmod>${lastmod}</lastmod><changefreq>${p.changefreq}</changefreq><priority>${p.priority}</priority></url>`;
+    })
+    .join("");
+  res.type("application/xml; charset=utf-8");
+  res.send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${rows}</urlset>`);
+});
 
 app.use(express.static(__dirname));
 

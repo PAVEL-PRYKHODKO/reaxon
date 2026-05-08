@@ -56,9 +56,9 @@ if (window.self !== window.top) {
 
 if (isAdmin) {
   const end = document.querySelector(".crm-header .header-utility-links--end");
-  if (end && !end.querySelector('a[href="admin-panel.html"]')) {
+  if (end && !end.querySelector('a[href="admin.html"]')) {
     const a = document.createElement("a");
-    a.href = "admin-panel.html";
+    a.href = "admin.html";
     a.textContent = "Админ-панель";
     a.setAttribute("target", "_top");
     const sep = document.createElement("span");
@@ -69,9 +69,9 @@ if (isAdmin) {
     end.insertBefore(a, sep);
   }
   const embedNav = document.getElementById("crm-embed-toolbar-nav");
-  if (document.documentElement.classList.contains("crm-embed-admin") && embedNav && !embedNav.querySelector('a[href="admin-panel.html"]')) {
+  if (document.documentElement.classList.contains("crm-embed-admin") && embedNav && !embedNav.querySelector('a[href="admin.html"]')) {
     const a = document.createElement("a");
-    a.href = "admin-panel.html#console";
+    a.href = "admin.html#console";
     a.textContent = "Консоль панели";
     a.setAttribute("target", "_top");
     embedNav.appendChild(a);

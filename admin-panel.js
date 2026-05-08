@@ -10,7 +10,7 @@ if (!token) {
           Сессия не найдена. Войдите под администратором.
         </p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a href="auth.html?next=admin-panel.html" style="padding:9px 13px;border-radius:9px;background:#1d4ed8;color:#fff;text-decoration:none">Войти</a>
+          <a href="auth.html?next=admin.html" style="padding:9px 13px;border-radius:9px;background:#1d4ed8;color:#fff;text-decoration:none">Войти</a>
           <a href="index.html" style="padding:9px 13px;border-radius:9px;border:1px solid #475569;color:#e2e8f0;text-decoration:none">На главную</a>
         </div>
       </section>
@@ -2280,7 +2280,7 @@ function renderAdminAccessDenied() {
           Войдите под администратором.
         </p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a href="auth.html?next=admin-panel.html" style="padding:9px 13px;border-radius:9px;background:#1d4ed8;color:#fff;text-decoration:none">Войти как админ</a>
+          <a href="auth.html?next=admin.html" style="padding:9px 13px;border-radius:9px;background:#1d4ed8;color:#fff;text-decoration:none">Войти как админ</a>
           <a href="index.html" style="padding:9px 13px;border-radius:9px;border:1px solid #475569;color:#e2e8f0;text-decoration:none">На главную</a>
         </div>
       </section>

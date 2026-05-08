@@ -103,6 +103,25 @@
   cursor: not-allowed;
 }
 
+.checkout-input.checkout-required-missing,
+.checkout-select.checkout-required-missing,
+.checkout-textarea.checkout-required-missing {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
+}
+
+input[type="checkbox"].checkout-required-missing {
+  outline: 2px solid rgba(220, 38, 38, 0.45);
+  outline-offset: 2px;
+}
+
+.checkout-field-error {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #b45309;
+}
+
 .checkout-block-muted {
   opacity: 0.55;
   pointer-events: none;
@@ -186,6 +205,10 @@
 
 .checkout-checkbox-row input {
   margin-top: 0.2rem;
+}
+
+.checkout-checkbox-row--offer {
+  margin-top: 0.4rem;
 }
 
 .checkout-offer-note {

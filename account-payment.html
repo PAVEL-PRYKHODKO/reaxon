@@ -23,6 +23,7 @@
               <a href="index.html" data-i18n="navHome">Главная</a>
               <a href="products.html" data-i18n="navCatalog">Каталог</a>
               <a href="price.html" data-i18n="navPrice">Прайс</a>
+              <a href="intelligent-selection.html" data-i18n="navIntelligentSelection">Помощник ИИ</a>
               <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
               <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
               <a href="news.html" data-i18n="navNews">Новости</a>
@@ -64,8 +65,7 @@
                   <circle cx="12" cy="7" r="4" />
                 </svg>
               </a>
-              <a href="index.html" class="auth-btn topbar-account-btn" data-ru="На главную" data-uk="На головну">На главную</a>
-              <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+              <a class="admin-btn" id="home-admin-btn" href="admin.html" hidden>Админ-панель</a>
             </div>
           </div>
         </div>
@@ -98,25 +98,110 @@
             </h1>
             <p
               class="apay-lead"
-              data-ru="Онлайн — через LiqPay (карта, Apple Pay / Google Pay — в зависимости от банка). Бесплатно для IBAN: перевод по реквизитам ниже."
-              data-uk="Онлайн — через LiqPay (карта Apple Pay / Google Pay — залежно від банку). Безкоштовно для IBAN: переказ за реквізитами нижче."
+              data-ru="Онлайн-оплата картой через защищённый платёжный шлюз (Fondy / WayForPay / LiqPay). Бесплатно для IBAN: перевод по реквизитам ниже."
+              data-uk="Онлайн-оплата карткою через захищений платіжний шлюз (Fondy / WayForPay / LiqPay). Безкоштовно для IBAN: переказ за реквізитами нижче."
             >
-              Онлайн — через LiqPay (карта, Apple Pay / Google Pay — в зависимости от банка). Бесплатно для IBAN: перевод по реквизитам ниже.
+              Онлайн-оплата картой через защищённый платёжный шлюз (Fondy / WayForPay / LiqPay). Бесплатно для IBAN: перевод по реквизитам ниже.
             </p>
             <p id="apay-status" class="form-status" role="status" aria-live="polite"></p>
           </header>
 
-          <section class="apay-card" aria-labelledby="apay-offer-title">
+          <section class="apay-card apay-order" aria-labelledby="apay-order-title">
             <h2
-              id="apay-offer-title"
+              id="apay-order-title"
               class="apay-card-title"
-              data-ru="Публичная оферта"
-              data-uk="Публічна оферта"
+              data-ru="Ваш заказ"
+              data-uk="Ваше замовлення"
             >
-              Публичная оферта
+              Ваш заказ
             </h2>
-            <div id="apay-offer-body" class="apay-richtext apay-offer">
-              <p data-ru="Загрузка…" data-uk="Завантаження…">Загрузка…</p>
+            <div id="apay-order-context" class="apay-order-badges" aria-live="polite"></div>
+            <div id="apay-order-items" class="apay-order-items" role="list"></div>
+            <div class="apay-order-total-row">
+              <span data-ru="Итого к оплате" data-uk="Разом до сплати">Итого к оплате</span>
+              <strong id="apay-order-total">0 грн</strong>
+            </div>
+          </section>
+
+          <section class="apay-card apay-delivery" aria-labelledby="apay-delivery-title">
+            <h2
+              id="apay-delivery-title"
+              class="apay-card-title"
+              data-ru="Доставка"
+              data-uk="Доставка"
+            >
+              Доставка
+            </h2>
+            <div class="apay-form">
+              <label class="apay-field">
+                <span data-ru="Способ доставки" data-uk="Спосіб доставки">Способ доставки</span>
+                <select id="apay-delivery-method" name="deliveryMethod">
+                  <option value="nova_poshta" data-ru="Новая Почта" data-uk="Нова Пошта">Новая Почта</option>
+                  <option value="courier" data-ru="Курьер Новой Почты по адресу" data-uk="Кур'єр Нової Пошти за адресою">Курьер Новой Почты по адресу</option>
+                  <option value="pickup" data-ru="Самовывоз" data-uk="Самовивіз">Самовывоз</option>
+                </select>
+              </label>
+              <label class="apay-field" id="apay-delivery-city-wrap">
+                <span data-ru="Город" data-uk="Місто">Город</span>
+                <select id="apay-delivery-city-select">
+                  <option value="" data-ru="Выберите город" data-uk="Оберіть місто">Выберите город</option>
+                  <option value="__other__" data-ru="Другой город (ввести вручную)" data-uk="Інше місто (ввести вручну)">Другой город (ввести вручную)</option>
+                </select>
+                <input
+                  id="apay-delivery-city"
+                  type="text"
+                  maxlength="120"
+                  hidden
+                  data-ru-placeholder="Например, Запорожье"
+                  data-uk-placeholder="Наприклад, Запоріжжя"
+                  placeholder="Например, Запорожье"
+                />
+              </label>
+              <label class="apay-field" id="apay-delivery-warehouse-wrap">
+                <span data-ru="Отделение / почтомат" data-uk="Відділення / поштомат">Отделение / почтомат</span>
+                <input id="apay-delivery-warehouse" type="text" maxlength="180" data-ru-placeholder="№ отделения, адрес" data-uk-placeholder="№ відділення, адреса" placeholder="№ отделения, адрес" />
+              </label>
+              <p
+                id="apay-np-fallback-hint"
+                class="apay-muted apay-delivery-hint"
+                hidden
+                data-ru="Поиск Новой Почты сейчас недоступен. Введите город и отделение вручную."
+                data-uk="Пошук Нової Пошти зараз недоступний. Вкажіть місто та відділення вручну."
+              >
+                Поиск Новой Почты сейчас недоступен. Введите город и отделение вручную.
+              </p>
+              <label class="apay-field" id="apay-delivery-address-wrap" hidden>
+                <span data-ru="Номер/комментарий заявки курьера НП" data-uk="Номер/коментар заявки кур'єра НП">Номер/комментарий заявки курьера НП</span>
+                <input id="apay-delivery-address" type="text" maxlength="220" data-ru-placeholder="Например, № заявки НП или комментарий" data-uk-placeholder="Наприклад, № заявки НП або коментар" placeholder="Например, № заявки НП или комментарий" />
+              </label>
+              <p
+                id="apay-courier-np-hint"
+                class="apay-muted apay-delivery-hint"
+                hidden
+                data-ru="Сначала оформите заявку курьера в сервисе Новой Почты, затем укажите номер/комментарий ниже."
+                data-uk="Спочатку оформіть заявку кур'єра в сервісі Нової Пошти, потім вкажіть номер/коментар нижче."
+              >
+                Сначала оформите заявку курьера в сервисе Новой Почты, затем укажите номер/комментарий ниже.
+              </p>
+              <p id="apay-courier-np-link-wrap" class="apay-delivery-hint" hidden>
+                <a
+                  id="apay-courier-np-link"
+                  class="btn btn-ghost apay-order-catalog-btn"
+                  href="https://novaposhta.ua/"
+                  target="_blank"
+                  rel="noopener"
+                  data-ru="Открыть сервис Новой Почты"
+                  data-uk="Відкрити сервіс Нової Пошти"
+                >Открыть сервис Новой Почты</a>
+              </p>
+              <label class="apay-check" id="apay-courier-np-confirm-wrap" hidden>
+                <input type="checkbox" id="apay-courier-np-confirm" />
+                <span data-ru="Подтверждаю, что оформил(а) доставку через сервис Новой Почты" data-uk="Підтверджую, що оформив(ла) доставку через сервіс Нової Пошти">Подтверждаю, что оформил(а) доставку через сервис Новой Почты</span>
+              </label>
+              <label class="apay-field" id="apay-delivery-comment-wrap" hidden>
+                <span data-ru="Комментарий к самовывозу" data-uk="Коментар до самовивозу">Комментарий к самовывозу</span>
+                <input id="apay-delivery-comment" type="text" maxlength="220" data-ru-placeholder="Например, дата и время выдачи" data-uk-placeholder="Наприклад, дата та час видачі" placeholder="Например, дата и время выдачи" />
+              </label>
             </div>
           </section>
 
@@ -144,16 +229,24 @@
           <section class="apay-card apay-liqpay" id="apay-liqpay-block">
             <h2
               class="apay-card-title"
-              data-ru="Оплата картой (LiqPay)"
-              data-uk="Оплата карткою (LiqPay)"
+              data-ru="Оплата картой (онлайн)"
+              data-uk="Оплата карткою (онлайн)"
             >
-              Оплата картой (LiqPay)
+              Оплата картой (онлайн)
             </h2>
             <p class="apay-muted" id="apay-liqpay-hint"></p>
             <form id="apay-liqpay-form" class="apay-form" autocomplete="off">
               <label class="apay-field">
+                <span data-ru="Платёжный провайдер" data-uk="Платіжний провайдер">Платёжный провайдер</span>
+                <select name="provider" id="apay-provider">
+                  <option value="fondy">Fondy</option>
+                  <option value="wayforpay">WayForPay</option>
+                  <option value="liqpay">LiqPay</option>
+                </select>
+              </label>
+              <label class="apay-field">
                 <span data-ru="Сумма, UAH" data-uk="Сума, UAH">Сумма, UAH</span>
-                <input name="amount" type="number" min="1" step="0.01" required placeholder="1000" />
+                <input name="amount" type="number" min="1" step="0.01" required placeholder="1000" readonly />
               </label>
               <label class="apay-field">
                 <span data-ru="Назначение (по согласованию)" data-uk="Призначення (на розсуд)">Назначение (по согласованию)</span>
@@ -168,21 +261,36 @@
               </label>
               <label class="apay-check">
                 <input type="checkbox" name="accept" value="1" id="apay-accept" required />
-                <span
-                  data-ru="Ознакомлен(а) с публичной офертой и согласен(а) с условиями оплаты"
-                  data-uk="Ознайомлений(а) з публічною офертою і погоджуюсь з умовами оплати"
-                  >Ознакомлен(а) с публичной офертой и согласен(а) с условиями оплаты</span>
+                <span>
+                  <span data-ru="Ознакомлен(а) с" data-uk="Ознайомлений(а) з">Ознакомлен(а) с</span>
+                  <a href="offer.html" target="_blank" rel="noopener" data-ru="публичной офертой" data-uk="публічною офертою">публичной офертой</a>
+                  <span data-ru="и согласен(а) с условиями оплаты" data-uk="і погоджуюсь з умовами оплати">и согласен(а) с условиями оплаты</span>
+                </span>
               </label>
               <button
                 class="btn btn-primary apay-btn"
                 type="submit"
                 id="apay-liqpay-submit"
-                data-ru="Перейти к LiqPay"
-                data-uk="Перейти до LiqPay"
+                data-ru="Перейти к оплате"
+                data-uk="Перейти до оплати"
               >
-                Перейти к LiqPay
+                Перейти к оплате
               </button>
             </form>
+          </section>
+
+          <section class="apay-card" aria-labelledby="apay-offer-title">
+            <h2
+              id="apay-offer-title"
+              class="apay-card-title"
+              data-ru="Публичная оферта"
+              data-uk="Публічна оферта"
+            >
+              Публичная оферта
+            </h2>
+            <div id="apay-offer-body" class="apay-richtext apay-offer">
+              <p data-ru="Загрузка…" data-uk="Завантаження…">Загрузка…</p>
+            </div>
           </section>
         </div>
       </main>
@@ -220,10 +328,7 @@
     </div>
   </div>
 
-  <form id="apay-hidden-liqpay" class="apay-hidden" method="POST" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8" aria-hidden="true">
-    <input type="hidden" name="data" value="" />
-    <input type="hidden" name="signature" value="" />
-  </form>
+  <form id="apay-hidden-gateway" class="apay-hidden" method="POST" action="" accept-charset="utf-8" aria-hidden="true"></form>
 
   <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
     <div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">

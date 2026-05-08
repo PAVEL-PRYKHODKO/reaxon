@@ -32,7 +32,7 @@
 
     if (adminBtn) {
       adminBtn.hidden = !isAdmin;
-      if (isAdmin) adminBtn.setAttribute("href", "admin-panel.html");
+      if (isAdmin) adminBtn.setAttribute("href", "admin.html");
     }
   }
 
@@ -72,12 +72,12 @@
       if (role === "admin") {
         e.preventDefault();
         e.stopPropagation();
-        window.location.href = "admin-panel.html";
+        window.location.href = "admin.html";
         return;
       }
       e.preventDefault();
       alert("Доступ в админ-панель только для администратора. Выполните вход под админ-аккаунтом.");
-      window.location.href = "auth.html?next=admin-panel.html";
+      window.location.href = "auth.html?next=admin.html";
     });
 
     window.addEventListener("dp-auth-changed", () => {

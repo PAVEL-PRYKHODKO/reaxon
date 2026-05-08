@@ -16,7 +16,16 @@ const AUTH_ST = {
     errPassShort: "Пароль — минимум 10 символов.",
     errPassMatch: "Пароль и подтверждение не совпадают.",
     errNeedCompany: "Для юридического лица укажите название предприятия.",
+    errNeedEdrpou: "Для юридического лица укажите ЄДРПОУ/РНОКПП (8–10 цифр).",
+    errNeedIban: "Для юридического лица укажите корректный IBAN (UA...).",
+    errNeedInvoiceEmail: "Для юридического лица укажите email для счетов.",
     errNeedPhone: "Укажите номер телефона.",
+    errNeedTerms: "Для регистрации нужно принять Политику конфиденциальности и правила использования.",
+    regFieldsHint: "Поля со звездочкой обязательны, остальные данные можно не указывать.",
+    policyBriefTitle: "Кратко о данных и согласии",
+    policyBrief1: "Обязательные данные нужны для регистрации, заказа и безопасности.",
+    policyBrief2: "Необязательная аналитика включается только после отдельного согласия.",
+    policyBrief3: "Согласие можно изменить в любой момент в настройках cookie.",
     labelCompanyReq: "Название предприятия *",
     regOk: "Регистрация выполнена…",
     regErr: "Ошибка регистрации",
@@ -53,7 +62,16 @@ const AUTH_ST = {
     errPassShort: "Пароль — щонайменше 10 символів.",
     errPassMatch: "Пароль і підтвердження не збігаються.",
     errNeedCompany: "Для юридичної особи вкажіть назву підприємства.",
+    errNeedEdrpou: "Для юридичної особи вкажіть ЄДРПОУ/РНОКПП (8–10 цифр).",
+    errNeedIban: "Для юридичної особи вкажіть коректний IBAN (UA...).",
+    errNeedInvoiceEmail: "Для юридичної особи вкажіть email для рахунків.",
     errNeedPhone: "Вкажіть номер телефону.",
+    errNeedTerms: "Для реєстрації потрібно прийняти Політику конфіденційності та правила використання.",
+    regFieldsHint: "Поля зі зірочкою обов'язкові, інші дані можна не вказувати.",
+    policyBriefTitle: "Коротко про дані та згоду",
+    policyBrief1: "Обов'язкові дані потрібні для реєстрації, замовлення та безпеки.",
+    policyBrief2: "Необов'язкова аналітика вмикається лише після окремої згоди.",
+    policyBrief3: "Згоду можна змінити в будь-який момент у налаштуваннях cookie.",
     labelCompanyReq: "Назва підприємства *",
     regOk: "Реєстрацію завершено…",
     regErr: "Помилка реєстрації",
@@ -96,42 +114,6 @@ function apiPath(p) {
 function setSession(data) {
   localStorage.setItem("authToken", data.token);
   localStorage.setItem("authUser", JSON.stringify(data.user));
-}
-
-function canUsePasswordManager() {
-  return typeof window !== "undefined" && "credentials" in navigator;
-}
-
-async function prefillSavedLogin(loginForm) {
-  if (!loginForm || !canUsePasswordManager()) return;
-  try {
-    const cred = await navigator.credentials.get({ password: true, mediation: "optional" });
-    if (!cred) return;
-    const emailInput = loginForm.querySelector('input[name="email"]');
-    const passInput = loginForm.querySelector('input[name="password"]');
-    if (emailInput && !String(emailInput.value || "").trim()) emailInput.value = String(cred.id || "");
-    if (passInput && !String(passInput.value || "").trim()) passInput.value = String(cred.password || "");
-  } catch {
-    /* ignore */
-  }
-}
-
-async function rememberLoginCredentials(identifier, password) {
-  if (!canUsePasswordManager()) return;
-  if (!window.PasswordCredential) return;
-  const id = String(identifier || "").trim();
-  const pass = String(password || "");
-  if (!id || !pass) return;
-  try {
-    const cred = new window.PasswordCredential({
-      id,
-      password: pass,
-      name: id,
-    });
-    await navigator.credentials.store(cred);
-  } catch {
-    /* ignore */
-  }
 }
 
 function authRedirectUrl() {
@@ -215,10 +197,35 @@ if (skipAuthForms) {
   const regCompany = document.getElementById("reg-company");
   const regCompanyLabel = document.getElementById("reg-company-label");
   const regLegalBlock = document.getElementById("reg-legal-block");
+  const regMarketing = document.getElementById("reg-marketing");
+  const regMarketingHint = document.getElementById("reg-marketing-consent-hint");
+  const regCookieSettingsBtn = document.getElementById("reg-cookie-settings");
+  const policyModal = document.getElementById("auth-policy-modal");
+  const policyOpenBtn = document.getElementById("auth-open-policy-brief");
+  const policyCloseBtn = document.getElementById("auth-policy-modal-close");
+  const policyBriefList = document.getElementById("auth-policy-brief-list");
 
   let authUiMode = "login";
   const resetToken = resetTokenFromUrl();
   let resetModeOn = Boolean(resetToken);
+
+  function hasMarketingConsent() {
+    return Boolean(window.dpHasConsent && window.dpHasConsent("marketing"));
+  }
+
+  function syncMarketingConsentUi() {
+    if (!regMarketing) return;
+    const allowed = hasMarketingConsent();
+    if (!allowed && regMarketing.checked) regMarketing.checked = false;
+    regMarketing.disabled = !allowed;
+    if (regMarketingHint) regMarketingHint.hidden = allowed;
+    const uk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+    regMarketing.title = allowed
+      ? ""
+      : uk
+        ? "Щоб увімкнути маркетингові розсилки, дозвольте маркетингові cookie у налаштуваннях."
+        : "Чтобы включить маркетинговые рассылки, разрешите маркетинговые cookie в настройках.";
+  }
 
   function updateLegalBlockVisibility() {
     if (!regLegal || !regLegalBlock) return;
@@ -292,11 +299,19 @@ if (skipAuthForms) {
     if (resetPassConfirmInput) resetPassConfirmInput.setAttribute("placeholder", at("resetPassRepeat"));
     const resetSubmit = resetForm?.querySelector('button[type="submit"]');
     if (resetSubmit) resetSubmit.textContent = at("resetBtn");
+    if (policyOpenBtn) policyOpenBtn.textContent = at("policyBriefTitle");
+    if (policyBriefList) {
+      policyBriefList.innerHTML = `
+        <li>${at("policyBrief1")}</li>
+        <li>${at("policyBrief2")}</li>
+        <li>${at("policyBrief3")}</li>
+      `;
+    }
     setStatus("", null);
     if (!isLogin) {
       updateLegalBlockVisibility();
     } else {
-      void prefillSavedLogin(loginForm);
+      /* no-op */
     }
   }
 
@@ -339,10 +354,41 @@ if (skipAuthForms) {
 
   window.addEventListener("dp-lang-change", () => {
     setAuthMode(authUiMode);
+    syncMarketingConsentUi();
+  });
+  window.addEventListener("dp-consent-changed", syncMarketingConsentUi);
+  regCookieSettingsBtn?.addEventListener("click", () => {
+    if (typeof window.dpOpenConsentSettings === "function") window.dpOpenConsentSettings();
   });
 
   authOpenRegister?.addEventListener("click", goRegister);
   authBackLogin?.addEventListener("click", goLogin);
+  policyOpenBtn?.addEventListener("click", async () => {
+    if (!policyModal) return;
+    policyModal.hidden = false;
+    policyModal.setAttribute("aria-hidden", "false");
+    try {
+      const r = await fetch("privacy-policy-config.json", { cache: "no-store" });
+      const d = await r.json().catch(() => null);
+      const loc = authLocale();
+      const rows = loc === "uk" ? d?.shortNoticeUk : d?.shortNoticeRu;
+      if (Array.isArray(rows) && rows.length && policyBriefList) {
+        policyBriefList.innerHTML = rows.map((x) => `<li>${String(x)}</li>`).join("");
+      }
+    } catch {
+      /* keep defaults */
+    }
+  });
+  policyCloseBtn?.addEventListener("click", () => {
+    if (!policyModal) return;
+    policyModal.hidden = true;
+    policyModal.setAttribute("aria-hidden", "true");
+  });
+  policyModal?.addEventListener("click", (e) => {
+    if (e.target !== policyModal) return;
+    policyModal.hidden = true;
+    policyModal.setAttribute("aria-hidden", "true");
+  });
   authForgotPassword?.addEventListener("click", async () => {
     if (resetModeOn) return;
     const willOpen = Boolean(forgotForm?.hidden);
@@ -369,8 +415,12 @@ if (skipAuthForms) {
       return;
     }
     try {
-      await apiPost(apiPath("/api/auth/forgot-password"), { email });
-      setStatus(at("forgotSent"), "ok");
+      const data = await apiPost(apiPath("/api/auth/forgot-password"), { email });
+      const debugResetUrl = String(data?.debugResetUrl || "").trim();
+      const msg = debugResetUrl
+        ? `${at("forgotSent")} ${debugResetUrl}`
+        : at("forgotSent");
+      setStatus(msg, "ok");
       forgotForm.hidden = true;
       forgotForm.setAttribute("aria-hidden", "true");
     } catch (err) {
@@ -403,6 +453,7 @@ if (skipAuthForms) {
     setAuthMode("login");
   }
   updateLegalBlockVisibility();
+  syncMarketingConsentUi();
 
   loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -413,7 +464,6 @@ if (skipAuthForms) {
     try {
       const data = await apiPost(apiPath("/api/auth/login"), { email: identifier, password });
       setSession(data);
-      await rememberLoginCredentials(identifier, password);
       setStatus(at("loginOk"), "ok");
       const target = authRedirectUrl();
       setTimeout(() => {
@@ -443,7 +493,6 @@ if (skipAuthForms) {
     try {
       const data = await apiPost(apiPath("/api/auth/reset-password"), { token: resetToken, newPassword });
       setSession(data);
-      await rememberLoginCredentials(String(data?.user?.email || ""), newPassword);
       setStatus(at("resetOk"), "ok");
       const target = authRedirectUrl();
       setTimeout(() => {
@@ -466,7 +515,12 @@ if (skipAuthForms) {
     const phone = String(fd.get("phone") || "").trim();
     const deliveryAddress = String(fd.get("deliveryAddress") || "").trim();
     const isLegal = regLegal?.checked || false;
+    const marketingOptIn = Boolean(fd.get("marketingOptIn")) && hasMarketingConsent();
+    const termsAccepted = Boolean(fd.get("termsAccepted"));
     const companyName = String(fd.get("companyName") || "").trim();
+    const edrpou = String(fd.get("edrpou") || "").replace(/\s+/g, "");
+    const billingIban = String(fd.get("billingIban") || "").replace(/\s+/g, "").toUpperCase();
+    const invoiceEmail = String(fd.get("invoiceEmail") || "").trim().toLowerCase();
     const website = String(fd.get("website") || "").trim();
     const legalAddress = String(fd.get("legalAddress") || "").trim();
 
@@ -490,6 +544,22 @@ if (skipAuthForms) {
       setStatus(at("errNeedCompany"), "err");
       return;
     }
+    if (isLegal && !/^\d{8,10}$/.test(edrpou)) {
+      setStatus(at("errNeedEdrpou"), "err");
+      return;
+    }
+    if (isLegal && !/^UA\d{2}[A-Z0-9]{5,30}$/.test(billingIban)) {
+      setStatus(at("errNeedIban"), "err");
+      return;
+    }
+    if (isLegal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invoiceEmail)) {
+      setStatus(at("errNeedInvoiceEmail"), "err");
+      return;
+    }
+    if (!termsAccepted) {
+      setStatus(at("errNeedTerms"), "err");
+      return;
+    }
 
     const payload = {
       email: email.toLowerCase(),
@@ -500,17 +570,21 @@ if (skipAuthForms) {
       phone,
       deliveryAddress: deliveryAddress || undefined,
       isLegalEntity: isLegal,
+      marketingOptIn,
+      termsAccepted: true,
     };
     if (isLegal) {
       payload.website = website || undefined;
       payload.companyName = companyName || undefined;
+      payload.edrpou = edrpou || undefined;
+      payload.billingIban = billingIban || undefined;
+      payload.invoiceEmail = invoiceEmail || undefined;
       payload.legalAddress = legalAddress || undefined;
     }
 
     try {
       const data = await apiPost(apiPath("/api/auth/register"), payload);
       setSession(data);
-      await rememberLoginCredentials(email.toLowerCase(), password);
       setStatus(at("regOk"), "ok");
       const target = authRedirectUrl();
       setTimeout(() => {

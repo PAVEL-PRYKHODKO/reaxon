@@ -23,6 +23,7 @@
           <a href="index.html" data-i18n="navHome">Главная</a>
           <a href="products.html" data-i18n="navCatalog">Каталог</a>
           <a href="price.html" data-i18n="navPrice">Прайс</a>
+          <a href="intelligent-selection.html" data-i18n="navIntelligentSelection">Помощник ИИ</a>
           <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
           <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
           <a href="news.html" data-i18n="navNews">Новости</a>
@@ -64,7 +65,7 @@
               <circle cx="12" cy="7" r="4" />
             </svg>
           </a>
-          <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+          <a class="admin-btn" id="home-admin-btn" href="admin.html" hidden>Админ-панель</a>
         </div>
       </div>
     </div>
@@ -89,6 +90,21 @@
               <button type="button" class="checkout-tab" data-mode="reg" id="co-tab-reg" role="tab" aria-selected="false" data-i18n="checkoutTabRegistered">
                 Я зарегистрированный покупатель
               </button>
+            </div>
+            <div class="checkout-hint" id="co-reg-login-hint" hidden>
+              <p id="co-reg-login-text">Для оформления как зарегистрированный покупатель выполните вход в аккаунт.</p>
+              <form id="co-reg-login-form" class="checkout-reg-login-rows" autocomplete="on">
+                <div class="checkout-row checkout-row--split">
+                  <label class="checkout-label" for="co-reg-email">E-mail</label>
+                  <input class="checkout-input" id="co-reg-email" name="email" type="email" autocomplete="email" required />
+                </div>
+                <div class="checkout-row checkout-row--split">
+                  <label class="checkout-label" for="co-reg-password">Пароль</label>
+                  <input class="checkout-input" id="co-reg-password" name="password" type="password" autocomplete="current-password" required />
+                </div>
+                <p class="checkout-hint" id="co-reg-login-status" role="status" aria-live="polite"></p>
+                <button type="submit" class="checkout-submit" id="co-reg-login-submit">Войти</button>
+              </form>
             </div>
 
             <form id="checkout-form" novalidate>
@@ -186,10 +202,13 @@
                   <input type="checkbox" id="co-newsletter" name="newsletter" value="1" />
                   <label for="co-newsletter" data-i18n="checkoutNewsletter">Новости и акции</label>
                 </div>
-                <p class="checkout-offer-note">
-                  <span data-i18n="checkoutOfferNoteBefore">Оформляя заказ, вы соглашаетесь с</span>
-                  <a href="offer.html" target="_blank" rel="noopener" data-i18n="checkoutOfferLink">Договором оферты</a><span data-i18n="checkoutOfferNoteAfter">.</span>
-                </p>
+                <div class="checkout-checkbox-row checkout-checkbox-row--offer">
+                  <input type="checkbox" id="co-accept-offer" name="acceptOffer" value="1" />
+                  <label for="co-accept-offer">
+                    <span data-i18n="checkoutOfferNoteBefore">Оформляя заказ, вы соглашаетесь с</span>
+                    <a href="offer.html" target="_blank" rel="noopener" data-i18n="checkoutOfferLink">Договором оферты</a><span data-i18n="checkoutOfferNoteAfter">.</span>
+                  </label>
+                </div>
                 <p class="checkout-hint" id="checkout-form-status" role="status" aria-live="polite"></p>
                 <button type="submit" class="checkout-submit" id="co-submit" data-i18n="checkoutSubmit">Оформить заказ</button>
               </div>

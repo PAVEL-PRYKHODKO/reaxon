@@ -30,7 +30,8 @@
         "siteInbox": [],
         "edrpou": "",
         "invoiceEmail": "",
-        "billingIban": ""
+        "billingIban": "",
+        "marketingOptIn": false
       },
       "profileUpdatedAt": "2026-04-25T14:47:27.397Z"
     },
@@ -64,7 +65,8 @@
         "siteInbox": [],
         "edrpou": "",
         "invoiceEmail": "",
-        "billingIban": ""
+        "billingIban": "",
+        "marketingOptIn": false
       }
     },
     {
@@ -97,7 +99,8 @@
         "siteInbox": [],
         "edrpou": "",
         "invoiceEmail": "",
-        "billingIban": ""
+        "billingIban": "",
+        "marketingOptIn": false
       }
     },
     {
@@ -130,7 +133,8 @@
         "siteInbox": [],
         "edrpou": "",
         "invoiceEmail": "",
-        "billingIban": ""
+        "billingIban": "",
+        "marketingOptIn": false
       }
     },
     {
@@ -163,7 +167,8 @@
         "siteInbox": [],
         "edrpou": "",
         "invoiceEmail": "",
-        "billingIban": ""
+        "billingIban": "",
+        "marketingOptIn": false
       }
     },
     {
@@ -196,7 +201,8 @@
         "siteInbox": [],
         "edrpou": "",
         "invoiceEmail": "",
-        "billingIban": ""
+        "billingIban": "",
+        "marketingOptIn": false
       },
       "profileUpdatedAt": null
     },
@@ -230,9 +236,46 @@
         "siteInbox": [],
         "edrpou": "",
         "invoiceEmail": "",
-        "billingIban": ""
+        "billingIban": "",
+        "marketingOptIn": false
       },
       "profileUpdatedAt": "2026-04-27T20:54:25.670Z"
+    },
+    {
+      "id": 9,
+      "name": "Павел",
+      "email": "webarn1@gmail.com",
+      "passwordHash": "$2a$10$WTK.8CyYU53UM.LrTDBOPe7AGfqgjMJzyvFT/cLN2neQxxxGeTUa2",
+      "role": "admin",
+      "createdAt": "2026-05-08T10:58:00.000Z",
+      "profile": {
+        "age": null,
+        "gender": "",
+        "countryRegion": "",
+        "lastName": "",
+        "city": "",
+        "website": "",
+        "isLegalEntity": false,
+        "companyName": "",
+        "edrpou": "",
+        "invoiceEmail": "",
+        "billingIban": "",
+        "phone": "",
+        "legalAddress": "",
+        "deliveryAddress": "",
+        "accountManagerId": null,
+        "avatarUrl": null,
+        "marketingOptIn": false,
+        "privacy": {
+          "hideEmail": false,
+          "hidePhone": false,
+          "hideLegalAddress": false,
+          "hideDeliveryAddress": false
+        },
+        "siteInbox": []
+      },
+      "profileUpdatedAt": "2026-05-08T11:08:03.400Z",
+      "updatedAt": "2026-05-08T11:07:24.213Z"
     }
   ],
   "leads": [
@@ -499,7 +542,7 @@
   ],
   "meta": {
     "nextLeadId": 6,
-    "nextUserId": 9,
+    "nextUserId": 10,
     "assignCursor": 1,
     "rolePermissions": {
       "admin": {

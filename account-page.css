@@ -57,6 +57,22 @@
   box-sizing: border-box;
 }
 
+/* Чекбокс "Юридическое лицо": не растягивать на всю ширину и выровнять с текстом */
+.account-page .account-legal-type-field {
+  display: grid;
+  gap: 6px;
+}
+
+.account-page .account-legal-type-field > span {
+  font-weight: 600;
+  color: var(--muted, rgba(15, 23, 42, 0.7));
+}
+
+.account-page #account-legal-only-fields:not([hidden]) {
+  display: grid;
+  gap: 10px;
+}
+
 .account-page .account-privacy-list label {
   min-width: 0;
 }
@@ -71,9 +87,10 @@
 }
 
 .account-page .account-actions .btn-primary {
-  width: 100%;
+  width: min(50%, 360px);
   justify-content: center;
   box-sizing: border-box;
+  margin-inline: auto;
 }
 
 .account-page .account-avatar-wrap {
@@ -96,7 +113,7 @@
 }
 
 .account-page .account-card--compact {
-  padding: 14px 14px;
+  padding: 10px 12px;
   margin-bottom: 12px;
 }
 
@@ -128,6 +145,44 @@
   margin: 0 0 0.6rem;
   font-size: 0.9rem;
   font-weight: 700;
+}
+
+.account-page .account-password-accordion {
+  overflow: hidden;
+}
+
+.account-page .account-password-accordion-summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.account-page .account-password-accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.account-page .account-password-accordion-summary::after {
+  content: "▾";
+  font-size: 0.82rem;
+  color: var(--muted, rgba(15, 23, 42, 0.62));
+  transition: transform 0.2s ease;
+}
+
+.account-page .account-password-accordion[open] .account-password-accordion-summary::after {
+  transform: rotate(180deg);
+}
+
+.account-page .account-password-accordion-form {
+  margin-top: 6px;
+}
+
+.account-page .account-password-accordion .account-card-subtitle {
+  margin: 0;
+  font-size: 0.84rem;
 }
 
 .account-page .account-purchase-history__status {
@@ -208,6 +263,15 @@
 .account-page .account-drawer-logged-bottom {
   margin-top: 0;
   padding-top: 4px;
+  display: flex;
+  justify-content: center;
+}
+
+.account-page #account-drawer-logout-btn {
+  width: min(50%, 360px);
+  justify-content: center;
+  margin-inline: auto;
+  margin-top: 8px;
 }
 
 @media (max-width: 980px) {

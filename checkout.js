@@ -21,13 +21,34 @@
   };
 
   let citySuggestOpen = false;
+  const CHECKOUT_DRAFT_COOKIE = "dp_checkout_draft_v1";
 
   function $(id) {
     return document.getElementById(id);
   }
 
+  function setCookie(name, value, days) {
+    const maxAge = Math.max(1, Number(days || 30)) * 24 * 60 * 60;
+    document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; samesite=lax`;
+  }
+
+  function getCookie(name) {
+    const key = `${name}=`;
+    const parts = String(document.cookie || "").split(";").map((x) => x.trim());
+    const row = parts.find((p) => p.startsWith(key));
+    if (!row) return "";
+    return decodeURIComponent(row.slice(key.length));
+  }
+
   function isNovaDelivery() {
     return ($("co-delivery") && $("co-delivery").value) === "nova_poshta";
+  }
+
+  function syncNewsletterConsentUi() {
+    const cb = $("co-newsletter");
+    if (!cb) return;
+    cb.disabled = false;
+    cb.title = "";
   }
 
   function hasCityComplete() {
@@ -466,6 +487,177 @@
     }
   }
 
+  function isCustomerLoggedIn() {
+    try {
+      if (typeof window.dpAuthCustomerLoggedIn === "function") return Boolean(window.dpAuthCustomerLoggedIn());
+      return Boolean(localStorage.getItem("authToken"));
+    } catch {
+      return false;
+    }
+  }
+
+  function syncCheckoutContactRules() {
+    const phone = $("co-phone");
+    const email = $("co-email");
+    const loggedIn = isCustomerLoggedIn();
+    if (loggedIn) prefillFromAuth();
+    if (phone) {
+      phone.required = true;
+      phone.readOnly = loggedIn;
+    }
+    if (email) {
+      email.required = !loggedIn;
+      email.readOnly = loggedIn;
+    }
+  }
+
+  function clearCheckoutRequiredHighlights() {
+    document.querySelectorAll(".checkout-required-missing").forEach((el) => el.classList.remove("checkout-required-missing"));
+  }
+
+  function clearCheckoutFieldErrors() {
+    document.querySelectorAll(".checkout-field-error").forEach((el) => el.remove());
+  }
+
+  function setCheckoutFieldError(id, message) {
+    const el = $(id);
+    if (!el || !message) return;
+    const markerClass = `checkout-field-error-for-${id}`;
+    const parent = el.parentElement;
+    if (!parent) return;
+    if (parent.querySelector(`.${markerClass}`)) return;
+    const err = document.createElement("p");
+    err.className = `checkout-field-error ${markerClass}`;
+    err.textContent = message;
+    parent.appendChild(err);
+  }
+
+  function markCheckoutMissingFields(ids) {
+    clearCheckoutRequiredHighlights();
+    ids.forEach((id) => {
+      const el = $(id);
+      if (el) el.classList.add("checkout-required-missing");
+    });
+  }
+
+  function syncRegisteredLoginPrompt() {
+    const hint = $("co-reg-login-hint");
+    const txt = $("co-reg-login-text");
+    const regLoginForm = $("co-reg-login-form");
+    const submit = $("co-submit");
+    const checkoutForm = $("checkout-form");
+    const rows = document.querySelector("#checkout-form .checkout-form-rows");
+    const autoFillHint = $("co-autofill-hint");
+    const status = $("checkout-form-status");
+    const regStatus = $("co-reg-login-status");
+    const regMode = state.tab === "reg";
+    const loggedIn = isCustomerLoggedIn();
+    const uk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+    if (txt) {
+      txt.textContent = uk
+        ? "Для оформлення як зареєстрований покупець увійдіть в акаунт."
+        : "Для оформления как зарегистрированный покупатель выполните вход в аккаунт.";
+    }
+    if (regLoginForm) regLoginForm.hidden = false;
+    if (hint) hint.hidden = !regMode;
+    if (checkoutForm) {
+      checkoutForm.hidden = regMode;
+      checkoutForm.style.display = regMode ? "none" : "";
+    }
+    if (rows) rows.hidden = regMode;
+    if (autoFillHint && regMode) autoFillHint.hidden = true;
+    if (status && regMode) status.textContent = "";
+    if (submit) submit.hidden = regMode;
+    if (regMode && loggedIn) {
+      if (regStatus) {
+        regStatus.textContent = uk ? "Ви вже авторизовані. Переходимо до оплати…" : "Вы уже авторизованы. Переходим к оплате…";
+      }
+      setTimeout(() => {
+        if (state.tab === "reg" && isCustomerLoggedIn()) {
+          location.href = "account-payment.html";
+        }
+      }, 250);
+    } else if (regStatus) {
+      regStatus.textContent = "";
+    }
+  }
+
+  function readCheckoutDraftCookie() {
+    try {
+      const raw = getCookie(CHECKOUT_DRAFT_COOKIE);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function collectCheckoutDraft() {
+    return {
+      name: $("co-name")?.value?.trim() || "",
+      phone: $("co-phone")?.value?.trim() || "",
+      email: $("co-email")?.value?.trim() || "",
+      citySelect: $("co-city-select")?.value || "",
+      city: $("co-city")?.value?.trim() || "",
+      cityRef: $("co-city-ref")?.value?.trim() || "",
+      comment: $("co-comment")?.value?.trim() || "",
+      delivery: $("co-delivery")?.value || "nova_poshta",
+      warehouseManual: $("co-warehouse-manual")?.value?.trim() || "",
+      payment: $("co-payment")?.value || "liqpay",
+      ts: Date.now(),
+    };
+  }
+
+  function saveCheckoutDraftCookie() {
+    const d = collectCheckoutDraft();
+    const hasUseful =
+      Boolean(d.name || d.phone || d.email || d.city || d.warehouseManual || d.comment) ||
+      d.citySelect === "__other__";
+    if (!hasUseful) return;
+    setCookie(CHECKOUT_DRAFT_COOKIE, JSON.stringify(d), 30);
+  }
+
+  function applyCheckoutDraft(draft) {
+    if (!draft || typeof draft !== "object") return;
+    const loggedIn = isCustomerLoggedIn();
+    if (!loggedIn) {
+      if ($("co-name") && draft.name) $("co-name").value = String(draft.name);
+      if ($("co-phone") && draft.phone) $("co-phone").value = String(draft.phone);
+      if ($("co-email") && draft.email) $("co-email").value = String(draft.email);
+    }
+    if ($("co-comment") && draft.comment) $("co-comment").value = String(draft.comment);
+    if ($("co-payment") && draft.payment) $("co-payment").value = String(draft.payment);
+    if ($("co-delivery") && draft.delivery) {
+      $("co-delivery").value = String(draft.delivery);
+      $("co-delivery").dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    if ($("co-city-select") && draft.citySelect) {
+      $("co-city-select").value = String(draft.citySelect);
+      $("co-city-select").dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    if ($("co-city") && draft.city) {
+      $("co-city").value = String(draft.city);
+      $("co-city").dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    if ($("co-city-ref") && draft.cityRef) $("co-city-ref").value = String(draft.cityRef);
+    if ($("co-warehouse-manual") && draft.warehouseManual) {
+      $("co-warehouse-manual").value = String(draft.warehouseManual);
+      $("co-warehouse-manual").dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    saveCheckoutDraftCookie();
+  }
+
+  function setupCheckoutAutofillSuggestion() {
+    const hint = $("co-autofill-hint");
+    const draft = readCheckoutDraftCookie();
+    if (!draft) return;
+    const hasValues = Boolean(draft.name || draft.phone || draft.email || draft.city || draft.warehouseManual || draft.comment);
+    if (!hasValues) return;
+    applyCheckoutDraft(draft);
+    if (hint) hint.hidden = true;
+  }
+
   function clearFormForNew() {
     ["co-name", "co-phone", "co-email", "co-city", "co-city-ref", "co-comment", "co-warehouse-manual", "co-city-select", "co-delivery"].forEach(
       (id) => {
@@ -500,6 +692,7 @@
         } else {
           clearFormForNew();
         }
+        syncRegisteredLoginPrompt();
         refreshDisabled();
         renderOrderSummary();
       });
@@ -553,8 +746,62 @@
     renderOrderSummary();
     initTabs();
     prefillFromAuth();
+    syncCheckoutContactRules();
+    setupCheckoutAutofillSuggestion();
+    syncNewsletterConsentUi();
+    syncRegisteredLoginPrompt();
 
-    window.addEventListener("dp-auth-changed", () => renderOrderSummary());
+    const regLoginForm = $("co-reg-login-form");
+    regLoginForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const statusEl = $("co-reg-login-status");
+      const submitBtn = $("co-reg-login-submit");
+      const email = String($("co-reg-email")?.value || "").trim().toLowerCase();
+      const password = String($("co-reg-password")?.value || "");
+      if (!email || !password) {
+        if (statusEl) statusEl.textContent = typeof window.getDpLang === "function" && window.getDpLang() === "uk"
+          ? "Вкажіть email і пароль."
+          : "Укажите email и пароль.";
+        return;
+      }
+      if (statusEl) statusEl.textContent = typeof window.getDpLang === "function" && window.getDpLang() === "uk"
+        ? "Виконуємо вхід…"
+        : "Выполняем вход…";
+      if (submitBtn) submitBtn.disabled = true;
+      try {
+        const res = await fetch(api("/api/auth/login"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          if (statusEl) statusEl.textContent = String(data?.message || (typeof window.getDpLang === "function" && window.getDpLang() === "uk"
+            ? "Не вдалося увійти."
+            : "Не удалось войти."));
+          return;
+        }
+        if (data?.token) localStorage.setItem("authToken", String(data.token));
+        if (data?.user) localStorage.setItem("authUser", JSON.stringify(data.user));
+        window.dispatchEvent(new Event("dp-auth-changed"));
+        location.href = "account-payment.html";
+      } catch {
+        if (statusEl) statusEl.textContent = typeof window.getDpLang === "function" && window.getDpLang() === "uk"
+          ? "Помилка мережі."
+          : "Ошибка сети.";
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+
+    window.addEventListener("dp-auth-changed", () => {
+      prefillFromAuth();
+      syncCheckoutContactRules();
+      syncRegisteredLoginPrompt();
+      renderOrderSummary();
+    });
+    window.addEventListener("dp-consent-changed", () => syncNewsletterConsentUi());
+    window.addEventListener("dp-lang-change", () => syncNewsletterConsentUi());
 
     const form = $("checkout-form");
     const whSel = $("co-warehouse");
@@ -689,7 +936,30 @@
     });
 
     $("co-comment")?.addEventListener("input", () => {
+      saveCheckoutDraftCookie();
       renderOrderSummary();
+    });
+    [
+      "co-name",
+      "co-phone",
+      "co-email",
+      "co-city",
+      "co-city-select",
+      "co-delivery",
+      "co-warehouse-manual",
+      "co-payment",
+      "co-accept-offer",
+    ].forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      el.addEventListener("input", saveCheckoutDraftCookie);
+      el.addEventListener("change", saveCheckoutDraftCookie);
+      const clearOne = () => {
+        el.classList.remove("checkout-required-missing");
+        document.querySelectorAll(`.checkout-field-error-for-${id}`).forEach((x) => x.remove());
+      };
+      el.addEventListener("input", clearOne);
+      el.addEventListener("change", clearOne);
     });
 
     form?.addEventListener("submit", async (e) => {
@@ -701,10 +971,79 @@
       const comment = ($("co-comment") && $("co-comment").value.trim()) || "";
       const pay = ($("co-payment") && $("co-payment").value) || "liqpay";
       const newsletter = $("co-newsletter") && $("co-newsletter").checked;
+      const acceptOffer = Boolean($("co-accept-offer")?.checked);
       const deliveryMethod = ($("co-delivery") && $("co-delivery").value) || "nova_poshta";
       const nova = deliveryMethod === "nova_poshta";
+      const loggedIn = isCustomerLoggedIn();
+      if (state.tab === "reg") {
+        if (st) st.textContent = "";
+        syncRegisteredLoginPrompt();
+        return;
+      }
+
+      clearCheckoutRequiredHighlights();
+      clearCheckoutFieldErrors();
+      const missing = [];
+      if (name.length < 2) missing.push("co-name");
+      if (phone.length < 9) missing.push("co-phone");
+      if (!/.+@.+\..+/.test(email)) missing.push("co-email");
+      if (!$("co-city-select")?.value) {
+        missing.push("co-city-select");
+      } else if ($("co-city-select")?.value === "__other__") {
+        if (state.npConfigured) {
+          if (!state.cityRef) missing.push("co-city");
+        } else if (!(($("co-city") && $("co-city").value.trim().length >= 2))) {
+          missing.push("co-city");
+        }
+      } else if (state.npConfigured && !state.cityRef) {
+        missing.push("co-city-select");
+      }
+      if (!($("co-delivery") && $("co-delivery").value)) missing.push("co-delivery");
+      if (!($("co-payment") && $("co-payment").value)) missing.push("co-payment");
+      if (nova) {
+        if (state.npConfigured) {
+          if (!state.warehouseRef) missing.push("co-warehouse");
+        } else if (!(whMan && whMan.value.trim().length >= 2)) {
+          missing.push("co-warehouse-manual");
+        }
+      } else if (!(whMan && whMan.value.trim().length >= 2)) {
+        missing.push("co-warehouse-manual");
+      }
+      if (missing.length) {
+        markCheckoutMissingFields(missing);
+        const uk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+        const labels = {
+          "co-name": uk ? "Вкажіть ПІБ." : "Укажите ФИО.",
+          "co-phone": uk ? "Вкажіть телефон." : "Укажите телефон.",
+          "co-email": uk ? "Вкажіть коректний E-mail." : "Укажите корректный E-mail.",
+          "co-city-select": uk ? "Оберіть місто." : "Выберите город.",
+          "co-city": uk ? "Вкажіть місто." : "Укажите город.",
+          "co-delivery": uk ? "Оберіть спосіб доставки." : "Выберите способ доставки.",
+          "co-payment": uk ? "Оберіть спосіб оплати." : "Выберите способ оплаты.",
+          "co-warehouse": uk ? "Оберіть відділення." : "Выберите отделение.",
+          "co-warehouse-manual": uk ? "Вкажіть відділення або адресу." : "Укажите отделение или адрес.",
+          "co-accept-offer": uk ? "Потрібна згода з договором оферти." : "Необходимо согласие с договором оферты.",
+        };
+        missing.forEach((id) => setCheckoutFieldError(id, labels[id] || (uk ? "Заповніть поле." : "Заполните поле.")));
+        if (st) st.textContent = "";
+        return;
+      }
+      if (!acceptOffer) {
+        markCheckoutMissingFields(["co-accept-offer"]);
+        setCheckoutFieldError(
+          "co-accept-offer",
+          typeof window.getDpLang === "function" && window.getDpLang() === "uk"
+            ? "Потрібна згода з договором оферти."
+            : "Необходимо согласие с договором оферты."
+        );
+        return;
+      }
 
       if (name.length < 2 || phone.length < 9) {
+        if (st) st.textContent = t("checkoutErrorContacts");
+        return;
+      }
+      if (!loggedIn && !/.+@.+\..+/.test(email)) {
         if (st) st.textContent = t("checkoutErrorContacts");
         return;
       }
@@ -809,6 +1148,7 @@
         /* ignore */
       }
       try {
+        saveCheckoutDraftCookie();
         const res = await fetch(leadsUrl, {
           method: "POST",
           headers: leadHeaders,

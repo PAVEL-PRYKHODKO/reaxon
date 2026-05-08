@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="account-page.css" />
   <link rel="stylesheet" href="site-lang.css" />
 </head>
-<body data-page="account">
+<body data-page="account" class="account-page">
   <script>
     (function () {
       try {
@@ -32,6 +32,7 @@
               <a href="index.html" data-i18n="navHome">Главная</a>
               <a href="products.html" data-i18n="navCatalog">Каталог</a>
               <a href="price.html" data-i18n="navPrice">Прайс</a>
+              <a href="intelligent-selection.html" data-i18n="navIntelligentSelection">Помощник ИИ</a>
               <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
               <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
               <a href="news.html" data-i18n="navNews">Новости</a>
@@ -74,7 +75,7 @@
                   <circle cx="12" cy="7" r="4" />
                 </svg>
               </a>
-              <a class="admin-btn" id="home-admin-btn" href="admin-panel.html" hidden>Админ-панель</a>
+              <a class="admin-btn" id="home-admin-btn" href="admin.html" hidden>Админ-панель</a>
             </div>
           </div>
         </div>
@@ -153,7 +154,7 @@
               </section>
               <div id="account-drawer-admin-tools" class="account-card account-card--compact account-drawer-admin-tools" hidden>
                 <p class="account-drawer-admin-lead">Сайт, каталог, аналитика — в админ-панели. CRM — отдельный раздел.</p>
-                <a href="admin-panel.html" class="btn btn-primary account-drawer-admin-link">Админ-панель</a>
+                <a href="admin.html" class="btn btn-primary account-drawer-admin-link">Админ-панель</a>
               </div>
               <div id="account-drawer-crm-tools" class="account-card account-card--compact account-drawer-crm-tools" hidden>
                 <p class="account-drawer-admin-lead">Заявки и экспорт CSV (доступ без полной админки сайта).</p>
@@ -193,36 +194,38 @@
                   </label>
                 </div>
                 <label style="grid-column: 1 / -1">Регион / страна<input name="countryRegion" type="text" maxlength="200" placeholder="Например: Украина, Днепропетровская обл." /></label>
-                <label style="grid-column: 1 / -1" class="account-legal-switch"
-                  ><span data-ru="Название компании" data-uk="Назва компанії">Название компании</span
-                  ><input name="companyName" type="text" maxlength="200" autocomplete="organization"
-                /></label>
-                <label class="account-checkbox-row account-accounting-legal-row" style="grid-column: 1 / -1" for="account-is-legal-entity">
-                  <input type="checkbox" name="isLegalEntity" id="account-is-legal-entity" value="1" />
-                  <span
-                    data-ru="Юридическое лицо — цены с НДС, счёт и счёт-фактура к оплате (реквизиты ниже)."
-                    data-uk="Юрособа — ціни з ПДВ, рахунок та податковий після оплати (реквізити нижче)."
-                  >Юридическое лицо — цены с НДС, счёт и счёт-фактура после оплаты.</span>
+                <label style="grid-column: 1 / -1" class="account-legal-type-field" for="account-is-legal-entity">
+                  <span data-ru="Тип плательщика" data-uk="Тип платника">Тип плательщика</span>
+                  <select name="isLegalEntity" id="account-is-legal-entity">
+                    <option value="0" data-ru="Физическое лицо" data-uk="Фізична особа">Физическое лицо</option>
+                    <option value="1" data-ru="Юридическое лицо (НДС, счёт и счёт-фактура)" data-uk="Юрособа (ПДВ, рахунок і податкова)">Юридическое лицо (НДС, счёт и счёт-фактура)</option>
+                  </select>
                 </label>
-                <div id="account-legal-billing" class="account-legal-billing-fields" style="grid-column: 1 / -1" hidden>
-                  <p class="account-legal-billing-lead" style="margin: 0 0 0.75rem; font-size: 0.92rem; color: var(--muted, #64748b)" data-ru="Обязательно для выставления счёта и отправки счёт-фактуры на email после оплаты." data-uk="Обов’язково для виставлення рахунку й надсилання податкової на email після оплати.">Реквизиты для счётов</p>
-                  <div class="account-form-grid account-form-grid--2" style="gap: 0.75rem">
-                    <label
-                      ><span data-ru="ЄДРПОУ / РНОКПП (8–10 цифр)" data-uk="ЄДРПОУ / РНОКПП">ЄДРПОУ / код</span
-                      ><input name="edrpou" type="text" inputmode="numeric" maxlength="12" placeholder="12345678" autocomplete="off"
-                    /></label>
-                    <label
-                      ><span data-ru="Расчётный IBAN (UA…)" data-uk="Поточний рахунок IBAN (UA…)">IBAN</span
-                      ><input name="billingIban" type="text" maxlength="34" placeholder="UA …" spellcheck="false" autocomplete="off"
-                    /></label>
-                    <label style="grid-column: 1 / -1"
-                      ><span data-ru="Email для счетов и счёт-фактур" data-uk="Email для рахунків і податкових">Email для счётов</span
-                      ><input name="invoiceEmail" type="email" maxlength="120" placeholder="buh@yourcompany.ua" autocomplete="email"
-                    /></label>
+                <div id="account-legal-only-fields" style="grid-column: 1 / -1" hidden>
+                  <label style="grid-column: 1 / -1" class="account-legal-switch"
+                    ><span data-ru="Название компании" data-uk="Назва компанії">Название компании</span
+                    ><input name="companyName" type="text" maxlength="200" autocomplete="organization"
+                  /></label>
+                  <div id="account-legal-billing" class="account-legal-billing-fields" style="grid-column: 1 / -1">
+                    <p class="account-legal-billing-lead" style="margin: 0 0 0.75rem; font-size: 0.92rem; color: var(--muted, #64748b)" data-ru="Обязательно для выставления счёта и отправки счёт-фактуры на email после оплаты." data-uk="Обов’язково для виставлення рахунку й надсилання податкової на email після оплати.">Реквизиты для счётов</p>
+                    <div class="account-form-grid account-form-grid--2" style="gap: 0.75rem">
+                      <label
+                        ><span data-ru="ЄДРПОУ / РНОКПП (8–10 цифр)" data-uk="ЄДРПОУ / РНОКПП">ЄДРПОУ / код</span
+                        ><input name="edrpou" type="text" inputmode="numeric" maxlength="12" placeholder="12345678" autocomplete="off"
+                      /></label>
+                      <label
+                        ><span data-ru="Расчётный IBAN (UA…)" data-uk="Поточний рахунок IBAN (UA…)">IBAN</span
+                        ><input name="billingIban" type="text" maxlength="34" placeholder="UA …" spellcheck="false" autocomplete="off"
+                      /></label>
+                      <label style="grid-column: 1 / -1"
+                        ><span data-ru="Email для счетов и счёт-фактур" data-uk="Email для рахунків і податкових">Email для счётов</span
+                        ><input name="invoiceEmail" type="email" maxlength="120" placeholder="buh@yourcompany.ua" autocomplete="email"
+                      /></label>
+                    </div>
                   </div>
+                  <label style="grid-column: 1 / -1">Юридический адрес<textarea name="legalAddress" maxlength="500" rows="2"></textarea></label>
+                  <label style="grid-column: 1 / -1">Адрес доставки<textarea name="deliveryAddress" maxlength="500" rows="2"></textarea></label>
                 </div>
-                <label style="grid-column: 1 / -1">Юридический адрес<textarea name="legalAddress" maxlength="500" rows="2"></textarea></label>
-                <label style="grid-column: 1 / -1">Адрес доставки<textarea name="deliveryAddress" maxlength="500" rows="2"></textarea></label>
               </div>
               <div class="account-privacy-block">
                 <h4 class="account-privacy-heading">Видимость для других пользователей сайта</h4>
@@ -241,37 +244,41 @@
               </div>
               <p id="account-drawer-form-status" class="account-status" role="status" aria-live="polite"></p>
               </form>
-              <form
-                id="account-password-form"
-                class="account-card account-card--compact"
-                autocomplete="on"
-                novalidate
-              >
-                <h3 class="account-card-subtitle" data-ru="Смена пароля" data-uk="Зміна пароля">Смена пароля</h3>
-                <p class="account-privacy-hint" style="margin: 0 0 12px" data-ru="Новый пароль устанавливается только после ввода текущего." data-uk="Новий пароль встановлюється лише після введення поточного.">
-                  Новый пароль устанавливается только после ввода текущего.
-                </p>
-                <div class="account-form-grid account-form-grid--2">
-                  <label style="grid-column: 1 / -1"
-                    ><span data-ru="Текущий пароль" data-uk="Поточний пароль">Текущий пароль</span
-                    ><input name="currentPassword" type="password" autocomplete="current-password"
-                  /></label>
-                  <label
-                    ><span data-ru="Новый пароль" data-uk="Новий пароль">Новый пароль</span
-                    ><input name="newPassword" type="password" minlength="10" maxlength="200" autocomplete="new-password"
-                  /></label>
-                  <label
-                    ><span data-ru="Повторите новый пароль" data-uk="Повторіть новий пароль">Повторите новый пароль</span
-                    ><input name="newPasswordConfirm" type="password" minlength="10" maxlength="200" autocomplete="new-password"
-                  /></label>
-                </div>
-                <div class="account-actions">
-                  <button class="btn btn-ghost" type="submit" data-ru="Сменить пароль" data-uk="Змінити пароль">
-                    Сменить пароль
-                  </button>
-                </div>
-                <p id="account-password-form-status" class="account-status" role="status" aria-live="polite"></p>
-              </form>
+              <details class="account-card account-card--compact account-password-accordion">
+                <summary class="account-password-accordion-summary">
+                  <span class="account-card-subtitle" data-ru="Смена пароля" data-uk="Зміна пароля">Смена пароля</span>
+                </summary>
+                <form
+                  id="account-password-form"
+                  class="account-password-accordion-form"
+                  autocomplete="on"
+                  novalidate
+                >
+                  <p class="account-privacy-hint" style="margin: 0 0 12px" data-ru="Новый пароль устанавливается только после ввода текущего." data-uk="Новий пароль встановлюється лише після введення поточного.">
+                    Новый пароль устанавливается только после ввода текущего.
+                  </p>
+                  <div class="account-form-grid account-form-grid--2">
+                    <label style="grid-column: 1 / -1"
+                      ><span data-ru="Текущий пароль" data-uk="Поточний пароль">Текущий пароль</span
+                      ><input name="currentPassword" type="password" autocomplete="current-password"
+                    /></label>
+                    <label
+                      ><span data-ru="Новый пароль" data-uk="Новий пароль">Новый пароль</span
+                      ><input name="newPassword" type="password" minlength="10" maxlength="200" autocomplete="new-password"
+                    /></label>
+                    <label
+                      ><span data-ru="Повторите новый пароль" data-uk="Повторіть новий пароль">Повторите новый пароль</span
+                      ><input name="newPasswordConfirm" type="password" minlength="10" maxlength="200" autocomplete="new-password"
+                    /></label>
+                  </div>
+                  <div class="account-actions">
+                    <button class="btn btn-ghost" type="submit" data-ru="Сменить пароль" data-uk="Змінити пароль">
+                      Сменить пароль
+                    </button>
+                  </div>
+                  <p id="account-password-form-status" class="account-status" role="status" aria-live="polite"></p>
+                </form>
+              </details>
               <div class="account-drawer-logged-bottom">
                 <button type="button" class="btn account-drawer-logout-bottom-btn" id="account-drawer-logout-btn" data-i18n="accountFooterLogout">Выйти</button>
               </div>

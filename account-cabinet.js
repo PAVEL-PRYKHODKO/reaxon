@@ -51,6 +51,14 @@
     return data;
   }
 
+  async function notifyServerLogout() {
+    try {
+      await fetch(apiUrl("/api/auth/logout"), { method: "POST" });
+    } catch {
+      /* ignore */
+    }
+  }
+
   function setStatus(el, msg, kind) {
     if (!el) return;
     el.textContent = msg || "";
@@ -60,10 +68,23 @@
   }
 
   function syncLegalBillingVisibility(form) {
-    const box = document.getElementById("account-legal-billing");
-    const ch = form?.querySelector?.("#account-is-legal-entity");
-    if (!box || !(ch instanceof HTMLInputElement)) return;
-    box.hidden = !ch.checked;
+    const box = document.getElementById("account-legal-only-fields");
+    const legacyBilling = document.getElementById("account-legal-billing");
+    const companyInput = form?.querySelector?.('input[name="companyName"]');
+    const legalAddressInput = form?.querySelector?.('textarea[name="legalAddress"]');
+    const deliveryAddressInput = form?.querySelector?.('textarea[name="deliveryAddress"]');
+    const legalControl = form?.querySelector?.("#account-is-legal-entity");
+    if (!box || !(legalControl instanceof HTMLInputElement || legalControl instanceof HTMLSelectElement)) return;
+    const enabled =
+      legalControl instanceof HTMLSelectElement
+        ? String(legalControl.value || "") === "1"
+        : Boolean(legalControl.checked);
+    box.hidden = !enabled;
+    // Fallback: если в кеше осталась старая разметка, принудительно скрываем связанные поля.
+    if (legacyBilling) legacyBilling.hidden = !enabled;
+    if (companyInput?.closest("label")) companyInput.closest("label").hidden = !enabled;
+    if (legalAddressInput?.closest("label")) legalAddressInput.closest("label").hidden = !enabled;
+    if (deliveryAddressInput?.closest("label")) deliveryAddressInput.closest("label").hidden = !enabled;
   }
 
   function applyUserToForm(form, user) {
@@ -81,7 +102,11 @@
     form.legalAddress.value = pr.legalAddress || "";
     form.deliveryAddress.value = pr.deliveryAddress || "";
     const ile = form.querySelector("#account-is-legal-entity");
-    if (ile instanceof HTMLInputElement) ile.checked = Boolean(pr.isLegalEntity);
+    if (ile instanceof HTMLSelectElement) {
+      ile.value = pr.isLegalEntity ? "1" : "0";
+    } else if (ile instanceof HTMLInputElement) {
+      ile.checked = Boolean(pr.isLegalEntity);
+    }
     const edEl = form.querySelector('[name="edrpou"]');
     if (edEl instanceof HTMLInputElement) edEl.value = pr.edrpou || "";
     const invEl = form.querySelector('[name="invoiceEmail"]');
@@ -408,20 +433,24 @@
     const avatarRemoveBtn = document.getElementById("account-drawer-avatar-remove-btn");
     const preview = document.getElementById("account-drawer-avatar-preview");
 
-    function performLogout() {
+    async function performLogout() {
       const ok = window.confirm(
         "Выйти из аккаунта?\n\n«ОК» — выйти, «Отмена» — остаться в системе."
       );
       if (!ok) return;
+      await notifyServerLogout();
       localStorage.removeItem("authToken");
       localStorage.removeItem("authUser");
       window.dispatchEvent(new CustomEvent("dp-auth-changed"));
       window.location.href = "index.html";
     }
 
-    document.getElementById("account-drawer-logout-btn")?.addEventListener("click", () => performLogout());
+    document.getElementById("account-drawer-logout-btn")?.addEventListener("click", () => {
+      void performLogout();
+    });
 
     form?.querySelector("#account-is-legal-entity")?.addEventListener("change", () => syncLegalBillingVisibility(form));
+    syncLegalBillingVisibility(form);
 
     avatarInput?.addEventListener("change", async () => {
       const f = avatarInput.files && avatarInput.files[0];
@@ -502,7 +531,9 @@
           })(),
           lastName: String(fd.get("lastName") || "").trim().slice(0, 200),
           countryRegion: fd.get("countryRegion") || "",
-          isLegalEntity: Boolean(form.elements.isLegalEntity?.checked),
+          isLegalEntity:
+            String(form.elements.isLegalEntity?.value || "") === "1" ||
+            Boolean(form.elements.isLegalEntity?.checked),
           companyName: fd.get("companyName") || "",
           edrpou: String(fd.get("edrpou") || "").trim(),
           billingIban: String(fd.get("billingIban") || "").trim(),

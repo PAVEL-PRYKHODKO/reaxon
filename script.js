@@ -172,8 +172,11 @@ const I18N = {
     navHome: "Главная",
     navRal: "Таблица RAL",
     navPrice: "Прайс",
+    navIntelligentSelection: "Помощник ИИ",
     navAdvice: "Советы",
     navContacts: "Контакты",
+    navPrivacyPolicy: "Политика конфиденциальности",
+    navCookieSettings: "Настройки cookie",
     navAbout: "О нас",
     navNews: "Новости",
     navLogin: "Вход",
@@ -542,8 +545,11 @@ const I18N = {
     navHome: "Головна сторінка",
     navRal: "Таблиця RAL",
     navPrice: "Прайс",
+    navIntelligentSelection: "Помічник ШІ",
     navAdvice: "Поради",
     navContacts: "Контакти",
+    navPrivacyPolicy: "Політика конфіденційності",
+    navCookieSettings: "Налаштування cookie",
     navAbout: "Про нас",
     navNews: "Новини",
     navLogin: "Вхід",
@@ -912,8 +918,11 @@ const I18N = {
     navHome: "Home page",
     navRal: "RAL chart",
     navPrice: "Price list",
+    navIntelligentSelection: "AI assistant",
     navAdvice: "Advice",
     navContacts: "Contacts",
+    navPrivacyPolicy: "Privacy policy",
+    navCookieSettings: "Cookie settings",
     navAbout: "About us",
     navNews: "News",
     navLogin: "Sign in",
@@ -1162,6 +1171,67 @@ function hydrateProductsFromData() {
   PRODUCTS.push(...window.PRODUCTS_DATA.map((raw) => normalizeProduct(merge(raw))));
 }
 hydrateProductsFromData();
+
+const CART_AUTH_OWNER_KEY = "dp_cart_auth_owner";
+const CART_STORAGE_KEY_GUEST = "dp_cart_guest";
+const CART_STORAGE_KEY_PREFIX_AUTH = "dp_cart_auth_";
+
+function cartStorageKeyForOwner(owner) {
+  if (!owner) return CART_STORAGE_KEY_GUEST;
+  return `${CART_STORAGE_KEY_PREFIX_AUTH}${encodeURIComponent(owner)}`;
+}
+
+function normalizeStoredCart(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(
+    (it) =>
+      it &&
+      typeof it.productId === "string" &&
+      (it.packType === "bucket" || it.packType === "drum" || it.packType === "jar") &&
+      typeof it.qty === "number" &&
+      (it.mode === "retail" || it.mode === "wholesale")
+  );
+}
+
+function currentCartAuthOwner() {
+  try {
+    const tok = localStorage.getItem("authToken");
+    if (!tok) return "";
+    const u = JSON.parse(localStorage.getItem("authUser") || "null");
+    const id = u?.id != null ? String(u.id) : "";
+    const email = String(u?.email || "").trim().toLowerCase();
+    return id || email || "auth";
+  } catch {
+    return "";
+  }
+}
+
+function loadCartForOwner(owner) {
+  try {
+    const key = cartStorageKeyForOwner(owner);
+    const raw = JSON.parse(localStorage.getItem(key) || "[]");
+    if (owner) {
+      localStorage.setItem(CART_AUTH_OWNER_KEY, owner);
+    } else {
+      localStorage.removeItem(CART_AUTH_OWNER_KEY);
+    }
+    return normalizeStoredCart(raw);
+  } catch {
+    return [];
+  }
+}
+
+function enforceCartAuthIsolationOnBoot() {
+  try {
+    const owner = String(localStorage.getItem(CART_AUTH_OWNER_KEY) || "");
+    const current = currentCartAuthOwner();
+    if (owner && !current) {
+      localStorage.removeItem(CART_AUTH_OWNER_KEY);
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
 const state = {
   lang: (() => {
@@ -3492,7 +3562,12 @@ function renderNavProductsMenu() {
 }
 
 function saveCart() {
+  const owner = currentCartAuthOwner();
+  const key = cartStorageKeyForOwner(owner);
+  localStorage.setItem(key, JSON.stringify(state.cart));
   localStorage.setItem("cart", JSON.stringify(state.cart));
+  if (owner) localStorage.setItem(CART_AUTH_OWNER_KEY, owner);
+  else localStorage.removeItem(CART_AUTH_OWNER_KEY);
   if (typeof window.dpOnCartChanged === "function") {
     try {
       window.dpOnCartChanged();
@@ -4500,6 +4575,8 @@ function renderStructuredFooterFromProjectData() {
     "contact",
     "about",
     "offer",
+    "intelligent-selection",
+    "privacy-policy",
   ]);
   if (!enabledPages.has(page)) return;
 
@@ -4557,6 +4634,7 @@ function renderStructuredFooterFromProjectData() {
         ? [
             "Вхід до кабінету",
             "Новини",
+            "Помічник ШІ",
             "Оплата і доставка",
             "Контакти",
             "Договір оферти",
@@ -4564,6 +4642,7 @@ function renderStructuredFooterFromProjectData() {
         : [
             "Вход в кабинет",
             "Новости",
+            "Помощник ИИ",
             "Оплата и доставка",
             "Контакты",
             "Договор оферты",
@@ -4606,6 +4685,7 @@ function renderStructuredFooterFromProjectData() {
     const clientHrefMap = [
       "account.html",
       "news.html",
+      "intelligent-selection.html",
       "delivery.html",
       "contact.html",
       "offer.html",
@@ -4646,6 +4726,7 @@ function renderStructuredFooterFromProjectData() {
           ${clientFallback
             .map((x) => `<a href="${esc(x.href)}">${esc(x.text)}</a>`)
             .join("")}
+          <a href="privacy-policy.html">${esc(t("navPrivacyPolicy"))}</a>
         </section>
         <section class="footer-arch-col footer-arch-col--contacts">
           <h4>${esc(t("footerArchContactHeading"))}</h4>
@@ -4699,6 +4780,79 @@ function ensureAboutNavLink() {
         nav.appendChild(link);
       }
     }
+  });
+}
+
+function ensureIntelligentSelectionNavLink() {
+  document.querySelectorAll(".topnav").forEach((nav) => {
+    if (nav.querySelector('a[href="intelligent-selection.html"]')) return;
+    const link = document.createElement("a");
+    link.href = "intelligent-selection.html";
+    link.dataset.i18n = "navIntelligentSelection";
+    link.textContent = t("navIntelligentSelection");
+    if (document.body?.dataset?.page === "intelligent-selection") {
+      link.setAttribute("aria-current", "page");
+    }
+    const catalog = nav.querySelector('a[href="products.html"]');
+    if (catalog && catalog.nextSibling) {
+      nav.insertBefore(link, catalog.nextSibling);
+      return;
+    }
+    if (catalog) {
+      nav.appendChild(link);
+      return;
+    }
+    const price = nav.querySelector('a[href="price.html"]');
+    if (price) nav.insertBefore(link, price);
+    else nav.appendChild(link);
+  });
+}
+
+function ensureIntelligentSelectionFooterLink() {
+  document.querySelectorAll(".footer-laconic-nav").forEach((nav) => {
+    if (nav.querySelector('a[href="intelligent-selection.html"]')) return;
+    const link = document.createElement("a");
+    link.href = "intelligent-selection.html";
+    link.dataset.i18n = "navIntelligentSelection";
+    link.textContent = t("navIntelligentSelection");
+    if (document.body?.dataset?.page === "intelligent-selection") {
+      link.setAttribute("aria-current", "page");
+    }
+    const price = nav.querySelector('a[href="price.html"]');
+    if (price && price.nextSibling) nav.insertBefore(link, price.nextSibling);
+    else if (price) nav.appendChild(link);
+    else nav.appendChild(link);
+  });
+}
+
+function ensurePrivacyPolicyFooterLink() {
+  document.querySelectorAll(".footer-laconic-nav").forEach((nav) => {
+    if (nav.querySelector('a[href="privacy-policy.html"]')) return;
+    const link = document.createElement("a");
+    link.href = "privacy-policy.html";
+    link.dataset.i18n = "navPrivacyPolicy";
+    link.textContent = t("navPrivacyPolicy");
+    nav.appendChild(link);
+  });
+}
+
+function ensureCookieSettingsFooterLink() {
+  document.querySelectorAll(".footer-laconic-nav").forEach((nav) => {
+    let link = nav.querySelector('a[data-cookie-settings-link="1"]');
+    if (!link) {
+      link = document.createElement("a");
+      link.href = "#cookie-settings";
+      link.dataset.cookieSettingsLink = "1";
+      link.dataset.i18n = "navCookieSettings";
+      nav.appendChild(link);
+    }
+    link.textContent = t("navCookieSettings");
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (typeof window.dpOpenConsentSettings === "function") {
+        window.dpOpenConsentSettings();
+      }
+    });
   });
 }
 
@@ -4991,22 +5145,246 @@ function initContactLeadFormPrefill() {
   }
 }
 
+function ensureGlobalSeoAndResponsiveDefaults() {
+  // Shared responsive overrides for all user-facing pages.
+  if (!document.querySelector('link[data-dp-global-responsive="1"]')) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "site-responsive-seo.css";
+    link.dataset.dpGlobalResponsive = "1";
+    document.head.appendChild(link);
+  }
+
+  // Canonical URL helps avoid duplicate indexing for query/hash variants.
+  try {
+    const url = new URL(location.href);
+    url.search = "";
+    url.hash = "";
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+    canonical.href = url.toString();
+  } catch {
+    /* ignore */
+  }
+}
+
+function ensureSeoMetaAndSchema() {
+  const page = String(document.body?.dataset?.page || "home");
+  const host = location.origin || "";
+  const path = location.pathname || "/index.html";
+  const absUrl = `${host}${path}`;
+  const defaults = {
+    title: "DP Coatings — промышленные лакокрасочные материалы",
+    description:
+      "DP Coatings (REAXON): каталог эмалей, грунтовок и специальных покрытий. Подбор материалов, доставка по Украине, B2B и розница.",
+  };
+  const seoByPage = {
+    home: {
+      title: "DP Coatings — каталог ЛКМ и промышленных покрытий",
+      description:
+        "Промышленные лакокрасочные материалы REAXON: эмали, грунтовки, лаки и специальные покрытия. Подбор, консультация, доставка.",
+    },
+    products: {
+      title: "Каталог продукции — DP Coatings",
+      description:
+        "Каталог лакокрасочных материалов: эмали, грунтовки, лаки, растворители и специальные системы покрытий для разных задач.",
+    },
+    product: {
+      title: "Карточка товара — DP Coatings",
+      description:
+        "Характеристики, фасовки и цены по выбранному продукту DP Coatings. Доступны варианты для промышленного и бытового применения.",
+    },
+    price: {
+      title: "Прайс-лист — DP Coatings",
+      description:
+        "Актуальный прайс-лист DP Coatings: цены по позициям, фасовкам и видам покрытий. Удобный поиск по каталогу.",
+    },
+    delivery: {
+      title: "Доставка и оплата — DP Coatings",
+      description:
+        "Условия доставки и оплаты DP Coatings по Украине. Доступны банковские реквизиты и онлайн-оплата.",
+    },
+    contact: {
+      title: "Контакты — DP Coatings",
+      description:
+        "Контакты DP Coatings: телефоны, email, адрес и форма обратной связи. Поможем с подбором материалов и заказом.",
+    },
+    about: {
+      title: "О компании — DP Coatings",
+      description:
+        "О компании REAXON / DP Coatings: поставки лакокрасочных материалов, поддержка B2B и розничных клиентов, системный контроль качества.",
+    },
+    news: {
+      title: "Новости — DP Coatings",
+      description:
+        "Новости и обновления DP Coatings: продукты, решения и отраслевые материалы по лакокрасочным покрытиям.",
+    },
+    "intelligent-selection": {
+      title: "Помощник ИИ — DP Coatings",
+      description:
+        "ИИ-помощник DP Coatings для подбора лакокрасочных материалов по задаче: интерьер, фасад, металл, дерево и спецпокрытия.",
+    },
+    auth: {
+      title: "Вход и регистрация — DP Coatings",
+      description:
+        "Вход и регистрация в личный кабинет DP Coatings. Управление профилем, заказами и настройками согласий пользователя.",
+    },
+    "privacy-policy": {
+      title: "Политика конфиденциальности — DP Coatings",
+      description:
+        "Политика конфиденциальности DP Coatings: цели обработки данных, права пользователя, cookies, аналитика и управление согласиями.",
+    },
+  };
+  const seo = seoByPage[page] || defaults;
+  if (seo.title && document.title !== seo.title) document.title = seo.title;
+
+  function ensureMeta(name, content, attr = "name") {
+    if (!content) return;
+    const selector = attr === "property" ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+    let meta = document.head.querySelector(selector);
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute(attr, name);
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", content);
+  }
+
+  const ogImageByPage = {
+    home: "/assets/hero-banner-main.png",
+    products: "/assets/hero-banner-main.png",
+    product: "/images/placeholder.svg",
+    price: "/assets/hero-banner-main.png",
+    delivery: "/assets/hero-banner-main.png",
+    contact: "/assets/hero-banner-main.png",
+    about: "/assets/hero-banner-main.png",
+    news: "/assets/hero-banner-main.png",
+    "intelligent-selection": "/assets/hero-banner-main.png",
+    "privacy-policy": "/assets/hero-banner-main.png",
+  };
+  const ogImage = `${host}${ogImageByPage[page] || "/assets/hero-banner-main.png"}`;
+  ensureMeta("description", seo.description);
+  ensureMeta("robots", "index,follow,max-image-preview:large");
+  ensureMeta("og:type", "website", "property");
+  ensureMeta("og:title", seo.title, "property");
+  ensureMeta("og:description", seo.description, "property");
+  ensureMeta("og:url", absUrl, "property");
+  ensureMeta("og:image", ogImage, "property");
+  ensureMeta("twitter:card", "summary_large_image");
+  ensureMeta("twitter:title", seo.title);
+  ensureMeta("twitter:description", seo.description);
+  ensureMeta("twitter:image", ogImage);
+
+  function ensureAltLink(rel, href, hreflang) {
+    const key = hreflang ? `link[rel="${rel}"][hreflang="${hreflang}"]` : `link[rel="${rel}"]`;
+    let link = document.head.querySelector(key);
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = rel;
+      if (hreflang) link.hreflang = hreflang;
+      document.head.appendChild(link);
+    }
+    link.href = href;
+  }
+
+  // Hreflang for RU/UK multilingual indexing and x-default fallback.
+  const ruUrl = `${absUrl}?lang=ru`;
+  const ukUrl = `${absUrl}?lang=uk`;
+  ensureAltLink("alternate", ruUrl, "ru");
+  ensureAltLink("alternate", ukUrl, "uk");
+  ensureAltLink("alternate", absUrl, "x-default");
+
+  function setJsonLd(id, obj) {
+    let node = document.getElementById(id);
+    if (!node) {
+      node = document.createElement("script");
+      node.type = "application/ld+json";
+      node.id = id;
+      document.head.appendChild(node);
+    }
+    node.textContent = JSON.stringify(obj);
+  }
+
+  setJsonLd("dp-schema-org", {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "DP Coatings",
+    alternateName: "REAXON",
+    url: host,
+    email: "reaxondh@gmail.com",
+    telephone: "+380676134220",
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "UA",
+      addressLocality: "Zaporizhzhia",
+      streetAddress: "ул. Константина Великого, 20",
+      postalCode: "69002",
+    },
+  });
+
+  setJsonLd("dp-schema-site", {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "DP Coatings",
+    url: host,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${host}/products.html?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  });
+
+  setJsonLd("dp-schema-breadcrumbs", {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Главная", item: `${host}/index.html` },
+      { "@type": "ListItem", position: 2, name: seo.title, item: absUrl },
+    ],
+  });
+}
+
 function init() {
+  ensureGlobalSeoAndResponsiveDefaults();
+  ensureSeoMetaAndSchema();
   if (window.getDpLang) {
     const d = getDpLang();
     if (d === "ru" || d === "uk") state.lang = d;
   }
   hydrateProductsFromData();
   ensureAboutNavLink();
+  ensureIntelligentSelectionNavLink();
+  ensureIntelligentSelectionFooterLink();
+  ensurePrivacyPolicyFooterLink();
+  ensureCookieSettingsFooterLink();
   initTelegramChannelFab();
   applyTranslations();
   initContactLeadFormPrefill();
   initLeadFormIdentityUI();
   initContactCallbackBanner();
   initHomeCalcCta();
+  enforceCartAuthIsolationOnBoot();
+  state.cart = loadCartForOwner(currentCartAuthOwner());
   if (!window.__dpLeadFormAuthListener) {
     window.__dpLeadFormAuthListener = true;
     window.addEventListener("dp-auth-changed", () => initLeadFormIdentityUI());
+  }
+  if (!window.__dpCartAuthListener) {
+    window.__dpCartAuthListener = true;
+    let prevOwner = currentCartAuthOwner();
+    window.addEventListener("dp-auth-changed", () => {
+      const nextOwner = currentCartAuthOwner();
+      if (prevOwner !== nextOwner) {
+        state.cart = loadCartForOwner(nextOwner);
+        localStorage.setItem("cart", JSON.stringify(state.cart));
+        renderCart();
+      }
+      prevOwner = nextOwner;
+    });
   }
   renderStructuredFooterFromProjectData();
   applyHeaderAuthState();

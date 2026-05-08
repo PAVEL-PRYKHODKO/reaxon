@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DP Coatings — Помощник ИИ</title>
+  <meta
+    name="description"
+    content="Помощник ИИ для подбора лакокрасочных материалов по описанию задачи на естественном языке."
+  />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="redesign-shared.css" />
+  <link rel="stylesheet" href="products-catalog.css" />
+  <link rel="stylesheet" href="site-lang.css" />
+  <link rel="stylesheet" href="intelligent-selection.css" />
+</head>
+<body data-page="intelligent-selection">
+  <div class="page-bg page-bg--site">
+    <div class="site-shell">
+      <header class="site-header">
+        <div class="container site-header-inner">
+          <div class="topbar">
+            <a href="index.html" class="logo" aria-label="Reaxon">
+              <span class="logo-main">Rea<span class="logo-red">xon</span></span>
+            </a>
+            <nav class="topnav" aria-label="Основная навигация">
+              <a href="index.html" data-i18n="navHome">Главная</a>
+              <a href="products.html" data-i18n="navCatalog">Каталог</a>
+              <a href="price.html" data-i18n="navPrice">Прайс</a>
+              <a href="intelligent-selection.html" data-i18n="navIntelligentSelection" aria-current="page">Помощник ИИ</a>
+              <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+              <a href="delivery.html" data-i18n="navDelivery">Доставка</a>
+              <a href="news.html" data-i18n="navNews">Новости</a>
+              <a href="contact.html" data-i18n="navContacts">Контакты</a>
+            </nav>
+            <div class="top-actions">
+              <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+                <label for="language-switcher" class="visually-hidden">
+                  <span data-i18n="langLabel">Язык</span>
+                </label>
+                <select id="language-switcher" class="lang-switcher__select">
+                  <option value="ru">RU</option>
+                  <option value="uk">UA</option>
+                </select>
+              </div>
+              <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+                🛒
+                <span class="cart-badge" id="cart-count">0</span>
+              </button>
+              <a
+                href="account.html"
+                class="icon-btn header-account-trigger topbar-account-btn"
+                id="home-account-trigger"
+                data-i18n-aria-label="accountDrawerTrigger"
+                aria-label="Личный кабинет"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </a>
+              <a class="admin-btn" id="home-admin-btn" href="admin.html" hidden>Админ-панель</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="section section-solid">
+          <div class="container site-content-card ai-selection-card">
+            <nav class="products-breadcrumbs" aria-label="Навигация по разделу">
+              <a href="index.html">Главная</a>
+              <span aria-hidden="true">/</span>
+              <span>Помощник ИИ</span>
+            </nav>
+            <header class="ai-selection-head">
+              <h1>Помощник ИИ</h1>
+              <p>Опишите задачу своими словами. Система поймет контекст и предложит подходящие товары из каталога.</p>
+            </header>
+
+            <form id="ai-selection-form" class="ai-selection-form ai-reveal">
+              <label for="ai-selection-query">Ваш запрос</label>
+              <div class="ai-selection-row">
+                <input
+                  id="ai-selection-query"
+                  type="search"
+                  placeholder="Например: нужна краска чтобы покрасить стены в доме"
+                  autocomplete="off"
+                  required
+                />
+                <button type="submit" class="btn btn-primary" id="ai-selection-submit">Подобрать</button>
+              </div>
+              <p id="ai-selection-status" class="ai-selection-status" role="status" aria-live="polite"></p>
+            </form>
+
+            <section class="ai-selection-hero ai-reveal" aria-label="Презентация помощника">
+              <div class="ai-selection-hero-inner">
+                <p class="ai-selection-hero-badge">AI COATINGS ASSISTANT</p>
+                <h2>Подбор покрытий за 30 секунд</h2>
+                <p>
+                  Укажите задачу в свободной форме — помощник подберет релевантные материалы с учетом условий эксплуатации,
+                  основания и назначения.
+                </p>
+                <div class="ai-selection-kpi">
+                  <span><strong>24/7</strong> доступ</span>
+                  <span><strong>1 запрос</strong> вместо ручного отбора</span>
+                  <span><strong>Карточки</strong> с фасовкой и ценами</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="ai-selection-intro ai-reveal" aria-label="О возможностях помощника">
+              <p class="ai-selection-intro-lead">
+                Помощник анализирует ваш запрос и подбирает наиболее релевантные материалы под задачу: интерьер, фасад, дерево,
+                металл, защитные и специальные покрытия.
+              </p>
+              <div class="ai-selection-intro-grid">
+                <article class="ai-selection-intro-item">
+                  <div class="ai-selection-intro-icon" aria-hidden="true">⚡</div>
+                  <h3>Быстро</h3>
+                  <p>Получаете готовую подборку без ручного перебора категорий и артикулов.</p>
+                </article>
+                <article class="ai-selection-intro-item">
+                  <div class="ai-selection-intro-icon" aria-hidden="true">🎯</div>
+                  <h3>По задаче</h3>
+                  <p>Можно писать обычным языком: «лак для дерева внутри дома», «эмаль для металла на улице».</p>
+                </article>
+                <article class="ai-selection-intro-item">
+                  <div class="ai-selection-intro-icon" aria-hidden="true">🧩</div>
+                  <h3>Практично</h3>
+                  <p>В результатах сразу видно карточки с фасовками, ценами и переходом к заказу.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="ai-selection-usecases ai-reveal" aria-label="Сценарии использования">
+              <article class="ai-selection-usecase ai-selection-usecase--interior">
+                <div class="ai-selection-usecase-overlay">
+                  <h3>Для интерьера</h3>
+                  <p>«Нужна краска для стен в квартире без резкого запаха»</p>
+                </div>
+              </article>
+              <article class="ai-selection-usecase ai-selection-usecase--metal">
+                <div class="ai-selection-usecase-overlay">
+                  <h3>Для металла</h3>
+                  <p>«Подберите эмаль для уличных металлоконструкций»</p>
+                </div>
+              </article>
+              <article class="ai-selection-usecase ai-selection-usecase--wood">
+                <div class="ai-selection-usecase-overlay">
+                  <h3>Для дерева</h3>
+                  <p>«Лак для деревянных поверхностей внутри дома»</p>
+                </div>
+              </article>
+            </section>
+
+            <div id="ai-selection-results" class="ai-selection-results ai-reveal"></div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer footer--site-laconic" aria-label="Подвал">
+        <div class="container footer-site-laconic-inner">
+          <div class="footer-laconic-row footer-laconic-row--brand">
+            <span class="footer-laconic-brand" aria-hidden="true">REAXON</span>
+            <p class="footer-laconic-tagline" data-i18n="footerAbout">
+              Промышленные лакокрасочные материалы: эмали, грунтовки и сопутствующие решения для B2B и розницы.
+            </p>
+          </div>
+          <nav class="footer-laconic-nav" aria-label="Разделы сайта">
+            <a href="products.html" data-i18n="navCatalog">Каталог</a>
+            <a href="price.html" data-i18n="navPrice">Прайс</a>
+            <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
+            <a href="delivery.html" data-dp-delivery="footerLink" data-i18n="navDelivery">Доставка и оплата</a>
+            <a href="contact.html" data-i18n="navContacts">Контакты</a>
+          </nav>
+          <div class="footer-laconic-row footer-laconic-row--meta">
+            <a class="footer-laconic-tel" href="tel:+380676134220">+38 (067) 613-42-20</a>
+            <span class="footer-laconic-dot" aria-hidden="true">·</span>
+            <a class="footer-laconic-tel" href="tel:+380676135155">+38 (067) 613-51-55</a>
+            <span class="footer-laconic-dot" aria-hidden="true">·</span>
+            <a class="footer-laconic-tel" href="tel:+380612209445">+38 (061) 220-94-45</a>
+            <span class="footer-laconic-fax-hint footer-phone-hint">т/факс</span>
+            <span class="footer-laconic-dot" aria-hidden="true">·</span>
+            <a class="footer-laconic-mail" href="mailto:reaxondh@gmail.com">reaxondh@gmail.com</a>
+            <span class="footer-laconic-dot footer-laconic-dot--wide" aria-hidden="true">·</span>
+            <span class="footer-laconic-addr">69002, Запорожье, ул. Константина Великого, 20</span>
+            <a class="footer-laconic-all" href="contact.html#contact" data-i18n="footerContactAll">Все реквизиты</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
+    <div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-drawer-shell">
+        <header class="cart-header">
+          <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
+          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть корзину">
+            <svg class="cart-close-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div id="cart-items" class="cart-items"></div>
+        <footer class="cart-footer">
+          <div class="cart-footer-totals">
+            <div class="cart-grand-row">
+              <span data-i18n="cartGrandTotal">Итого по заказу</span>
+              <strong class="cart-grand-value"><span id="cart-total">0</span><span class="cart-currency"> грн</span></strong>
+            </div>
+          </div>
+          <div class="cart-footer-actions">
+            <button type="button" id="cart-pay-btn" class="btn btn-primary cart-pay-btn" data-i18n="payButton">Оплатить</button>
+            <button type="button" id="checkout" class="btn btn-ghost" data-i18n="checkoutRequest">Заявка без оплаты</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script src="products-data.js"></script>
+  <script src="api-base.js"></script>
+  <script src="site-lang.js"></script>
+  <script src="catalog-pricing.js"></script>
+  <script src="site-bootstrap.js"></script>
+  <script src="script.js"></script>
+  <script src="home-auth-ui.js"></script>
+  <script src="intelligent-selection.js"></script>
+</body>
+</html>
