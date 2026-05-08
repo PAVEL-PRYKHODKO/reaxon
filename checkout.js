@@ -44,6 +44,16 @@
     return ($("co-delivery") && $("co-delivery").value) === "nova_poshta";
   }
 
+  function currentCheckoutDeliveryMethod() {
+    return ($("co-delivery") && $("co-delivery").value) || "nova_poshta";
+  }
+
+  /** Місто потрібне для відправлень; для самовивозу та «за узгодженням» — ні (як на сторінці оплати). */
+  function checkoutDeliveryNeedsCity(dm) {
+    const d = dm || currentCheckoutDeliveryMethod();
+    return d !== "pickup" && d !== "agreement";
+  }
+
   function syncNewsletterConsentUi() {
     const cb = $("co-newsletter");
     if (!cb) return;
@@ -115,37 +125,93 @@
   }
 
   function refreshDisabled() {
-    const ok = hasCityComplete();
-    const isNv = isNovaDelivery();
+    const legal = isLoggedLegalEntityBuyer();
+    const dm = currentCheckoutDeliveryMethod();
+    const pickupOrAgreement = dm === "pickup" || dm === "agreement";
+    const needsCity = checkoutDeliveryNeedsCity(dm);
+    const ok = needsCity ? hasCityComplete() : true;
+    const isNv = dm === "nova_poshta";
+    const courier = dm === "courier";
+    const otherCarrier = dm === "ukrposhta" || dm === "meest" || dm === "autolux";
+
     const useNpSelect = ok && isNv && state.npConfigured;
-    const useManual = !useNpSelect;
+    const useManualNpOnly = ok && isNv && !state.npConfigured;
+    const showCarrierManual = ok && (courier || otherCarrier);
+
     const delBlock = $("co-delivery-block");
     const del = $("co-delivery");
     const wh = $("co-warehouse");
     const whMan = $("co-warehouse-manual");
     const whNp = $("co-np-warehouse-wrap");
     const lbl = $("co-warehouse-row-label");
+    const warehouseBlock = $("co-warehouse-block");
+    const shippingLoc = $("co-shipping-location-block");
+    const npHint = $("co-np-fallback-hint");
 
-    if (delBlock) delBlock.classList.toggle("checkout-block-muted", !ok);
-    if (del) del.disabled = !ok;
+    if (delBlock) delBlock.classList.toggle("checkout-block-muted", needsCity && !ok);
+    if (del) del.disabled = Boolean((needsCity && !ok) || legal);
+
+    if (shippingLoc) shippingLoc.hidden = pickupOrAgreement || legal;
+
+    if (npHint) {
+      if (legal || pickupOrAgreement) npHint.hidden = true;
+      else npHint.hidden = Boolean(state.npConfigured);
+    }
+
+    const showWarehouseBlock = !pickupOrAgreement && !legal;
+    if (warehouseBlock) warehouseBlock.hidden = !showWarehouseBlock;
+
+    if (!showWarehouseBlock) {
+      if (whNp) whNp.classList.add("is-hidden");
+      if (wh) {
+        wh.classList.add("is-hidden");
+        wh.disabled = true;
+      }
+      if (whMan) {
+        whMan.classList.add("is-hidden");
+        whMan.disabled = true;
+      }
+      setNpWarehouseHint("");
+      return;
+    }
 
     if (whNp) whNp.classList.toggle("is-hidden", !useNpSelect);
+    const showMan = Boolean(useManualNpOnly || showCarrierManual);
     if (whMan) {
-      whMan.classList.toggle("is-hidden", !useManual);
-      whMan.disabled = !useManual || !ok;
+      whMan.classList.toggle("is-hidden", !showMan);
+      whMan.disabled = !showMan || !ok;
+      if (showMan) {
+        if (useManualNpOnly) whMan.setAttribute("data-i18n-placeholder", "checkoutWarehouseManual");
+        else if (courier) whMan.setAttribute("data-i18n-placeholder", "checkoutWarehouseCourierPlaceholder");
+        else if (otherCarrier) whMan.setAttribute("data-i18n-placeholder", "checkoutWarehouseCarrierPlaceholder");
+        if (typeof window.applyTranslations === "function") window.applyTranslations(whMan);
+        else whMan.placeholder = t(whMan.getAttribute("data-i18n-placeholder") || "checkoutWarehouseManual");
+      }
     }
     if (wh) {
-      wh.classList.remove("is-hidden");
+      wh.classList.toggle("is-hidden", !useNpSelect);
       wh.disabled = !useNpSelect || (useNpSelect && !state.cityRef);
     }
+
     if (lbl) {
-      if (useNpSelect) lbl.setAttribute("for", "co-warehouse");
-      else lbl.setAttribute("for", "co-warehouse-manual");
+      if (useNpSelect) {
+        lbl.setAttribute("for", "co-warehouse");
+        lbl.setAttribute("data-i18n", "checkoutWarehouse");
+      } else if (useManualNpOnly) {
+        lbl.setAttribute("for", "co-warehouse-manual");
+        lbl.setAttribute("data-i18n", "checkoutWarehouse");
+      } else if (courier) {
+        lbl.setAttribute("for", "co-warehouse-manual");
+        lbl.setAttribute("data-i18n", "checkoutWarehouseCourier");
+      } else if (otherCarrier) {
+        lbl.setAttribute("for", "co-warehouse-manual");
+        lbl.setAttribute("data-i18n", "checkoutWarehouseCarrier");
+      }
+      if (typeof window.applyTranslations === "function") window.applyTranslations(lbl);
+      else lbl.textContent = t(lbl.getAttribute("data-i18n") || "checkoutWarehouse");
     }
 
-    if (!useNpSelect) {
-      setNpWarehouseHint("");
-    }
+    if (!useNpSelect) setNpWarehouseHint("");
   }
 
   /** Реквизиты юрособи в сохранённом профиле (после /api/auth/me). */
@@ -578,20 +644,20 @@
 
   function syncCheckoutPaymentRules() {
     const paymentBlock = $("co-payment-block");
-    const formatWrap = $("co-legal-invoice-format-wrap");
     const legal = isLoggedLegalEntityBuyer();
-    if (paymentBlock) paymentBlock.hidden = !legal;
-    if (formatWrap) formatWrap.hidden = !legal;
+    if (paymentBlock) {
+      paymentBlock.hidden = !legal;
+      paymentBlock.classList.toggle("is-hidden", !legal);
+    }
   }
 
   function syncCheckoutLegalEntityFieldVisibility() {
     const legal = isLoggedLegalEntityBuyer();
     const deliveryBlock = $("co-delivery-block");
-    const warehouseBlock = $("co-warehouse-block");
     const npHint = $("co-np-fallback-hint");
     if (deliveryBlock) deliveryBlock.hidden = legal;
-    if (warehouseBlock) warehouseBlock.hidden = legal;
     if (npHint && legal) npHint.hidden = true;
+    refreshDisabled();
   }
 
   function clearCheckoutRequiredHighlights() {
@@ -920,6 +986,7 @@
       syncNewsletterConsentUi();
       syncCheckoutPaymentRules();
       syncCheckoutLegalEntityFieldVisibility();
+      refreshDisabled();
     });
 
     const form = $("checkout-form");
@@ -993,22 +1060,22 @@
     }
 
     $("co-delivery")?.addEventListener("change", () => {
-      if (!isNovaDelivery()) {
-        setNpWarehouseHint("");
+      const dm = currentCheckoutDeliveryMethod();
+      setNpWarehouseHint("");
+      if (dm === "pickup" || dm === "agreement") {
+        if (whMan) whMan.value = "";
+        state.warehouseRef = "";
+        state.warehouseLabel = "";
+        if (whSel) whSel.innerHTML = `<option value="">${escapeHtml(t("checkoutWarehousePlaceholder"))}</option>`;
+      } else if (dm === "nova_poshta") {
         state.warehouseRef = "";
         state.warehouseLabel = (whMan && whMan.value.trim()) || "";
-        if (whSel) {
-          whSel.innerHTML = `<option value="">${escapeHtml(t("checkoutWarehousePlaceholder"))}</option>`;
-        }
+        if (whSel) whSel.innerHTML = `<option value="">${escapeHtml(t("checkoutWarehousePlaceholder"))}</option>`;
+        if (state.npConfigured && state.cityRef) void loadWarehouses(state.cityRef);
       } else {
         state.warehouseRef = "";
         state.warehouseLabel = (whMan && whMan.value.trim()) || "";
-        if (whSel) {
-          whSel.innerHTML = `<option value="">${escapeHtml(t("checkoutWarehousePlaceholder"))}</option>`;
-        }
-        if (state.npConfigured && state.cityRef) {
-          void loadWarehouses(state.cityRef);
-        }
+        if (whSel) whSel.innerHTML = `<option value="">${escapeHtml(t("checkoutWarehousePlaceholder"))}</option>`;
       }
       renderOrderSummary();
       refreshDisabled();
@@ -1136,16 +1203,19 @@
       if (phoneFinal.length < 9) missing.push("co-phone");
       if (!/.+@.+\..+/.test(emailFinal)) missing.push("co-email");
       if (!legalInvoiceOnly) {
-        if (!$("co-city-select")?.value) {
-          missing.push("co-city-select");
-        } else if ($("co-city-select")?.value === "__other__") {
-          if (state.npConfigured) {
-            if (!state.cityRef) missing.push("co-city");
-          } else if (!(($("co-city") && $("co-city").value.trim().length >= 2))) {
-            missing.push("co-city");
+        const needsCity = checkoutDeliveryNeedsCity(deliveryMethod);
+        if (needsCity) {
+          if (!$("co-city-select")?.value) {
+            missing.push("co-city-select");
+          } else if ($("co-city-select")?.value === "__other__") {
+            if (state.npConfigured) {
+              if (!state.cityRef) missing.push("co-city");
+            } else if (!(($("co-city") && $("co-city").value.trim().length >= 2))) {
+              missing.push("co-city");
+            }
+          } else if (state.npConfigured && !state.cityRef) {
+            missing.push("co-city-select");
           }
-        } else if (state.npConfigured && !state.cityRef) {
-          missing.push("co-city-select");
         }
         if (!($("co-delivery") && $("co-delivery").value)) missing.push("co-delivery");
         if (nova) {
@@ -1154,7 +1224,13 @@
           } else if (!(whMan && whMan.value.trim().length >= 2)) {
             missing.push("co-warehouse-manual");
           }
-        } else if (!byAgreement && !(whMan && whMan.value.trim().length >= 2)) {
+        } else if (
+          (deliveryMethod === "courier" ||
+            deliveryMethod === "ukrposhta" ||
+            deliveryMethod === "meest" ||
+            deliveryMethod === "autolux") &&
+          !(whMan && whMan.value.trim().length >= 2)
+        ) {
           missing.push("co-warehouse-manual");
         }
       }
@@ -1173,6 +1249,16 @@
           "co-warehouse-manual": uk ? "Вкажіть відділення або адресу." : "Укажите отделение или адрес.",
           "co-accept-offer": uk ? "Потрібна згода з договором оферти." : "Необходимо согласие с договором оферты.",
         };
+        if (missing.includes("co-warehouse-manual")) {
+          if (deliveryMethod === "courier") labels["co-warehouse-manual"] = t("checkoutErrorCourierDetail");
+          else if (
+            deliveryMethod === "ukrposhta" ||
+            deliveryMethod === "meest" ||
+            deliveryMethod === "autolux"
+          ) {
+            labels["co-warehouse-manual"] = t("checkoutErrorCarrierDetail");
+          }
+        }
         missing.forEach((id) => setCheckoutFieldError(id, labels[id] || (uk ? "Заповніть поле." : "Заполните поле.")));
         if (st) st.textContent = "";
         return;
@@ -1203,7 +1289,7 @@
         }
       }
       if (!legalInvoiceOnly) {
-        if (!hasCityComplete()) {
+        if (checkoutDeliveryNeedsCity(deliveryMethod) && !hasCityComplete()) {
           if (st) st.textContent = t("checkoutCityPick");
           return;
         }
@@ -1224,9 +1310,17 @@
             }
             state.warehouseRef = "";
           }
-        } else if (!byAgreement) {
+        } else if (
+          deliveryMethod === "courier" ||
+          deliveryMethod === "ukrposhta" ||
+          deliveryMethod === "meest" ||
+          deliveryMethod === "autolux"
+        ) {
           if (!(whMan && whMan.value.trim().length >= 2)) {
-            if (st) st.textContent = t("checkoutWarehouseManual");
+            if (st) {
+              st.textContent =
+                deliveryMethod === "courier" ? t("checkoutErrorCourierDetail") : t("checkoutErrorCarrierDetail");
+            }
             return;
           }
           state.warehouseRef = "";
@@ -1240,13 +1334,16 @@
       if (!cityDisp) cityDisp = String(($("co-city") && $("co-city").value.trim()) || "");
 
       const whText = (whMan && whMan.value.trim()) || "";
-      const point = nova
-        ? state.warehouseRef
-          ? state.warehouseLabel
-          : whText
-        : byAgreement
-          ? (comment || "")
-          : whText;
+      const point =
+        deliveryMethod === "pickup"
+          ? t("checkoutDeliveryPickup")
+          : nova
+            ? state.warehouseRef
+              ? state.warehouseLabel
+              : whText
+            : byAgreement
+              ? comment || ""
+              : whText;
 
       const { cartSnapshot, orderTotal } = window.dpCheckoutLeadPayloadBase();
       const checkoutMeta = typeof window.dpCheckoutGetCart === "function" ? window.dpCheckoutGetCart() : {};

@@ -19,7 +19,8 @@
   };
 
   function getLang() {
-    const l = String(localStorage.getItem(KEY) || "uk");
+    const l = String(localStorage.getItem(KEY) || "uk").trim().toLowerCase();
+    if (l === "ru") return "ru";
     if (l === "uk") return "uk";
     if (l === "en") return "uk";
     return "uk";
@@ -118,6 +119,15 @@
     if (l !== "ru" && l !== "uk") return;
     localStorage.setItem(KEY, l);
     setHtmlLang();
+    const sel = document.getElementById("language-switcher");
+    if (sel) {
+      sel.value = l;
+      const row = MIN[l] || MIN.ru;
+      sel.setAttribute("aria-label", row.langSelectAria || row.langLabel);
+    }
+    applyMinI18n();
+    dispatch();
+    if (window.dpApplyDataLangAttrs) window.dpApplyDataLangAttrs();
   };
   window.DP_I18N_MIN = MIN;
   window.dpApplyDataLangAttrs = applyDataLangAttrs;

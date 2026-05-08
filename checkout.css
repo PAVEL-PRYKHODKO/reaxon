@@ -54,6 +54,11 @@
   gap: 0.9rem;
 }
 
+/* Атрибут hidden має ховати рядок навіть при `.checkout-row { display: grid }` (інакше блок «юрособа» видно фізособі). */
+.checkout-wrap [hidden] {
+  display: none !important;
+}
+
 .checkout-row {
   display: grid;
   grid-template-columns: 1fr;

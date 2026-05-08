@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -35,8 +35,8 @@
               <span data-i18n="langLabel">Язык</span>
             </label>
             <select id="language-switcher" class="lang-switcher__select">
+              <option value="uk" selected>UA</option>
               <option value="ru">RU</option>
-              <option value="uk">UA</option>
             </select>
           </div>
           <div class="header-search-inline topbar-search home-site-search">
@@ -120,31 +120,33 @@
                   <label class="checkout-label" for="co-phone" data-i18n="checkoutPhone">Телефон</label>
                   <input class="checkout-input" id="co-phone" name="phone" type="tel" required autocomplete="tel" />
                 </div>
-                <div class="checkout-row checkout-row--split">
-                  <label class="checkout-label" for="co-city-select" data-i18n="checkoutCity">Город</label>
-                  <div class="checkout-city-col">
-                    <select class="checkout-select" id="co-city-select" name="citySelect" data-i18n-aria-label="checkoutCity" aria-label="Город">
-                      <option value="" data-i18n="checkoutCityPick">— Выберите город —</option>
-                      <option value="__other__" data-i18n="checkoutCityOther">Другой город (поиск)…</option>
-                    </select>
-                    <div id="co-city-search-wrap" class="checkout-city-wrap is-hidden">
-                      <input
-                        class="checkout-input"
-                        id="co-city"
-                        name="city"
-                        type="text"
-                        data-i18n-placeholder="checkoutCityPlaceholder"
-                        placeholder="название города или индекс"
-                        autocomplete="address-level1"
-                      />
-                      <ul class="checkout-city-suggest is-hidden" id="co-city-suggest" aria-live="polite" role="listbox"></ul>
+                <div id="co-shipping-location-block">
+                  <div class="checkout-row checkout-row--split">
+                    <label class="checkout-label" for="co-city-select" data-i18n="checkoutCity">Город</label>
+                    <div class="checkout-city-col">
+                      <select class="checkout-select" id="co-city-select" name="citySelect" data-i18n-aria-label="checkoutCity" aria-label="Город">
+                        <option value="" data-i18n="checkoutCityPick">— Выберите город —</option>
+                        <option value="__other__" data-i18n="checkoutCityOther">Другой город (поиск)…</option>
+                      </select>
+                      <div id="co-city-search-wrap" class="checkout-city-wrap is-hidden">
+                        <input
+                          class="checkout-input"
+                          id="co-city"
+                          name="city"
+                          type="text"
+                          data-i18n-placeholder="checkoutCityPlaceholder"
+                          placeholder="название города или индекс"
+                          autocomplete="address-level1"
+                        />
+                        <ul class="checkout-city-suggest is-hidden" id="co-city-suggest" aria-live="polite" role="listbox"></ul>
+                      </div>
+                      <input type="hidden" id="co-city-ref" name="cityRef" value="" />
                     </div>
-                    <input type="hidden" id="co-city-ref" name="cityRef" value="" />
                   </div>
+                  <p class="checkout-hint" id="co-np-fallback-hint" data-i18n="checkoutHintManualNp">
+                    Укажите населённый пункт (от 2 символов), затем отделение. Справочник Новой Почты на сервере не подключён — адрес введите вручную.
+                  </p>
                 </div>
-                <p class="checkout-hint" id="co-np-fallback-hint" data-i18n="checkoutHintManualNp">
-                  Укажите населённый пункт (от 2 символов), затем отделение. Справочник Новой Почты на сервере не подключён — адрес введите вручную.
-                </p>
                 <div class="checkout-row checkout-row--split">
                   <label class="checkout-label" for="co-email" data-i18n="checkoutEmail">E-mail</label>
                   <input class="checkout-input" id="co-email" name="email" type="email" autocomplete="email" />

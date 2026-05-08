@@ -69,6 +69,12 @@ const I18N = {
     checkoutWarehouse: "Отделение / адрес",
     checkoutWarehousePlaceholder: "Выберите отделение",
     checkoutWarehouseManual: "Отделение / комментарий к адресу",
+    checkoutWarehouseCourier: "Курьер НП: заявка / комментарий",
+    checkoutWarehouseCourierPlaceholder: "Номер заявки в сервисе Новой Почты или комментарий для курьера",
+    checkoutWarehouseCarrier: "Отделение / адрес доставки",
+    checkoutWarehouseCarrierPlaceholder: "Индекс отделения, адрес или комментарий к доставке",
+    checkoutErrorCourierDetail: "Укажите номер заявки Новой Почты или комментарий для курьера (от 2 символов).",
+    checkoutErrorCarrierDetail: "Укажите отделение, индекс или адрес доставки (от 2 символов).",
     checkoutPayment: "Оплата",
     checkoutPayCard: "Онлайн-оплата банковской картой (LiqPay)",
     checkoutPayIban: "Счет-фактура отправляется файлом на email",
@@ -441,6 +447,12 @@ const I18N = {
     checkoutWarehouse: "Відділення / адреса",
     checkoutWarehousePlaceholder: "Оберіть відділення",
     checkoutWarehouseManual: "Відділення / коментар до адреси",
+    checkoutWarehouseCourier: "Кур'єр НП: заявка / коментар",
+    checkoutWarehouseCourierPlaceholder: "Номер заявки в сервісі Нової Пошти або коментар для кур'єра",
+    checkoutWarehouseCarrier: "Відділення / адреса доставки",
+    checkoutWarehouseCarrierPlaceholder: "Індекс відділення, адреса або коментар до доставки",
+    checkoutErrorCourierDetail: "Вкажіть номер заявки Нової Пошти або коментар для кур'єра (від 2 символів).",
+    checkoutErrorCarrierDetail: "Вкажіть відділення, індекс або адресу доставки (від 2 символів).",
     checkoutPayment: "Оплата",
     checkoutPayCard: "Онлайн-оплата банківською карткою (LiqPay)",
     checkoutPayIban: "Рахунок-фактура надсилається файлом на email",
@@ -813,6 +825,12 @@ const I18N = {
     checkoutWarehouse: "Branch / address",
     checkoutWarehousePlaceholder: "Select a branch",
     checkoutWarehouseManual: "Branch / address note",
+    checkoutWarehouseCourier: "NP courier: request № / note",
+    checkoutWarehouseCourierPlaceholder: "Nova Poshta shipment request № or note for courier",
+    checkoutWarehouseCarrier: "Branch / delivery address",
+    checkoutWarehouseCarrierPlaceholder: "Branch index, address or delivery note",
+    checkoutErrorCourierDetail: "Enter the Nova Poshta request № or a note for the courier (at least 2 characters).",
+    checkoutErrorCarrierDetail: "Enter branch, index or delivery address (at least 2 characters).",
     checkoutPayment: "Payment",
     checkoutPayCard: "Card online (LiqPay)",
     checkoutPayIban: "Invoice file is sent by email",
@@ -1642,7 +1660,7 @@ function dv2StripPriceLeadIntro(lead) {
 }
 
 function dv2DefaultRowPriceLabels() {
-  const lang = String(document.documentElement.lang || "ru")
+  const lang = String(document.documentElement.lang || "uk")
     .slice(0, 2)
     .toLowerCase();
   if (lang === "uk") return ["від", "до"];
@@ -4682,7 +4700,7 @@ function renderStructuredFooterFromProjectData() {
   footers.forEach((wrap) => {
     const langNow =
       (typeof window.getDpLang === "function" ? window.getDpLang() : null) ||
-      (typeof state !== "undefined" && state && state.lang ? state.lang : "ru");
+      (typeof state !== "undefined" && state && state.lang ? state.lang : "uk");
     if (wrap.dataset.footerStructured === "1" && wrap.dataset.footerStructuredLang === langNow) return;
     const navAnchors = Array.from(wrap.querySelectorAll(".footer-laconic-nav a"));
     const metaAnchors = Array.from(wrap.querySelectorAll(".footer-laconic-row--meta a"));

@@ -961,6 +961,21 @@ function initPortal(root) {
     const params = new URLSearchParams(location.search);
     const urlId = params.get("id");
     const urlQ = params.get("q");
+    const urlFamily = String(params.get("family") || "").trim().toLowerCase();
+    const urlPurpose = String(params.get("purpose") || "").trim().toLowerCase();
+
+    const allowedFamily = new Set(["enamel", "primer", "lacquer", "paint", "putty", "other", "all"]);
+    const allowedPurpose = new Set([
+      "interior",
+      "facade",
+      "industrial",
+      "wd-dispersion",
+      "wood-protection",
+      "fire-retardant",
+      "surface-prep",
+      "disinfectant",
+      "solvents",
+    ]);
 
     if (urlId && urlId.trim() && cfg.catalogLayout) {
       const idStr = urlId.trim();
@@ -979,6 +994,17 @@ function initPortal(root) {
         if (codeInpEarly) codeInpEarly.value = "";
         cfg.root.querySelectorAll('input[name="catalog-purpose"]').forEach((el) => {
           el.checked = false;
+        });
+      }
+    } else if (allowedFamily.has(urlFamily) || allowedPurpose.has(urlPurpose)) {
+      state.headerSearch = "";
+      state.family = allowedFamily.has(urlFamily) ? urlFamily : "all";
+      state.purpose = "all";
+      state.seriesCode = "all";
+      state.positionId = "all";
+      if (cfg.catalogLayout) {
+        cfg.root.querySelectorAll('input[name="catalog-purpose"]').forEach((el) => {
+          el.checked = allowedPurpose.has(urlPurpose) && el.value === urlPurpose;
         });
       }
     } else if (urlQ && urlQ.trim()) {
