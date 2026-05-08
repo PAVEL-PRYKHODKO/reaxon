@@ -189,30 +189,30 @@
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", "true");
     modal.style.cssText =
-      "position:fixed;inset:0;z-index:10000;background:rgba(2,8,23,.62);display:grid;place-items:center;padding:16px;";
+      "position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,.18);display:grid;place-items:center;padding:16px;";
     modal.innerHTML = `
-      <section style="max-width:720px;width:100%;background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:14px;padding:18px;font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;">
+      <section style="max-width:720px;width:100%;background:#ffffff;color:#0f172a;border:1px solid #dbe4f0;border-radius:14px;padding:18px;box-shadow:0 14px 34px rgba(15,23,42,.14);font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;">
         <h2 style="margin:0 0 8px;font-size:20px;">${i18n.title}</h2>
-        <p style="margin:0 0 14px;color:#94a3b8;">${i18n.intro}</p>
-        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border:1px solid #334155;border-radius:10px;">
+        <p style="margin:0 0 14px;color:#475569;">${i18n.intro}</p>
+        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border:1px solid #dbe4f0;background:#f8fbff;border-radius:10px;">
           <input type="checkbox" checked disabled />
-          <span><strong>${i18n.necessaryTitle}</strong><br/><span style="color:#94a3b8">${i18n.necessaryBody}</span></span>
+          <span><strong>${i18n.necessaryTitle}</strong><br/><span style="color:#64748b">${i18n.necessaryBody}</span></span>
         </label>
-        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border:1px solid #334155;border-radius:10px;">
+        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border:1px solid #dbe4f0;background:#ffffff;border-radius:10px;">
           <input id="dp-consent-analytics" type="checkbox" ${consent.analytics ? "checked" : ""} />
-          <span><strong>${i18n.analyticsTitle}</strong><br/><span style="color:#94a3b8">${i18n.analyticsBody}</span></span>
+          <span><strong>${i18n.analyticsTitle}</strong><br/><span style="color:#64748b">${i18n.analyticsBody}</span></span>
         </label>
-        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border:1px solid #334155;border-radius:10px;">
+        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border:1px solid #dbe4f0;background:#ffffff;border-radius:10px;">
           <input id="dp-consent-marketing" type="checkbox" ${consent.marketing ? "checked" : ""} />
-          <span><strong>${i18n.marketingTitle}</strong><br/><span style="color:#94a3b8">${i18n.marketingBody}</span></span>
+          <span><strong>${i18n.marketingTitle}</strong><br/><span style="color:#64748b">${i18n.marketingBody}</span></span>
         </label>
-        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border:1px solid #334155;border-radius:10px;">
+        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border:1px solid #dbe4f0;background:#ffffff;border-radius:10px;">
           <input id="dp-consent-personalization" type="checkbox" ${consent.personalization ? "checked" : ""} />
-          <span><strong>${i18n.personalizationTitle}</strong><br/><span style="color:#94a3b8">${i18n.personalizationBody}</span></span>
+          <span><strong>${i18n.personalizationTitle}</strong><br/><span style="color:#64748b">${i18n.personalizationBody}</span></span>
         </label>
         <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;">
-          <button id="dp-consent-modal-cancel" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #475569;background:transparent;color:#e2e8f0;cursor:pointer;">${i18n.cancel}</button>
-          <button id="dp-consent-modal-reject" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #475569;background:transparent;color:#e2e8f0;cursor:pointer;">${i18n.reject}</button>
+          <button id="dp-consent-modal-cancel" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#334155;cursor:pointer;">${i18n.cancel}</button>
+          <button id="dp-consent-modal-reject" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#334155;cursor:pointer;">${i18n.reject}</button>
           <button id="dp-consent-modal-save" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;cursor:pointer;">${i18n.save}</button>
         </div>
       </section>
@@ -248,16 +248,16 @@
     banner.setAttribute("role", "dialog");
     banner.setAttribute("aria-live", "polite");
     banner.style.cssText =
-      "position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:12px;padding:14px;box-shadow:0 12px 28px rgba(2,8,23,.35);font:14px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;";
+      "position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;background:#ffffff;color:#0f172a;border:1px solid #dbe4f0;border-radius:12px;padding:14px;box-shadow:0 10px 24px rgba(15,23,42,.14);font:14px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;";
     banner.innerHTML = `
       <div style="max-width:980px;margin:0 auto;display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between">
         <div style="min-width:260px;flex:1">
           Мы хотели бы сообщить вам, что на нашем веб-сайте мы используем функциональные файлы cookie без вашего согласия, в то время как статистические и маркетинговые файлы cookie используются с вашего согласия.
-          <a href="privacy-policy.html" style="color:#93c5fd">Подробная информация об управлении файлами cookie доступна здесь.</a>
+          <a href="privacy-policy.html" style="color:#1d4ed8">Подробная информация об управлении файлами cookie доступна здесь.</a>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button id="dp-consent-settings" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #475569;background:transparent;color:#e2e8f0;cursor:pointer">Настроить</button>
-          <button id="dp-consent-reject" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #475569;background:transparent;color:#e2e8f0;cursor:pointer">Только обязательные</button>
+          <button id="dp-consent-settings" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#334155;cursor:pointer">Настроить</button>
+          <button id="dp-consent-reject" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#334155;cursor:pointer">Только обязательные</button>
           <button id="dp-consent-accept" type="button" style="padding:8px 12px;border-radius:8px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;cursor:pointer">Принять все cookie</button>
         </div>
       </div>

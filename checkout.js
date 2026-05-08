@@ -22,6 +22,7 @@
 
   let citySuggestOpen = false;
   const CHECKOUT_DRAFT_COOKIE = "dp_checkout_draft_v1";
+  let legalRequisitesCache = null;
 
   function $(id) {
     return document.getElementById(id);
@@ -54,6 +55,9 @@
   function hasCityComplete() {
     const sel = $("co-city-select");
     if (!sel || !sel.value) return false;
+    if (/^p:/.test(sel.value)) {
+      return Boolean(String(state.cityLabel || sel.options[sel.selectedIndex]?.textContent || "").trim());
+    }
     if (sel.value === "__other__") {
       if (state.npConfigured) {
         return Boolean(state.cityRef && state.cityLabel);
@@ -155,14 +159,10 @@
       const u = JSON.parse(localStorage.getItem("authUser") || "null");
       const pr = u?.profile || {};
       const company = String(pr.companyName || "").trim();
-      const ed = String(pr.edrpou || "").replace(/\s/g, "");
-      const ibanRaw = String(pr.billingIban || "").replace(/\s/g, "").toUpperCase();
       const invMail = String(pr.invoiceEmail || "").trim() || String(u?.email || "").trim();
       const adr = String(pr.legalAddress || "").trim();
       const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invMail);
-      const edOk = /^\d{8,10}$/.test(ed);
-      const ibOk = /^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(ibanRaw) && ibanRaw.length >= 15;
-      return company.length >= 2 && edOk && ibOk && emailOk && adr.length >= 8;
+      return company.length >= 2 && emailOk && adr.length >= 5;
     } catch {
       return false;
     }
@@ -239,6 +239,15 @@
         <h2 class="checkout-order-title" data-i18n="checkoutYourOrder">${escapeHtml(t("checkoutYourOrder"))}</h2>
         ${pricingNoteHtml}
         ${items || `<p class="meta">${escapeHtml(t("emptyCart"))}</p>`}
+        ${
+          lines.length
+            ? `<p><button type="button" class="btn btn-ghost" data-clear-checkout-cart>${
+                typeof window.getDpLang === "function" && window.getDpLang() === "uk"
+                  ? "Очистити кошик"
+                  : "Очистить корзину"
+              }</button></p>`
+            : ""
+        }
         <p class="checkout-coupon" data-i18n="checkoutCoupon">${escapeHtml(t("checkoutCoupon"))}</p>
         <div class="checkout-order-meta">
           <div class="checkout-order-row">
@@ -427,6 +436,15 @@
 
   function wireOrderPanel(root) {
     root.addEventListener("click", (e) => {
+      const clear = e.target.closest("[data-clear-checkout-cart]");
+      if (clear) {
+        e.preventDefault();
+        if (typeof window.dpCheckoutClearCart === "function") window.dpCheckoutClearCart();
+        state.warehouseLabel = "";
+        state.warehouseRef = "";
+        renderOrderSummary();
+        return;
+      }
       const r = e.target.closest("[data-remove-line]");
       if (r) {
         e.preventDefault();
@@ -479,9 +497,44 @@
       const name = $("co-name");
       const phone = $("co-phone");
       const email = $("co-email");
+      const citySelect = $("co-city-select");
+      const cityInput = $("co-city");
+      const cityRefInput = $("co-city-ref");
+      const profileCity = String(
+        (u.profile && (u.profile.city || u.profile.countryRegion)) || ""
+      ).trim();
       if (name) name.value = String(u.name || "").trim();
       if (email) email.value = String(u.email || "").trim();
       if (phone) phone.value = String((u.profile && u.profile.phone) || "").trim();
+      if (profileCity && citySelect) {
+        const options = Array.from(citySelect.options || []);
+        const norm = (v) => String(v || "").toLowerCase().replace(/\s+/g, " ").trim();
+        const target = norm(profileCity);
+        const hit = options.find((opt) => /^c:\d+$/.test(String(opt.value || "")) && norm(opt.textContent) === target);
+        if (hit) {
+          citySelect.value = hit.value;
+          cityInput && (cityInput.value = "");
+          cityRefInput && (cityRefInput.value = "");
+          citySelect.dispatchEvent(new Event("change", { bubbles: true }));
+        } else {
+          const customValue = `p:${target}`;
+          let custom = options.find((opt) => opt.value === customValue);
+          if (!custom) {
+            custom = document.createElement("option");
+            custom.value = customValue;
+            custom.textContent = profileCity;
+            citySelect.appendChild(custom);
+          }
+          citySelect.value = customValue;
+          citySelect.dispatchEvent(new Event("change", { bubbles: true }));
+          if (cityInput) cityInput.value = profileCity;
+          if (cityRefInput) cityRefInput.value = "";
+          state.cityLabel = profileCity;
+          state.cityRef = "";
+          renderOrderSummary();
+          refreshDisabled();
+        }
+      }
     } catch {
       /* ignore */
     }
@@ -509,6 +562,72 @@
       email.required = !loggedIn;
       email.readOnly = loggedIn;
     }
+    syncCheckoutPaymentRules();
+  }
+
+  function isLoggedLegalEntityBuyer() {
+    try {
+      if (!isCustomerLoggedIn()) return false;
+      const u = JSON.parse(localStorage.getItem("authUser") || "null");
+      return Boolean(u?.profile?.isLegalEntity);
+    } catch {
+      return false;
+    }
+  }
+
+  function legalCompanyRequisitesText() {
+    const uk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+    const cfg = legalRequisitesCache;
+    if (cfg && cfg.address && cfg.correspondenceAddress) {
+      const addr = uk ? String(cfg.address.uk || "") : String(cfg.address.ru || "");
+      const corr = uk ? String(cfg.correspondenceAddress.uk || "") : String(cfg.correspondenceAddress.ru || "");
+      const ed = String(cfg.edrpou || "");
+      const ipn = String(cfg.ipn || "");
+      const cert = String(cfg.certificateNo || "");
+      const phone = String(cfg.phone || "");
+      if (uk) {
+        return `Для юридичних осіб доступна лише оплата за реквізитами компанії: ${addr}; код ЄДРПОУ ${ed}; ІПН ${ipn}; св-во № ${cert}; адреса для кореспонденції: ${corr}; тел. ${phone}.`;
+      }
+      return `Для юридических лиц доступна только оплата по реквизитам компании: ${addr}; код ЕГРПОУ ${ed}; ИНН ${ipn}; св-во № ${cert}; адрес для корреспонденции: ${corr}; тел. ${phone}.`;
+    }
+    if (uk) {
+      return "Для юридичних осіб доступна лише оплата за реквізитами компанії: 69002, м. Запоріжжя, вул. Костянтина Великого, буд. 20; код ЄДРПОУ 32297953; ІПН 322979508268; св-во № 200123175; адреса для кореспонденції: м. Запоріжжя, Н. Пошта, відд. 29; тел. (067) 6134828.";
+    }
+    return "Для юридических лиц доступна только оплата по реквизитам компании: 69002, г. Запорожье, ул. Константина Великого, дом 20; код ЕГРПОУ 32297953; ИНН 322979508268; св-во № 200123175; адрес для корреспонденции: г. Запорожье, Н. Почта, отд. 29; тел. (067) 6134828.";
+  }
+
+  function syncCheckoutPaymentRules() {
+    const pay = $("co-payment");
+    const note = $("co-legal-payment-note");
+    const formatWrap = $("co-legal-invoice-format-wrap");
+    if (!pay) return;
+    const cardOpt = pay.querySelector('option[value="liqpay"]');
+    const legal = isLoggedLegalEntityBuyer();
+    if (cardOpt) {
+      cardOpt.disabled = legal;
+      cardOpt.hidden = legal;
+    }
+    if (legal) {
+      pay.value = "iban";
+      if (note) {
+        note.hidden = false;
+        note.textContent = legalCompanyRequisitesText();
+      }
+      if (formatWrap) formatWrap.hidden = false;
+      return;
+    }
+    if (cardOpt) {
+      cardOpt.disabled = false;
+      cardOpt.hidden = false;
+    }
+    if (!pay.value) {
+      pay.value = "liqpay";
+    }
+    if (note) {
+      note.hidden = true;
+      note.textContent = "";
+    }
+    if (formatWrap) formatWrap.hidden = true;
   }
 
   function clearCheckoutRequiredHighlights() {
@@ -558,26 +677,18 @@
         ? "Для оформлення як зареєстрований покупець увійдіть в акаунт."
         : "Для оформления как зарегистрированный покупатель выполните вход в аккаунт.";
     }
-    if (regLoginForm) regLoginForm.hidden = false;
-    if (hint) hint.hidden = !regMode;
+    if (regLoginForm) regLoginForm.hidden = !regMode || loggedIn;
+    if (hint) hint.hidden = !(regMode && !loggedIn);
     if (checkoutForm) {
-      checkoutForm.hidden = regMode;
-      checkoutForm.style.display = regMode ? "none" : "";
+      const hideCheckout = regMode && !loggedIn;
+      checkoutForm.hidden = hideCheckout;
+      checkoutForm.style.display = hideCheckout ? "none" : "";
     }
-    if (rows) rows.hidden = regMode;
+    if (rows) rows.hidden = regMode && !loggedIn;
     if (autoFillHint && regMode) autoFillHint.hidden = true;
-    if (status && regMode) status.textContent = "";
-    if (submit) submit.hidden = regMode;
-    if (regMode && loggedIn) {
-      if (regStatus) {
-        regStatus.textContent = uk ? "Ви вже авторизовані. Переходимо до оплати…" : "Вы уже авторизованы. Переходим к оплате…";
-      }
-      setTimeout(() => {
-        if (state.tab === "reg" && isCustomerLoggedIn()) {
-          location.href = "account-payment.html";
-        }
-      }, 250);
-    } else if (regStatus) {
+    if (status && regMode && !loggedIn) status.textContent = "";
+    if (submit) submit.hidden = regMode && !loggedIn;
+    if (regStatus) {
       regStatus.textContent = "";
     }
   }
@@ -646,6 +757,7 @@
       $("co-warehouse-manual").dispatchEvent(new Event("input", { bubbles: true }));
     }
     saveCheckoutDraftCookie();
+    syncCheckoutPaymentRules();
   }
 
   function setupCheckoutAutofillSuggestion() {
@@ -699,6 +811,35 @@
     });
   }
 
+  function syncBuyerTabsByAuth() {
+    const tabNew = $("co-tab-new");
+    const tabReg = $("co-tab-reg");
+    const tabsWrap = (tabNew && tabNew.closest(".checkout-tabs")) || (tabReg && tabReg.closest(".checkout-tabs")) || document.querySelector(".checkout-tabs");
+    const loggedIn = isCustomerLoggedIn();
+    if (loggedIn) {
+      state.tab = "reg";
+      if (tabsWrap) {
+        tabsWrap.hidden = true;
+        tabsWrap.style.display = "none";
+      }
+      if (tabNew) tabNew.hidden = true;
+      if (tabReg) tabReg.hidden = false;
+      if (tabReg) tabReg.setAttribute("aria-selected", "true");
+      if (tabNew) tabNew.setAttribute("aria-selected", "false");
+      prefillFromAuth();
+    } else {
+      if (tabsWrap) {
+        tabsWrap.hidden = false;
+        tabsWrap.style.display = "";
+      }
+      if (tabNew) tabNew.hidden = false;
+      if (tabReg) tabReg.hidden = false;
+      if (state.tab !== "new" && state.tab !== "reg") state.tab = "new";
+      if (tabNew) tabNew.setAttribute("aria-selected", state.tab === "new" ? "true" : "false");
+      if (tabReg) tabReg.setAttribute("aria-selected", state.tab === "reg" ? "true" : "false");
+    }
+  }
+
   window.initCheckoutPage = function initCheckoutPage() {
     if (typeof window.dpCheckoutGetCart !== "function") return;
     if (!window.dpCheckoutGetCart().lines.length) {
@@ -725,8 +866,16 @@
       } catch {
         state.majorCities = [];
       }
+      try {
+        const rr = await fetch(api("/api/legal-requisites"), { cache: "no-store" });
+        const jj = await rr.json().catch(() => null);
+        if (jj && typeof jj === "object") legalRequisitesCache = jj;
+      } catch {
+        /* keep fallback text */
+      }
       fillCitySelect();
       if (window.applyTranslations) window.applyTranslations(document.getElementById("co-city-select"));
+      prefillFromAuth();
 
       try {
         const r2 = await fetch(api("/api/shipping/np/status"));
@@ -741,15 +890,18 @@
         if (window.applyTranslations) window.applyTranslations(npHint.parentElement);
       }
       refreshDisabled();
+      syncCheckoutPaymentRules();
     })();
 
     renderOrderSummary();
     initTabs();
+    syncBuyerTabsByAuth();
     prefillFromAuth();
     syncCheckoutContactRules();
     setupCheckoutAutofillSuggestion();
     syncNewsletterConsentUi();
     syncRegisteredLoginPrompt();
+    syncCheckoutPaymentRules();
 
     const regLoginForm = $("co-reg-login-form");
     regLoginForm?.addEventListener("submit", async (e) => {
@@ -784,7 +936,10 @@
         if (data?.token) localStorage.setItem("authToken", String(data.token));
         if (data?.user) localStorage.setItem("authUser", JSON.stringify(data.user));
         window.dispatchEvent(new Event("dp-auth-changed"));
-        location.href = "account-payment.html";
+        prefillFromAuth();
+        syncCheckoutContactRules();
+        syncRegisteredLoginPrompt();
+        if (typeof window.applyTranslations === "function") window.applyTranslations(document.body);
       } catch {
         if (statusEl) statusEl.textContent = typeof window.getDpLang === "function" && window.getDpLang() === "uk"
           ? "Помилка мережі."
@@ -795,13 +950,18 @@
     });
 
     window.addEventListener("dp-auth-changed", () => {
+      syncBuyerTabsByAuth();
       prefillFromAuth();
       syncCheckoutContactRules();
       syncRegisteredLoginPrompt();
+      syncCheckoutPaymentRules();
       renderOrderSummary();
     });
     window.addEventListener("dp-consent-changed", () => syncNewsletterConsentUi());
-    window.addEventListener("dp-lang-change", () => syncNewsletterConsentUi());
+    window.addEventListener("dp-lang-change", () => {
+      syncNewsletterConsentUi();
+      syncCheckoutPaymentRules();
+    });
 
     const form = $("checkout-form");
     const whSel = $("co-warehouse");
@@ -832,6 +992,17 @@
         if ($("co-city")) $("co-city").value = "";
         if ($("co-city-ref")) $("co-city-ref").value = "";
         searchWrap?.classList.remove("is-hidden");
+        refreshDisabled();
+        renderOrderSummary();
+        return;
+      }
+      if (/^p:/.test(String(v || ""))) {
+        searchWrap?.classList.add("is-hidden");
+        const opt = sel?.options?.[sel.selectedIndex];
+        state.cityLabel = String(opt?.textContent || "").trim();
+        state.cityRef = "";
+        if ($("co-city")) $("co-city").value = state.cityLabel;
+        if ($("co-city-ref")) $("co-city-ref").value = "";
         refreshDisabled();
         renderOrderSummary();
         return;
@@ -923,6 +1094,7 @@
     document.getElementById("language-switcher")?.addEventListener("change", () => {
       setTimeout(() => {
         fillCitySelect();
+        prefillFromAuth();
         if (window.applyTranslations) {
           window.applyTranslations(document.body);
         }
@@ -970,23 +1142,39 @@
       const email = ($("co-email") && $("co-email").value.trim()) || "";
       const comment = ($("co-comment") && $("co-comment").value.trim()) || "";
       const pay = ($("co-payment") && $("co-payment").value) || "liqpay";
+      const payFinal = isLoggedLegalEntityBuyer() ? "iban" : pay;
+      const legalInvoiceFormat = ($("co-legal-invoice-format") && $("co-legal-invoice-format").value) || "both";
       const newsletter = $("co-newsletter") && $("co-newsletter").checked;
       const acceptOffer = Boolean($("co-accept-offer")?.checked);
       const deliveryMethod = ($("co-delivery") && $("co-delivery").value) || "nova_poshta";
       const nova = deliveryMethod === "nova_poshta";
       const loggedIn = isCustomerLoggedIn();
-      if (state.tab === "reg") {
+      if (state.tab === "reg" && !loggedIn) {
         if (st) st.textContent = "";
         syncRegisteredLoginPrompt();
         return;
+      }
+      let nameFinal = name;
+      let phoneFinal = phone;
+      let emailFinal = email;
+      if (loggedIn) {
+        const prof = checkoutBillingPayloadFromStoredProfile();
+        try {
+          const u = JSON.parse(localStorage.getItem("authUser") || "null");
+          nameFinal = nameFinal || String(u?.name || "").trim() || String(prof.billingCompanyName || "").trim();
+          phoneFinal = phoneFinal || String(u?.profile?.phone || "").trim();
+          emailFinal = emailFinal || String(u?.email || "").trim() || String(prof.billingInvoiceEmail || "").trim();
+        } catch {
+          /* ignore */
+        }
       }
 
       clearCheckoutRequiredHighlights();
       clearCheckoutFieldErrors();
       const missing = [];
-      if (name.length < 2) missing.push("co-name");
-      if (phone.length < 9) missing.push("co-phone");
-      if (!/.+@.+\..+/.test(email)) missing.push("co-email");
+      if (nameFinal.length < 2) missing.push("co-name");
+      if (phoneFinal.length < 9) missing.push("co-phone");
+      if (!/.+@.+\..+/.test(emailFinal)) missing.push("co-email");
       if (!$("co-city-select")?.value) {
         missing.push("co-city-select");
       } else if ($("co-city-select")?.value === "__other__") {
@@ -1039,11 +1227,11 @@
         return;
       }
 
-      if (name.length < 2 || phone.length < 9) {
+      if (nameFinal.length < 2 || phoneFinal.length < 9) {
         if (st) st.textContent = t("checkoutErrorContacts");
         return;
       }
-      if (!loggedIn && !/.+@.+\..+/.test(email)) {
+      if (!loggedIn && !/.+@.+\..+/.test(emailFinal)) {
         if (st) st.textContent = t("checkoutErrorContacts");
         return;
       }
@@ -1099,20 +1287,20 @@
       const checkoutMeta = typeof window.dpCheckoutGetCart === "function" ? window.dpCheckoutGetCart() : {};
       const rawCart = typeof window.dpGetCartItems === "function" ? window.dpGetCartItems() : [];
       const paymentNote =
-        pay === "iban"
+        payFinal === "iban"
           ? t("checkoutPayIban")
-          : pay === "liqpay"
+          : payFinal === "liqpay"
             ? t("checkoutPayCard")
-            : String(pay);
+            : String(payFinal);
 
       const billingExtras =
         typeof checkoutBillingPayloadFromStoredProfile === "function" ? checkoutBillingPayloadFromStoredProfile() : {};
 
       const payload = {
-        name,
-        customerName: name,
-        phone,
-        email,
+        name: nameFinal,
+        customerName: nameFinal,
+        phone: phoneFinal,
+        email: emailFinal,
         comment: [comment, orderTotal != null ? `${t("total")}: ${formatMoney(orderTotal)}` : ""]
           .filter(Boolean)
           .join("\n"),
@@ -1126,8 +1314,9 @@
         cartSnapshot,
         orderTotal,
         deliveryMethod,
-        paymentMethod: pay,
+        paymentMethod: payFinal,
         paymentNote,
+        legalInvoiceFormat: isLoggedLegalEntityBuyer() ? String(legalInvoiceFormat || "both") : "both",
         deliveryCity: cityDisp,
         deliveryPoint: point,
         npCityRef: nova && state.npConfigured ? state.cityRef || null : null,

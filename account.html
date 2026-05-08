@@ -193,7 +193,23 @@
                     <input name="phone" type="tel" maxlength="80" autocomplete="tel" />
                   </label>
                 </div>
-                <label style="grid-column: 1 / -1">Регион / страна<input name="countryRegion" type="text" maxlength="200" placeholder="Например: Украина, Днепропетровская обл." /></label>
+                <label style="grid-column: 1 / -1" for="account-city-select">
+                  <span data-ru="Город" data-uk="Місто">Город</span>
+                  <select name="citySelect" id="account-city-select">
+                    <option value="" data-ru="Выберите город" data-uk="Оберіть місто">Выберите город</option>
+                    <option value="__other__" data-ru="Другой город (ввести вручную)" data-uk="Інше місто (ввести вручну)">Другой город (ввести вручную)</option>
+                  </select>
+                  <input
+                    id="account-city-manual"
+                    name="city"
+                    type="text"
+                    maxlength="200"
+                    hidden
+                    data-ru-placeholder="Введите город"
+                    data-uk-placeholder="Введіть місто"
+                    placeholder="Введите город"
+                  />
+                </label>
                 <label style="grid-column: 1 / -1" class="account-legal-type-field" for="account-is-legal-entity">
                   <span data-ru="Тип плательщика" data-uk="Тип платника">Тип плательщика</span>
                   <select name="isLegalEntity" id="account-is-legal-entity">

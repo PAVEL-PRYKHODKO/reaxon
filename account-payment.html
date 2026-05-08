@@ -121,6 +121,11 @@
               <span data-ru="Итого к оплате" data-uk="Разом до сплати">Итого к оплате</span>
               <strong id="apay-order-total">0 грн</strong>
             </div>
+            <p class="apay-order-empty-action">
+              <button type="button" id="apay-clear-cart" class="btn btn-ghost apay-order-catalog-btn" data-ru="Очистить корзину" data-uk="Очистити кошик">
+                Очистить корзину
+              </button>
+            </p>
           </section>
 
           <section class="apay-card apay-delivery" aria-labelledby="apay-delivery-title">
@@ -223,6 +228,20 @@
               data-uk="Скопіюйте поле кнопкою. У призначенні платежу вкажіть ПІБ / назву ТОВ і номер рахунку або договору."
             >
               Скопируйте поле кнопкой. В назначении платежа укажите ФИО / название ТОВ и номер счёта или договора.
+            </p>
+            <p id="apay-legal-only-note" class="apay-hint" hidden></p>
+            <p id="apay-legal-invoice-action" class="apay-order-empty-action" hidden>
+              <label class="apay-field" style="max-width:320px;margin:0 auto 10px;">
+                <span data-ru="Формат счета-фактуры" data-uk="Формат рахунку-фактури">Формат счета-фактуры</span>
+                <select id="apay-legal-invoice-format">
+                  <option value="both" data-ru="Excel и PDF" data-uk="Excel та PDF">Excel и PDF</option>
+                  <option value="xlsx" data-ru="Только Excel" data-uk="Лише Excel">Только Excel</option>
+                  <option value="pdf" data-ru="Только PDF" data-uk="Лише PDF">Только PDF</option>
+                </select>
+              </label>
+              <button type="button" class="btn btn-primary apay-btn" id="apay-legal-invoice-btn" data-ru="Сформировать счёт-фактуру" data-uk="Сформувати рахунок-фактуру">
+                Сформировать счёт-фактуру
+              </button>
             </p>
           </section>
 

@@ -138,6 +138,10 @@ body[data-page="contact"] .contact-v2-phone-hint {
   margin: -2px 0 4px;
 }
 
+body[data-page="contact"] .contact-v2-requisites {
+  line-height: 1.5;
+}
+
 body[data-page="contact"] .contact-v2-col--form {
   display: flex;
   flex-direction: column;

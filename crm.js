@@ -181,6 +181,7 @@ function statusText(s) {
   return (
     {
       new: "Новая",
+      invoice_issued: "Счёт-фактура",
       in_progress: "В работе",
       quoted: "КП отправлено",
       won: "Успешно",
@@ -659,6 +660,7 @@ function leadCard(lead, readOnly) {
           <label class="crm-action-field">Статус
             <select class="crm-status-select">
               <option value="new" ${lead.status === "new" ? "selected" : ""}>Новая</option>
+              <option value="invoice_issued" ${lead.status === "invoice_issued" ? "selected" : ""}>Счёт-фактура</option>
               <option value="in_progress" ${lead.status === "in_progress" ? "selected" : ""}>В работе</option>
               <option value="quoted" ${lead.status === "quoted" ? "selected" : ""}>КП отправлено</option>
               <option value="won" ${lead.status === "won" ? "selected" : ""}>Успешно</option>
@@ -787,6 +789,7 @@ function renderLeadsSummary(summary, count) {
   sumEl.innerHTML = `
     <span class="crm-summary-chip">В базе: <strong>${Number(summary.total || 0)}</strong></span>
     <span class="crm-summary-chip">Новые: <strong>${Number(summary.new || 0)}</strong></span>
+    <span class="crm-summary-chip">Счёт-фактура: <strong>${Number(summary.invoice_issued || 0)}</strong></span>
     <span class="crm-summary-chip">В работе: <strong>${Number(summary.in_progress || 0)}</strong></span>
     <span class="crm-summary-chip">КП: <strong>${Number(summary.quoted || 0)}</strong></span>
     <span class="crm-summary-chip">Успех: <strong>${Number(summary.won || 0)}</strong></span>
@@ -867,6 +870,7 @@ function renderKanban(items) {
   if (!root) return;
   const columns = [
     { id: "new", title: "Новые" },
+    { id: "invoice_issued", title: "Счёт-фактура" },
     { id: "in_progress", title: "В работе" },
     { id: "quoted", title: "КП отправлено" },
     { id: "won", title: "Успешно" },

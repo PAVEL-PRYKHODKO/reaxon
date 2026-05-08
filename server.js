@@ -20,6 +20,7 @@ import {
   sendSiteInboxMessageMail,
   sendPasswordResetMail,
   sendPaymentReceiptMail,
+  sendLegalInvoiceDocumentsMail,
 } from "./lib/transactional-mail.mjs";
 import { notifyTelegramBannerLead } from "./lib/telegram-banner-notify.mjs";
 
@@ -37,6 +38,7 @@ const PRODUCTS_CATALOG_BACKUP_DIR = path.join(__dirname, "data", "catalog-backup
 const PRODUCTS_DATA_JS_PATH = path.join(__dirname, "products-data.js");
 const ANALYTICS_PATH = path.join(__dirname, "analytics-store.json");
 const PRIVACY_POLICY_CONFIG_PATH = path.join(__dirname, "privacy-policy-config.json");
+const LEGAL_REQUISITES_PATH = path.join(__dirname, "legal-requisites.json");
 const ANALYTICS_MAX_EVENTS = 25000;
 const isProd = process.env.NODE_ENV === "production";
 
@@ -88,6 +90,43 @@ function readPrivacyPolicyConfig() {
     return parsed;
   } catch {
     return null;
+  }
+}
+
+function readLegalRequisitesConfig() {
+  const fallback = {
+    address: {
+      ru: "69002, г. Запорожье, ул. Константина Великого, дом 20",
+      uk: "69002, м. Запоріжжя, вул. Костянтина Великого, буд. 20",
+    },
+    edrpou: "32297953",
+    ipn: "322979508268",
+    certificateNo: "200123175",
+    correspondenceAddress: {
+      ru: "г. Запорожье, Н. Почта, отд. 29",
+      uk: "м. Запоріжжя, Н. Пошта, відд. 29",
+    },
+    phone: "(067) 6134828",
+  };
+  try {
+    const raw = fs.readFileSync(LEGAL_REQUISITES_PATH, "utf8");
+    const cfg = JSON.parse(raw);
+    return {
+      address: {
+        ru: String(cfg?.address?.ru || fallback.address.ru),
+        uk: String(cfg?.address?.uk || fallback.address.uk),
+      },
+      edrpou: String(cfg?.edrpou || fallback.edrpou),
+      ipn: String(cfg?.ipn || fallback.ipn),
+      certificateNo: String(cfg?.certificateNo || fallback.certificateNo),
+      correspondenceAddress: {
+        ru: String(cfg?.correspondenceAddress?.ru || fallback.correspondenceAddress.ru),
+        uk: String(cfg?.correspondenceAddress?.uk || fallback.correspondenceAddress.uk),
+      },
+      phone: String(cfg?.phone || fallback.phone),
+    };
+  } catch {
+    return fallback;
   }
 }
 
@@ -2075,6 +2114,9 @@ function normalizeLeadInput(payload = {}) {
     billingInvoiceEmail: String(payload.billingInvoiceEmail || "").trim().toLowerCase().slice(0, 120) || null,
     billingIban: String(payload.billingIban || "").trim().slice(0, 40) || null,
     billingLegalAddress: String(payload.billingLegalAddress || "").trim().slice(0, 500) || null,
+    legalInvoiceFormat: ["both", "xlsx", "pdf"].includes(String(payload.legalInvoiceFormat || "").trim().toLowerCase())
+      ? String(payload.legalInvoiceFormat).trim().toLowerCase()
+      : "both",
   };
 }
 
@@ -2425,6 +2467,7 @@ app.get("/api/payment/config", (req, res) => {
     : (ap.offerHtml || d.offerHtml);
   res.set("Cache-Control", "no-store");
   const providers = paymentProviderAvailability();
+  const legalRequisites = readLegalRequisitesConfig();
   res.json({
     liqpayEnabled: providers.liqpay.configured,
     liqpaySandbox: LIQPAY_SANDBOX,
@@ -2440,7 +2483,13 @@ app.get("/api/payment/config", (req, res) => {
     offerTitle,
     offerHtml,
     iban: ap.iban,
+    legalRequisites,
   });
+});
+
+app.get("/api/legal-requisites", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(readLegalRequisitesConfig());
 });
 
 function normalizeAccountPaymentCartItems(input) {
@@ -2462,6 +2511,53 @@ function normalizeAccountPaymentCartItems(input) {
       };
     })
     .filter(Boolean);
+}
+
+function isLegalEntityProfile(profile) {
+  const v = profile?.isLegalEntity;
+  return v === true || v === "true" || v === 1 || v === "1";
+}
+
+function onlinePaymentRestrictionForUser(user) {
+  if (!isLegalEntityProfile(user?.profile)) return null;
+  const rq = readLegalRequisitesConfig();
+  const msg = `Для юридичних осіб онлайн-оплата карткою недоступна. Використовуйте оплату за реквізитами (IBAN): ${String(
+    rq.address?.uk || ""
+  )}; код ЄДРПОУ ${String(rq.edrpou || "")}; ІПН ${String(rq.ipn || "")}; св-во № ${String(
+    rq.certificateNo || ""
+  )}; адреса для кореспонденції: ${String(rq.correspondenceAddress?.uk || "")}; тел. ${String(rq.phone || "")}.`;
+  return {
+    status: 403,
+    error: "legal_entity_bank_transfer_only",
+    message: msg,
+  };
+}
+
+async function rejectOnlinePaymentForLegalEntity(req, res, next) {
+  try {
+    const uid = req?.user?.sub;
+    if (!uid) return next();
+    const db = await crmSnapshot();
+    const user = Array.isArray(db?.users) ? db.users.find((u) => u.id === uid) : null;
+    if (!user) return next();
+    const restriction = onlinePaymentRestrictionForUser(user);
+    if (restriction) {
+      try {
+        console.warn(
+          `[payments] blocked online invoice for legal entity userId=${String(uid)} route=${String(req?.path || "")}`
+        );
+      } catch {
+        /* ignore logging issues */
+      }
+      return res.status(restriction.status).json({
+        error: restriction.error,
+        message: restriction.message,
+      });
+    }
+    return next();
+  } catch {
+    return next();
+  }
 }
 
 function computeAccountPaymentAmountByCart(cartItems, isLegalEntityBuyer) {
@@ -2625,11 +2721,14 @@ async function createAccountPaymentInvoice(req, res, providerInput) {
       message: "Вкажіть номер телефону в профілі кабінету перед оплатою.",
     });
   }
-  const isLegalEntityBuyer =
-    user?.profile?.isLegalEntity === true ||
-    user?.profile?.isLegalEntity === "true" ||
-    user?.profile?.isLegalEntity === 1 ||
-    user?.profile?.isLegalEntity === "1";
+  const isLegalEntityBuyer = isLegalEntityProfile(user?.profile);
+  const paymentRestriction = onlinePaymentRestrictionForUser(user);
+  if (paymentRestriction) {
+    return res.status(paymentRestriction.status).json({
+      error: paymentRestriction.error,
+      message: paymentRestriction.message,
+    });
+  }
   const priceByCart = computeAccountPaymentAmountByCart(cartItems, isLegalEntityBuyer);
   if (Array.isArray(priceByCart.invalidItems) && priceByCart.invalidItems.length) {
     return res.status(400).json({
@@ -2806,11 +2905,11 @@ async function createAccountPaymentInvoice(req, res, providerInput) {
   });
 }
 
-app.post("/api/payments/invoice", authMiddleware, liqpayInvoiceLimiter, async (req, res) => {
+app.post("/api/payments/invoice", authMiddleware, liqpayInvoiceLimiter, rejectOnlinePaymentForLegalEntity, async (req, res) => {
   return createAccountPaymentInvoice(req, res, null);
 });
 
-app.post("/api/payments/liqpay/invoice", authMiddleware, liqpayInvoiceLimiter, async (req, res) => {
+app.post("/api/payments/liqpay/invoice", authMiddleware, liqpayInvoiceLimiter, rejectOnlinePaymentForLegalEntity, async (req, res) => {
   return createAccountPaymentInvoice(req, res, "liqpay");
 });
 
@@ -3855,15 +3954,18 @@ app.post("/api/leads", leadsPostLimiter, optionalAuthMiddleware, async (req, res
     payload.comment = [payload.comment, line].filter((x) => x && String(x).trim()).join("\n\n");
   }
   let lead;
+  const leadSource = String(payload.source || "").trim();
+  const legalInvoiceIssued = Boolean(payload.isLegalEntityBuyer) && ["checkout", "account_payment_legal_invoice"].includes(leadSource);
+  const initialStage = legalInvoiceIssued ? "invoice_issued" : "new";
   await crmUpdate(async (db) => {
     const assignee = pickAssignee(db);
     lead = {
       id: db.meta.nextLeadId++,
-      status: "new",
+      status: initialStage,
       priority: "normal",
       ...payload,
       crm: {
-        stage: "new",
+        stage: initialStage,
         tags: [],
         managerNote: "",
         managerNotes: [],
@@ -3879,6 +3981,21 @@ app.post("/api/leads", leadsPostLimiter, optionalAuthMiddleware, async (req, res
     db.leads.unshift(lead);
   });
   sendWebhook("lead_created", lead);
+  const shouldSendLegalInvoiceDocs =
+    ["checkout", "account_payment_legal_invoice"].includes(String(lead.source || "")) && Boolean(lead.isLegalEntityBuyer);
+  if (isTransactionalMailConfigured() && shouldSendLegalInvoiceDocs) {
+    void sendLegalInvoiceDocumentsMail(lead, readLegalRequisitesConfig())
+      .then((info) => {
+        const accepted = Array.isArray(info?.accepted) ? info.accepted : [];
+        console.log("[mail] legal invoice docs sent:", {
+          leadId: lead.id,
+          to: lead.billingInvoiceEmail || lead.email || null,
+          accepted,
+          messageId: info?.messageId || null,
+        });
+      })
+      .catch((err) => console.error("[mail] legal invoice docs failed:", err?.message || err));
+  }
   if (!isStaffCrmRequest(req)) {
     if (isTransactionalMailConfigured()) {
       void sendLeadCreatedMails(lead).catch((err) => console.error("[mail] lead notify failed:", err?.message || err));
@@ -3893,6 +4010,7 @@ app.get("/api/leads", authMiddleware, permissionMiddleware("leads.view"), async 
   const summary = {
     total: db.leads.length,
     new: db.leads.filter((x) => x.status === "new").length,
+    invoice_issued: db.leads.filter((x) => x.status === "invoice_issued").length,
     in_progress: db.leads.filter((x) => x.status === "in_progress").length,
     quoted: db.leads.filter((x) => x.status === "quoted").length,
     won: db.leads.filter((x) => x.status === "won").length,

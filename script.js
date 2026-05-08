@@ -1210,12 +1210,22 @@ function loadCartForOwner(owner) {
   try {
     const key = cartStorageKeyForOwner(owner);
     const raw = JSON.parse(localStorage.getItem(key) || "[]");
+    let cart = normalizeStoredCart(raw);
+    if (cart.length === 0) {
+      const legacyRaw = JSON.parse(localStorage.getItem("cart") || "[]");
+      const legacy = normalizeStoredCart(legacyRaw);
+      if (legacy.length) {
+        cart = legacy;
+        localStorage.setItem(key, JSON.stringify(cart));
+      }
+    }
     if (owner) {
       localStorage.setItem(CART_AUTH_OWNER_KEY, owner);
     } else {
       localStorage.removeItem(CART_AUTH_OWNER_KEY);
     }
-    return normalizeStoredCart(raw);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    return cart;
   } catch {
     return [];
   }
@@ -3852,6 +3862,11 @@ function renderCart() {
       nodes.cartPayBtn.disabled = true;
       nodes.cartPayBtn.classList.add("is-disabled");
     }
+    const clearBtn = document.getElementById("cart-clear-btn");
+    if (clearBtn) {
+      clearBtn.disabled = true;
+      clearBtn.classList.add("is-disabled");
+    }
     return;
   }
 
@@ -3888,6 +3903,11 @@ function renderCart() {
   if (nodes.cartPayBtn) {
     nodes.cartPayBtn.disabled = false;
     nodes.cartPayBtn.classList.remove("is-disabled");
+  }
+  const clearBtn = document.getElementById("cart-clear-btn");
+  if (clearBtn) {
+    clearBtn.disabled = false;
+    clearBtn.classList.remove("is-disabled");
   }
 }
 
@@ -4016,6 +4036,15 @@ function openProductModal(productId) {
 }
 
 function initEvents() {
+  const cartActions = document.querySelector(".cart-footer-actions");
+  if (cartActions && !document.getElementById("cart-clear-btn")) {
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.id = "cart-clear-btn";
+    clearBtn.className = "btn btn-ghost";
+    clearBtn.textContent = state.lang === "uk" ? "Очистити кошик" : "Очистить корзину";
+    cartActions.appendChild(clearBtn);
+  }
   if (nodes.languageSwitcher) {
     nodes.languageSwitcher.value = state.lang;
   }
@@ -4284,6 +4313,11 @@ function initEvents() {
   nodes.cartPayBtn?.addEventListener("click", () => {
     if (!state.cart.length) return;
     window.location.href = "checkout.html";
+  });
+  document.getElementById("cart-clear-btn")?.addEventListener("click", () => {
+    state.cart = [];
+    saveCart();
+    renderCart();
   });
 
   document.addEventListener("keydown", (ev) => {

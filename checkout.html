@@ -193,10 +193,21 @@
 
                 <div class="checkout-row checkout-row--split" id="co-payment-block">
                   <label class="checkout-label" for="co-payment" data-i18n="checkoutPayment">Оплата</label>
-                  <select class="checkout-select" id="co-payment" name="payment" disabled>
-                    <option value="liqpay" data-i18n="checkoutPayCard">Картой (LiqPay)</option>
-                    <option value="iban" data-i18n="checkoutPayIban">По реквизитам (IBAN)</option>
-                  </select>
+                  <div class="checkout-payment-col">
+                    <select class="checkout-select" id="co-payment" name="payment" disabled>
+                      <option value="liqpay" data-i18n="checkoutPayCard">Картой (LiqPay)</option>
+                      <option value="iban" data-i18n="checkoutPayIban">По реквизитам (IBAN)</option>
+                    </select>
+                    <p class="checkout-hint checkout-legal-payment-note" id="co-legal-payment-note" hidden></p>
+                    <label class="checkout-label" id="co-legal-invoice-format-wrap" hidden>
+                      <span data-ru="Формат счета-фактуры" data-uk="Формат рахунку-фактури">Формат счета-фактуры</span>
+                      <select class="checkout-select" id="co-legal-invoice-format" name="legalInvoiceFormat">
+                        <option value="both" data-ru="Excel и PDF" data-uk="Excel та PDF">Excel и PDF</option>
+                        <option value="xlsx" data-ru="Только Excel" data-uk="Лише Excel">Только Excel</option>
+                        <option value="pdf" data-ru="Только PDF" data-uk="Лише PDF">Только PDF</option>
+                      </select>
+                    </label>
+                  </div>
                 </div>
                 <div class="checkout-checkbox-row">
                   <input type="checkbox" id="co-newsletter" name="newsletter" value="1" />

@@ -96,7 +96,24 @@
     form.age.value = pr.age != null && pr.age !== "" ? String(pr.age) : "";
     const g = pr.gender === "female" || pr.gender === "male" ? pr.gender : "";
     form.gender.value = g;
-    form.countryRegion.value = pr.countryRegion || "";
+    const profileCity = String(pr.city || pr.countryRegion || "").trim();
+    const citySelect = form.querySelector("#account-city-select");
+    const cityManual = form.querySelector("#account-city-manual");
+    if (citySelect instanceof HTMLSelectElement && cityManual instanceof HTMLInputElement) {
+      const norm = (v) => String(v || "").toLowerCase().replace(/\s+/g, " ").trim();
+      const target = norm(profileCity);
+      const options = Array.from(citySelect.options || []);
+      const hit = options.find((opt) => /^c:\d+$/.test(String(opt.value || "")) && norm(opt.textContent) === target);
+      if (hit) {
+        citySelect.value = hit.value;
+        cityManual.hidden = true;
+        cityManual.value = String(hit.textContent || "").trim();
+      } else {
+        citySelect.value = profileCity ? "__other__" : "";
+        cityManual.hidden = citySelect.value !== "__other__";
+        cityManual.value = profileCity;
+      }
+    }
     form.companyName.value = pr.companyName || "";
     form.phone.value = pr.phone || "";
     form.legalAddress.value = pr.legalAddress || "";
@@ -119,6 +136,60 @@
     form.hidePhone.checked = Boolean(pv.hidePhone);
     form.hideLegalAddress.checked = Boolean(pv.hideLegalAddress);
     form.hideDeliveryAddress.checked = Boolean(pv.hideDeliveryAddress);
+  }
+
+  let accountMajorCities = [];
+
+  function fillAccountCitySelect(select) {
+    if (!(select instanceof HTMLSelectElement)) return;
+    const isUk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+    const options = [
+      `<option value="">${isUk ? "Оберіть місто" : "Выберите город"}</option>`,
+      ...accountMajorCities.map((row, i) => {
+        const label = isUk ? String(row?.searchUk || row?.searchRu || "") : String(row?.searchRu || row?.searchUk || "");
+        return `<option value="c:${i}">${label.replace(/</g, "&lt;")}</option>`;
+      }),
+      `<option value="__other__">${isUk ? "Інше місто (ввести вручну)" : "Другой город (ввести вручную)"}</option>`,
+    ];
+    select.innerHTML = options.join("");
+  }
+
+  function setupAccountCityField(form) {
+    const select = form?.querySelector?.("#account-city-select");
+    const manual = form?.querySelector?.("#account-city-manual");
+    if (!(select instanceof HTMLSelectElement) || !(manual instanceof HTMLInputElement)) return;
+    select.addEventListener("change", () => {
+      const v = String(select.value || "");
+      if (v === "__other__") {
+        manual.hidden = false;
+        manual.focus();
+        return;
+      }
+      manual.hidden = true;
+      if (/^c:\d+$/.test(v)) {
+        const idx = Number(v.slice(2));
+        const row = accountMajorCities[idx];
+        const isUk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+        const label = isUk ? String(row?.searchUk || row?.searchRu || "") : String(row?.searchRu || row?.searchUk || "");
+        manual.value = label;
+      }
+    });
+  }
+
+  function resolveAccountCityFromForm(form) {
+    const select = form?.querySelector?.("#account-city-select");
+    const manual = form?.querySelector?.("#account-city-manual");
+    if (!(select instanceof HTMLSelectElement) || !(manual instanceof HTMLInputElement)) return "";
+    const v = String(select.value || "");
+    if (v === "__other__") return String(manual.value || "").trim().slice(0, 200);
+    if (/^c:\d+$/.test(v)) {
+      const idx = Number(v.slice(2));
+      const row = accountMajorCities[idx];
+      const isUk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+      const label = isUk ? String(row?.searchUk || row?.searchRu || "") : String(row?.searchRu || row?.searchUk || "");
+      return String(label || "").trim().slice(0, 200);
+    }
+    return String(manual.value || "").trim().slice(0, 200);
   }
 
   function updateAvatarPreview(box, url) {
@@ -404,6 +475,15 @@
     const statusEl = document.getElementById("account-drawer-form-status");
     if (!form) return;
     try {
+      try {
+        const citiesRes = await fetch(apiUrl("/api/shipping/ua-major-cities"), { cache: "no-store" });
+        const citiesJson = await citiesRes.json().catch(() => ({}));
+        accountMajorCities = Array.isArray(citiesJson?.items) ? citiesJson.items : [];
+      } catch {
+        accountMajorCities = [];
+      }
+      const citySelect = form.querySelector("#account-city-select");
+      fillAccountCitySelect(citySelect);
       const user = await apiAuth("GET", "/api/auth/me");
       localStorage.setItem("authUser", JSON.stringify(user));
       applyUserToForm(form, user);
@@ -432,6 +512,7 @@
     const avatarInput = document.getElementById("account-drawer-avatar-input");
     const avatarRemoveBtn = document.getElementById("account-drawer-avatar-remove-btn");
     const preview = document.getElementById("account-drawer-avatar-preview");
+    setupAccountCityField(form);
 
     async function performLogout() {
       const ok = window.confirm(
@@ -530,7 +611,8 @@
             return "";
           })(),
           lastName: String(fd.get("lastName") || "").trim().slice(0, 200),
-          countryRegion: fd.get("countryRegion") || "",
+          countryRegion: resolveAccountCityFromForm(form),
+          city: resolveAccountCityFromForm(form),
           isLegalEntity:
             String(form.elements.isLegalEntity?.value || "") === "1" ||
             Boolean(form.elements.isLegalEntity?.checked),

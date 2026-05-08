@@ -23,6 +23,11 @@
       liqRedirect: "Перенаправление на защищённую страницу оплаты.",
       liqLogin: "Войдите в кабинет, чтобы оплатить картой.",
       liqEnv: "Не найден ни один настроенный платёжный провайдер в .env.",
+      legalOnlyIban:
+        "Для юридических лиц доступна только оплата по реквизитам компании: 69002, г. Запорожье, ул. Константина Великого, дом 20; код ЕГРПОУ 32297953; ИНН 322979508268; св-во № 200123175; адрес для корреспонденции: г. Запорожье, Н. Почта, отд. 29; тел. (067) 6134828.",
+      legalInvoiceCreating: "Формируем счёт-фактуру и отправляем на email…",
+      legalInvoiceDone: "Счёт-фактура сформирована. Файлы Excel и PDF отправлены на email для счетов.",
+      legalInvoiceError: "Не удалось сформировать счёт-фактуру.",
       copy: "Копировать",
       copied: "Скопировано",
       copyErr: "Не удалось скопировать. Выделите текст вручную.",
@@ -69,6 +74,11 @@
       liqRedirect: "Перенаправлення на захищену сторінку оплати.",
       liqLogin: "Увійдіть у кабінет, щоб оплатити карткою.",
       liqEnv: "Не знайдено жодного налаштованого платіжного провайдера в .env.",
+      legalOnlyIban:
+        "Для юридичних осіб доступна лише оплата за реквізитами компанії: 69002, м. Запоріжжя, вул. Костянтина Великого, буд. 20; код ЄДРПОУ 32297953; ІПН 322979508268; св-во № 200123175; адреса для кореспонденції: м. Запоріжжя, Н. Пошта, відд. 29; тел. (067) 6134828.",
+      legalInvoiceCreating: "Формуємо рахунок-фактуру та надсилаємо на email…",
+      legalInvoiceDone: "Рахунок-фактуру сформовано. Файли Excel та PDF надіслано на email для рахунків.",
+      legalInvoiceError: "Не вдалося сформувати рахунок-фактуру.",
       copy: "Копіювати",
       copied: "Скопійовано",
       copyErr: "Не вдалося скопіювати. Виділіть текст вручну.",
@@ -123,6 +133,7 @@
   }
 
   const token = localStorage.getItem("authToken");
+  let legalRequisitesCache = null;
 
   function syncApayAccountIcon() {
     const trigger = document.getElementById("home-account-trigger");
@@ -201,6 +212,67 @@
 
   function resolvePriceModeLabel() {
     return isLegalPayerFromProfile() ? apayT("priceWholesale") : apayT("priceRetail");
+  }
+
+  function legalOnlyIbanText() {
+    const cfg = legalRequisitesCache;
+    if (cfg && cfg.address && cfg.correspondenceAddress) {
+      const uk = apayLocale() === "uk";
+      const addr = uk ? String(cfg.address.uk || "") : String(cfg.address.ru || "");
+      const corr = uk ? String(cfg.correspondenceAddress.uk || "") : String(cfg.correspondenceAddress.ru || "");
+      const ed = String(cfg.edrpou || "");
+      const ipn = String(cfg.ipn || "");
+      const cert = String(cfg.certificateNo || "");
+      const phone = String(cfg.phone || "");
+      if (uk) {
+        return `Для юридичних осіб доступна лише оплата за реквізитами компанії: ${addr}; код ЄДРПОУ ${ed}; ІПН ${ipn}; св-во № ${cert}; адреса для кореспонденції: ${corr}; тел. ${phone}.`;
+      }
+      return `Для юридических лиц доступна только оплата по реквизитам компании: ${addr}; код ЕГРПОУ ${ed}; ИНН ${ipn}; св-во № ${cert}; адрес для корреспонденции: ${corr}; тел. ${phone}.`;
+    }
+    return apayT("legalOnlyIban");
+  }
+
+  function syncLegalOnlyPaymentUi() {
+    const liqBlock = document.getElementById("apay-liqpay-block");
+    const note = document.getElementById("apay-legal-only-note");
+    const legalAction = document.getElementById("apay-legal-invoice-action");
+    const legalAuthorized = Boolean(localStorage.getItem("authToken")) && isLegalPayerFromProfile();
+    if (liqBlock) liqBlock.hidden = legalAuthorized;
+    if (legalAction) legalAction.hidden = !legalAuthorized;
+    if (note) {
+      note.hidden = !legalAuthorized;
+      note.textContent = legalAuthorized ? legalOnlyIbanText() : "";
+    }
+  }
+
+  function billingPayloadFromProfile() {
+    try {
+      const u = JSON.parse(localStorage.getItem("authUser") || "null");
+      const pr = u?.profile || {};
+      const email = String(u?.email || "").trim();
+      const invoiceEmail = String(pr.invoiceEmail || "").trim() || email;
+      return {
+        userName: String(u?.name || "").trim(),
+        phone: String(pr.phone || "").trim(),
+        email,
+        billingCompanyName: String(pr.companyName || "").trim(),
+        billingEdrpou: String(pr.edrpou || "").replace(/\s/g, ""),
+        billingInvoiceEmail: invoiceEmail,
+        billingIban: String(pr.billingIban || "").replace(/\s+/g, "").toUpperCase(),
+        billingLegalAddress: String(pr.legalAddress || "").trim(),
+      };
+    } catch {
+      return {
+        userName: "",
+        phone: "",
+        email: "",
+        billingCompanyName: "",
+        billingEdrpou: "",
+        billingInvoiceEmail: "",
+        billingIban: "",
+        billingLegalAddress: "",
+      };
+    }
   }
 
   function getProductsMap() {
@@ -289,6 +361,7 @@
     const root = document.getElementById("apay-order-items");
     const totalEl = document.getElementById("apay-order-total");
     const ctxEl = document.getElementById("apay-order-context");
+    const clearBtn = document.getElementById("apay-clear-cart");
     const amountInput = document.querySelector('#apay-liqpay-form input[name="amount"]');
     if (!root || !totalEl) return;
     const order = buildPaymentOrder();
@@ -303,6 +376,7 @@
       `;
       totalEl.textContent = fmtUAH(0);
       if (ctxEl) ctxEl.textContent = "";
+      if (clearBtn) clearBtn.disabled = true;
       if (amountInput) amountInput.value = "";
       syncPayButtonState();
       return;
@@ -337,6 +411,7 @@
       })
       .join("");
     totalEl.textContent = fmtUAH(order.orderTotal || 0);
+    if (clearBtn) clearBtn.disabled = false;
     if (amountInput) amountInput.value = String(order.orderTotal || "");
     syncPayButtonState();
   }
@@ -527,6 +602,36 @@
     sel.innerHTML = opts.join("");
   }
 
+  function prefillDeliveryCityFromProfile() {
+    try {
+      const u = JSON.parse(localStorage.getItem("authUser") || "null");
+      const profileCity = String((u?.profile && u.profile.city) || "").trim();
+      if (!profileCity) return;
+      const citySelect = document.getElementById("apay-delivery-city-select");
+      const cityInput = document.getElementById("apay-delivery-city");
+      if (!citySelect || !cityInput) return;
+      const norm = (v) => String(v || "").toLowerCase().replace(/\s+/g, " ").trim();
+      const target = norm(profileCity);
+      const options = Array.from(citySelect.options || []);
+      const hit = options.find((opt) => /^c:\d+$/.test(String(opt.value || "")) && norm(opt.textContent) === target);
+      if (hit) {
+        citySelect.value = hit.value;
+        cityInput.hidden = true;
+        cityInput.value = String(hit.textContent || "").trim();
+        deliveryState.cityRef = "";
+        citySelect.dispatchEvent(new Event("change", { bubbles: true }));
+      } else {
+        citySelect.value = "__other__";
+        citySelect.dispatchEvent(new Event("change", { bubbles: true }));
+        cityInput.hidden = false;
+        cityInput.value = profileCity;
+        deliveryState.cityRef = "";
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   function ensureDeliveryDataLists() {
     const cityInput = document.getElementById("apay-delivery-city");
     const whInput = document.getElementById("apay-delivery-warehouse");
@@ -694,6 +799,7 @@
       const liqHint = document.getElementById("apay-liqpay-hint");
       const liqForm = document.getElementById("apay-liqpay-form");
       const providers = cfg.paymentProviders && typeof cfg.paymentProviders === "object" ? cfg.paymentProviders : {};
+      legalRequisitesCache = cfg && cfg.legalRequisites && typeof cfg.legalRequisites === "object" ? cfg.legalRequisites : null;
       const providerSel = document.getElementById("apay-provider");
       if (providerSel) {
         const options = [
@@ -730,6 +836,7 @@
         }
         if (liqForm) liqForm.hidden = !token || !hasAnyProvider;
       }
+      syncLegalOnlyPaymentUi();
       try {
         const citiesRes = await fetch(apiUrl("/api/shipping/ua-major-cities"), { cache: "no-store" });
         const citiesJson = await citiesRes.json().catch(() => ({}));
@@ -746,6 +853,8 @@
         deliveryState.npConfigured = false;
       }
       wireNpDeliveryAutocomplete();
+      prefillDeliveryCityFromProfile();
+      void detectSelectedCityRef();
       syncDeliveryFields();
     } catch {
       setStatus(apayT("errLoad"), true);
@@ -761,6 +870,92 @@
 
   const liqForm = document.getElementById("apay-liqpay-form");
   const orderRoot = document.getElementById("apay-order-items");
+  document.getElementById("apay-legal-invoice-btn")?.addEventListener("click", async () => {
+    if (!token) {
+      setStatus(apayT("needLoginFirst"), true);
+      return;
+    }
+    if (!isLegalPayerFromProfile()) return;
+    const order = buildPaymentOrder();
+    if (!Array.isArray(order?.lines) || !order.lines.length) {
+      setStatus(apayT("cartEmpty"), true);
+      return;
+    }
+    const delivery = readDeliveryPayload();
+    if (delivery.error) {
+      setStatus(delivery.error, true);
+      return;
+    }
+    const profile = billingPayloadFromProfile();
+    if (!profile.phone || profile.phone.length < 9) {
+      setStatus(apayT("needLoginFirst"), true);
+      return;
+    }
+    setStatus(apayT("legalInvoiceCreating"));
+    const btn = document.getElementById("apay-legal-invoice-btn");
+    if (btn) btn.disabled = true;
+    try {
+      const payload = {
+        name: profile.userName || profile.billingCompanyName || profile.email || "Клиент",
+        customerName: profile.userName || profile.billingCompanyName || profile.email || "Клиент",
+        phone: profile.phone,
+        email: profile.email || profile.billingInvoiceEmail,
+        source: "account_payment_legal_invoice",
+        customerType: "legal",
+        buyerIsAuthenticated: true,
+        legalEntityVatPricing: true,
+        isLegalEntityBuyer: true,
+        billingCompanyName: profile.billingCompanyName,
+        billingEdrpou: profile.billingEdrpou,
+        billingInvoiceEmail: profile.billingInvoiceEmail,
+        billingIban: profile.billingIban,
+        billingLegalAddress: profile.billingLegalAddress,
+        cart: Array.isArray(order.cartItems) ? order.cartItems : [],
+        cartSnapshot: Array.isArray(order.cartSnapshot) ? order.cartSnapshot : [],
+        orderTotal: order.orderTotal,
+        deliveryMethod: String(delivery?.value?.method || ""),
+        deliveryCity: String(delivery?.value?.city || ""),
+        deliveryPoint: String(
+          delivery?.value?.method === "nova_poshta"
+            ? delivery?.value?.warehouse || ""
+            : delivery?.value?.method === "courier"
+              ? delivery?.value?.address || ""
+              : delivery?.value?.comment || ""
+        ),
+        npCityRef: delivery?.value?.cityRef || null,
+        npWarehouseRef: delivery?.value?.warehouseRef || null,
+        paymentMethod: "iban",
+        paymentNote: "Оплата по реквизитам (IBAN)",
+        legalInvoiceFormat: String(document.getElementById("apay-legal-invoice-format")?.value || "both"),
+        marketingOptIn: false,
+        comment: "Сформувати рахунок-фактуру (юрособа, без онлайн-оплати).",
+      };
+      const r = await fetch(apiUrl("/api/leads"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setStatus(d.message || apayT("legalInvoiceError"), true);
+        return;
+      }
+      window.dpCheckoutClearCart?.();
+      syncOrderFromCart();
+      setStatus(apayT("legalInvoiceDone"));
+    } catch (err) {
+      setStatus(err?.message || apayT("networkErr"), true);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  });
+  document.getElementById("apay-clear-cart")?.addEventListener("click", () => {
+    window.dpCheckoutClearCart?.();
+    syncOrderFromCart();
+  });
   orderRoot?.addEventListener("click", (e) => {
     const dec = e.target.closest("[data-dec]");
     if (dec) {
@@ -793,6 +988,8 @@
   syncOrderFromCart();
   window.addEventListener("dp-cart-changed", syncOrderFromCart);
   window.addEventListener("dp-catalog-updated", syncOrderFromCart);
+  window.addEventListener("dp-auth-changed", syncLegalOnlyPaymentUi);
+  window.addEventListener("dp-lang-change", syncLegalOnlyPaymentUi);
 
   if (liqForm) {
     const acceptCheckbox = liqForm.querySelector("#apay-accept");
