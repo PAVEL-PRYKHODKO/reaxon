@@ -9,7 +9,7 @@
 </head>
 <body data-page="admin">
   <div class="ap-layout">
-    <aside class="ap-sidebar" aria-label="Разделы админки">
+    <aside class="ap-sidebar" data-ru-aria-label="Разделы админки" data-uk-aria-label="Розділи адмінки" aria-label="Розділи адмінки">
       <div class="ap-brand" data-ru="Панель" data-uk="Панель">Панель</div>
       <button
         type="button"
@@ -41,7 +41,7 @@
       <button type="button" class="ap-nav-btn" data-ap-view="delivery" data-ru="Доставка" data-uk="Доставка">Доставка</button>
       <button type="button" class="ap-nav-btn" data-ap-view="crm" data-ru="CRM" data-uk="CRM">CRM</button>
       <div class="ap-sidebar-foot">
-        <div class="lang-switcher" role="navigation" style="padding: 0 0 10px" aria-label="Переключение языка">
+        <div class="lang-switcher" role="navigation" style="padding: 0 0 10px" data-ru-aria-label="Переключение языка" data-uk-aria-label="Перемикання мови" aria-label="Перемикання мови">
           <label for="language-switcher" class="visually-hidden">
             <span data-i18n="langLabel">Язык</span>
           </label>
@@ -60,7 +60,7 @@
       </div>
     </aside>
     <main class="ap-main">
-      <div id="ap-shared-products-draft" class="ap-panel-hidden" aria-label="Черновик каталога и карточек">
+      <div id="ap-shared-products-draft" class="ap-panel-hidden" data-ru-aria-label="Черновик каталога и карточек" data-uk-aria-label="Чернетка каталогу і карток" aria-label="Чернетка каталогу і карток">
         <div id="ap-products-draft-bar" class="ap-draft-bar">
           <p id="ap-draft-hint" class="ap-draft-hint ap-muted"></p>
           <div class="ap-draft-bar-actions">
@@ -100,12 +100,12 @@
           <input type="text" id="ap-user-new-name" class="ap-search" placeholder="Имя" required />
           <input type="email" id="ap-user-new-email" class="ap-search" placeholder="Email" required />
           <input type="password" id="ap-user-new-password" class="ap-search" placeholder="Пароль от 10 символов" required minlength="10" />
-          <select id="ap-user-new-role" class="ap-search" aria-label="Роль нового пользователя"></select>
+          <select id="ap-user-new-role" class="ap-search" data-ru-aria-label="Роль нового пользователя" data-uk-aria-label="Роль нового користувача" aria-label="Роль нового користувача"></select>
           <button type="submit" class="ap-btn ap-btn-primary ap-btn-sm">Добавить</button>
         </form>
         <div class="ap-users-client-toolbar">
           <input type="search" id="ap-users-client-search" class="ap-search" placeholder="Поиск клиентов: имя, email, телефон, компания…" />
-          <select id="ap-users-client-sort" class="ap-search" aria-label="Сортировка клиентов">
+          <select id="ap-users-client-sort" class="ap-search" data-ru-aria-label="Сортировка клиентов" data-uk-aria-label="Сортування клієнтів" aria-label="Сортування клієнтів">
             <option value="created_desc">Сначала новые</option>
             <option value="created_asc">Сначала старые</option>
             <option value="name_asc">Имя А-Я</option>
@@ -113,7 +113,7 @@
             <option value="updated_desc">Профиль обновлён недавно</option>
           </select>
         </div>
-        <div id="ap-users-root" class="ap-users-role-sections" aria-label="Пользователи по ролям">
+        <div id="ap-users-root" class="ap-users-role-sections" data-ru-aria-label="Пользователи по ролям" data-uk-aria-label="Користувачі за ролями" aria-label="Користувачі за ролями">
           <p class="ap-muted">Загрузка пользователей…</p>
         </div>
       </section>
@@ -139,7 +139,7 @@
 
         <div id="ap-products-panel-catalog" class="ap-products-panel">
           <div class="ap-catalog-admin-layout">
-            <aside class="ap-catalog-filters" aria-label="Фильтры каталога">
+            <aside class="ap-catalog-filters" data-ru-aria-label="Фильтры каталога" data-uk-aria-label="Фільтри каталогу" aria-label="Фільтри каталогу">
               <h2 class="ap-catalog-filters-title">Фильтры</h2>
               <label class="ap-field-label" for="ap-cat-filter-family" data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</label>
               <select id="ap-cat-filter-family" class="ap-search ap-catalog-filter-select"></select>
@@ -255,10 +255,10 @@
                         Редактирование и удаление строк в таблице сначала только на экране; «Таблицу фасовок в черновик» сохраняет состав в черновик для целей массовых операций; «Отменить правки таблицы» возвращает вид к сохранённому черновику. «Сохранить на сайт» вверху применено к сайту только после вашего подтверждения. Базовый список строится по прайсу: веса розницы, ведро/барабан при заданном массаже в каталоге. После смены прайса можно нажать «Как из прайса», затем снова «Таблицу фасовок в черновик», затем «Сохранить на сайт».
                       </p>
                       <div class="ap-table-wrap ap-pack-table-wrap">
-                        <table class="ap-table ap-pack-options-table" aria-label="Фасовки массово">
+                        <table class="ap-table ap-pack-options-table" data-ru-aria-label="Фасовки массово" data-uk-aria-label="Фасування масово" aria-label="Фасування масово">
                           <thead>
                             <tr>
-                              <th class="ap-pack-drag-th" title="Порядок">↕</th>
+                              <th class="ap-pack-drag-th" data-ru-title="Порядок" data-uk-title="Порядок" title="Порядок">↕</th>
                               <th>Тип</th>
                               <th>Кг (банка)</th>
                               <th>Подпись</th>
@@ -295,10 +295,10 @@
                         <a href="products.html" target="_blank" rel="noopener noreferrer">каталоге</a>. «Записать в черновик» — правки в админке; «Опубликовать на сайте» — то же, что кнопка «Сохранить на сайт» вверху (для всех изменений черновика).
                       </p>
                       <div class="ap-table-wrap ap-pack-table-wrap">
-                        <table class="ap-table ap-pack-options-table" aria-label="Фасовки">
+                        <table class="ap-table ap-pack-options-table" data-ru-aria-label="Фасовки" data-uk-aria-label="Фасування" aria-label="Фасування">
                           <thead>
                             <tr>
-                              <th class="ap-pack-drag-th" title="Порядок">↕</th>
+                              <th class="ap-pack-drag-th" data-ru-title="Порядок" data-uk-title="Порядок" title="Порядок">↕</th>
                               <th>Тип</th>
                               <th>Кг (банка)</th>
                               <th>Подпись</th>
@@ -337,7 +337,7 @@
                 </div>
               </details>
 
-              <div id="ap-product-catalog" class="ap-product-catalog ap-product-catalog--wide" role="region" aria-label="Каталог позиций"></div>
+              <div id="ap-product-catalog" class="ap-product-catalog ap-product-catalog--wide" role="region" data-ru-aria-label="Каталог позиций" data-uk-aria-label="Каталог позицій" aria-label="Каталог позицій"></div>
             </div>
           </div>
         </div>
@@ -445,7 +445,7 @@
                   </label>
                   <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-cards-photo-reset-crop">Сбросить кадр</button>
                 </div>
-                <canvas id="ap-cards-photo-canvas" width="900" height="900" aria-label="Предпросмотр обрезки фото"></canvas>
+                <canvas id="ap-cards-photo-canvas" width="900" height="900" data-ru-aria-label="Предпросмотр обрезки фото" data-uk-aria-label="Попередній перегляд обрізки фото" aria-label="Попередній перегляд обрізки фото"></canvas>
               </div>
               <div class="ap-actions ap-actions--compact">
                 <button type="button" class="ap-btn ap-btn-primary ap-btn-sm" id="ap-cards-photo-save">Сохранить фото</button>
@@ -475,7 +475,9 @@
               type="button"
               class="ap-btn ap-btn-danger ap-btn-sm"
               id="ap-price-clear-catalog"
-              title="Удалить все позиции в этом окне и сбросить историю импорта; затем можно загрузить новый файл"
+              data-ru-title="Удалить все позиции в этом окне и сбросить историю импорта; затем можно загрузить новый файл"
+              data-uk-title="Видалити всі позиції у цьому вікні та скинути історію імпорту; потім можна завантажити новий файл"
+              title="Видалити всі позиції у цьому вікні та скинути історію імпорту; потім можна завантажити новий файл"
             >
               Очистить все позиции
             </button>
@@ -492,7 +494,7 @@
             <label class="ap-field-label ap-price-search-label" for="ap-price-admin-search">Поиск позиции</label>
             <div class="ap-price-search-controls">
               <input type="search" id="ap-price-admin-search" class="ap-search ap-search--products" placeholder="Артикул, линия, название, id…" autocomplete="off" />
-              <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-price-find-btn" title="Прокрутить к строке и открыть поле для правки">Найти позицию</button>
+              <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" id="ap-price-find-btn" data-ru-title="Прокрутить к строке и открыть поле для правки" data-uk-title="Прокрутити до рядка і відкрити поле для редагування" title="Прокрутити до рядка і відкрити поле для редагування">Найти позицию</button>
             </div>
             <p id="ap-price-find-hint" class="ap-muted ap-price-find-hint" aria-live="polite"></p>
           </div>
@@ -516,14 +518,14 @@
               <tr>
                 <th>ID</th>
                 <th data-ru="Тип покрытия" data-uk="Тип покриття">Тип покрытия</th>
-                <th title="Числовой артикул, единый с каталогом и прайсом на сайте">Артикул</th>
+                <th data-ru-title="Числовой артикул, единый с каталогом и прайсом на сайте" data-uk-title="Числовий артикул, єдиний з каталогом і прайсом на сайті" title="Числовий артикул, єдиний з каталогом і прайсом на сайті">Артикул</th>
                 <th>Наименование</th>
                 <th>Без НДС / кг</th>
                 <th>С НДС / кг</th>
-                <th title="Мала банка, кг">мал /кг/ банка</th>
-                <th title="Велика банка, кг">вел /кг/ банка</th>
-                <th title="Фасовка ведра, кг">Вага /кг/ відро</th>
-                <th title="Фасовка барабана, кг">Вага /кг/ барабан</th>
+                <th data-ru-title="Мала банка, кг" data-uk-title="Мала банка, кг" title="Мала банка, кг">мал /кг/ банка</th>
+                <th data-ru-title="Велика банка, кг" data-uk-title="Велика банка, кг" title="Велика банка, кг">вел /кг/ банка</th>
+                <th data-ru-title="Фасовка ведра, кг" data-uk-title="Фасування відра, кг" title="Фасування відра, кг">Вага /кг/ відро</th>
+                <th data-ru-title="Фасовка барабана, кг" data-uk-title="Фасування барабана, кг" title="Фасування барабана, кг">Вага /кг/ барабан</th>
               </tr>
             </thead>
             <tbody id="ap-price-catalog-body"></tbody>
@@ -549,7 +551,7 @@
             <a class="ap-btn ap-btn-ghost ap-btn-sm" href="crm.html" target="_blank" rel="noopener noreferrer">crm.html (заявки)</a>
           </div>
           <div class="ap-crm-frame-wrap">
-            <iframe id="ap-crm-iframe" class="ap-crm-iframe" title="CRM — склад, прайс, фото SKU" src="about:blank"></iframe>
+            <iframe id="ap-crm-iframe" class="ap-crm-iframe" data-ru-title="CRM — склад, прайс, фото SKU" data-uk-title="CRM — склад, прайс, фото SKU" title="CRM — склад, прайс, фото SKU" src="about:blank"></iframe>
           </div>
         </div>
       </section>
@@ -610,7 +612,7 @@
                   <div id="ap-delivery-v2-mount-ru" class="ap-delivery-v2-mount"></div>
                 </div>
               </div>
-              <aside class="ap-delivery-preview-col" aria-label="Текущий текст на сайте для русского">
+              <aside class="ap-delivery-preview-col" data-ru-aria-label="Текущий текст на сайте для русского" data-uk-aria-label="Поточний текст на сайті для російської" aria-label="Поточний текст на сайті для російської">
                 <p class="ap-delivery-preview-title">На сайте (delivery.html)</p>
                 <div class="ap-delivery-preview-scroll" id="ap-delivery-preview-ru"></div>
               </aside>
@@ -629,7 +631,7 @@
                   <div id="ap-delivery-v2-mount-uk" class="ap-delivery-v2-mount"></div>
                 </div>
               </div>
-              <aside class="ap-delivery-preview-col" aria-label="Текущий текст на сайте для української">
+              <aside class="ap-delivery-preview-col" data-ru-aria-label="Текущий текст на сайте для української" data-uk-aria-label="Поточний текст на сайті для української" aria-label="Поточний текст на сайті для української">
                 <p class="ap-delivery-preview-title">На сайті (delivery.html)</p>
                 <div class="ap-delivery-preview-scroll" id="ap-delivery-preview-uk"></div>
               </aside>

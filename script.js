@@ -71,7 +71,7 @@ const I18N = {
     checkoutWarehouseManual: "Отделение / комментарий к адресу",
     checkoutPayment: "Оплата",
     checkoutPayCard: "Онлайн-оплата банковской картой (LiqPay)",
-    checkoutPayIban: "Оплата по реквизитам (IBAN)",
+    checkoutPayIban: "Счет-фактура отправляется файлом на email",
     checkoutNewsletter: "Хочу получать новости и спецпредложения магазина",
     checkoutOfferNoteBefore: "Оформляя заказ, вы соглашаетесь с",
     checkoutOfferLink: "Договором оферты",
@@ -87,7 +87,6 @@ const I18N = {
       "Для юрлица заполните в личном кабинете: название организации, ЄДРПОУ, IBAN, email для счетов и юридический адрес.",
     checkoutLegalEntityVatShort: "с НДС",
     checkoutDeliveryTbd: "уточняется",
-    checkoutCoupon: "Есть купон со скидкой?",
     checkoutQty: "Кол-во",
     checkoutEmptyRedirect: "Корзина пуста — открыт каталог.",
     checkoutHintManualNp:
@@ -444,7 +443,7 @@ const I18N = {
     checkoutWarehouseManual: "Відділення / коментар до адреси",
     checkoutPayment: "Оплата",
     checkoutPayCard: "Онлайн-оплата банківською карткою (LiqPay)",
-    checkoutPayIban: "Оплата за реквізитами (IBAN)",
+    checkoutPayIban: "Рахунок-фактура надсилається файлом на email",
     checkoutNewsletter: "Бажаю отримувати новини та спеціальні пропозиції магазину",
     checkoutOfferNoteBefore: "Оформлюючи замовлення, ви погоджуєтеся з",
     checkoutOfferLink: "Договором оферти",
@@ -460,7 +459,6 @@ const I18N = {
       "Для юрособи заповніть у кабінеті: назва, ЄДРПОУ/РНОКПП, IBAN, email для рахунків і юридична адреса.",
     checkoutLegalEntityVatShort: "з ПДВ",
     checkoutDeliveryTbd: "уточнюється",
-    checkoutCoupon: "Є купон зі знижкою?",
     checkoutQty: "К-сть",
     checkoutEmptyRedirect: "Кошик порожній — відкрито каталог.",
     checkoutHintManualNp:
@@ -817,7 +815,7 @@ const I18N = {
     checkoutWarehouseManual: "Branch / address note",
     checkoutPayment: "Payment",
     checkoutPayCard: "Card online (LiqPay)",
-    checkoutPayIban: "Bank transfer (IBAN)",
+    checkoutPayIban: "Invoice file is sent by email",
     checkoutNewsletter: "I want news and special offers",
     checkoutOfferNoteBefore: "By placing the order, you agree to the",
     checkoutOfferLink: "Public Offer Agreement",
@@ -833,7 +831,6 @@ const I18N = {
       "Legal-entity buyers must complete company name, tax ID, IBAN, invoicing email and legal address in their account profile.",
     checkoutLegalEntityVatShort: "incl. VAT",
     checkoutDeliveryTbd: "TBD",
-    checkoutCoupon: "Have a discount coupon?",
     checkoutQty: "Qty",
     checkoutEmptyRedirect: "Cart is empty — opening catalog.",
     checkoutHintManualNp:
@@ -1212,11 +1209,22 @@ function loadCartForOwner(owner) {
     const raw = JSON.parse(localStorage.getItem(key) || "[]");
     let cart = normalizeStoredCart(raw);
     if (cart.length === 0) {
-      const legacyRaw = JSON.parse(localStorage.getItem("cart") || "[]");
-      const legacy = normalizeStoredCart(legacyRaw);
-      if (legacy.length) {
-        cart = legacy;
-        localStorage.setItem(key, JSON.stringify(cart));
+      const hasScopedCartData = (() => {
+        if (localStorage.getItem(CART_AUTH_OWNER_KEY)) return true;
+        if (localStorage.getItem(CART_STORAGE_KEY_GUEST)) return true;
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = String(localStorage.key(i) || "");
+          if (k.startsWith(CART_STORAGE_KEY_PREFIX_AUTH)) return true;
+        }
+        return false;
+      })();
+      if (!hasScopedCartData) {
+        const legacyRaw = JSON.parse(localStorage.getItem("cart") || "[]");
+        const legacy = normalizeStoredCart(legacyRaw);
+        if (legacy.length) {
+          cart = legacy;
+          localStorage.setItem(key, JSON.stringify(cart));
+        }
       }
     }
     if (owner) {
@@ -1233,10 +1241,20 @@ function loadCartForOwner(owner) {
 
 function enforceCartAuthIsolationOnBoot() {
   try {
-    const owner = String(localStorage.getItem(CART_AUTH_OWNER_KEY) || "");
     const current = currentCartAuthOwner();
-    if (owner && !current) {
+    if (!current) {
+      // Нет сессии пользователя: корзина должна быть гостевой и пустой.
+      const owner = String(localStorage.getItem(CART_AUTH_OWNER_KEY) || "");
+      if (owner) localStorage.removeItem(`dp_cart_auth_${encodeURIComponent(owner)}`);
       localStorage.removeItem(CART_AUTH_OWNER_KEY);
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = String(localStorage.key(i) || "");
+        if (k.startsWith(CART_STORAGE_KEY_PREFIX_AUTH)) {
+          localStorage.removeItem(k);
+        }
+      }
+      localStorage.setItem(CART_STORAGE_KEY_GUEST, "[]");
+      localStorage.setItem("cart", "[]");
     }
   } catch {
     /* ignore */
@@ -1246,7 +1264,7 @@ function enforceCartAuthIsolationOnBoot() {
 const state = {
   lang: (() => {
     const l = localStorage.getItem("lang");
-    return l === "uk" ? "uk" : "ru";
+    return l === "ru" ? "ru" : "uk";
   })(),
   customerType: "retail",
   category: "",
@@ -3408,7 +3426,7 @@ function renderProducts() {
   if (nodes.pagination) {
     nodes.pagination.innerHTML = `
       <button class="btn btn-ghost" type="button" data-page="${Math.max(1, state.page - 1)}" ${state.page === 1 ? "disabled" : ""}>←</button>
-      <span class="meta">Страница ${state.page} из ${totalPages}</span>
+      <span class="meta">${state.lang === "uk" ? "Сторінка" : "Страница"} ${state.page} ${state.lang === "uk" ? "з" : "из"} ${totalPages}</span>
       <button class="btn btn-ghost" type="button" data-page="${Math.min(totalPages, state.page + 1)}" ${state.page === totalPages ? "disabled" : ""}>→</button>
     `;
   }
@@ -3422,8 +3440,10 @@ function renderProductsShowcase(activeLabel = "") {
   }
   if (nodes.productsShowcaseSubtitle) {
     nodes.productsShowcaseSubtitle.textContent = items.length
-      ? `${items.length} позиций в выбранной категории`
-      : "В этой категории пока нет подходящих позиций.";
+      ? `${items.length} ${state.lang === "uk" ? "позицій у вибраній категорії" : "позиций в выбранной категории"}`
+      : state.lang === "uk"
+        ? "У цій категорії поки немає відповідних позицій."
+        : "В этой категории пока нет подходящих позиций.";
   }
   nodes.productsShowcaseGrid.innerHTML = items
     .map((p) => {
@@ -3443,7 +3463,7 @@ function renderProductsShowcase(activeLabel = "") {
             <p>${escapeHtml(p.variant || "")}</p>
             <p><strong>${t("retailPrice")}:</strong> ${formatPrice(unitPricePerKg(p, "retail"))} ${t("perKg")}</p>
             <p><strong>${t("packKg")}:</strong> 0.9 кг / 2.8 кг / 19.5 кг / 49.6 кг</p>
-            <span class="showcase-more">Увидеть больше</span>
+            <span class="showcase-more">${state.lang === "uk" ? "Побачити більше" : "Увидеть больше"}</span>
           </a>
         </article>
       `;
@@ -3470,7 +3490,7 @@ function renderSidebarCategories() {
   nodes.sidebar.innerHTML = order
     .filter((f) => f === "all" || counts.has(f))
     .map((f) => {
-      const label = f === "all" ? "Все товары" : `${names[f] || f} (${counts.get(f) || 0})`;
+      const label = f === "all" ? (state.lang === "uk" ? "Усі товари" : "Все товары") : `${names[f] || f} (${counts.get(f) || 0})`;
       const active = (state.category || "all") === f ? "active" : "";
       return `<button class="side-link ${active}" type="button" data-side-category="${f}">${label}</button>`;
     })
@@ -3587,6 +3607,29 @@ function saveCart() {
   }
 }
 
+let addToCartToastTimer = null;
+function showToastMessage(message, durationMs = 2100) {
+  let toast = document.getElementById("add-to-cart-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "add-to-cart-toast";
+    toast.className = "dp-toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    document.body.appendChild(toast);
+  }
+  toast.textContent = String(message || "");
+  toast.classList.add("is-visible");
+  if (addToCartToastTimer) clearTimeout(addToCartToastTimer);
+  addToCartToastTimer = setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, Math.max(900, Number(durationMs || 2100)));
+}
+
+function showAddToCartToast() {
+  showToastMessage(t("added"), 2100);
+}
+
 function addToCart(productId, packType) {
   const mode = state.customerType;
   const hit = state.cart.find(
@@ -3597,6 +3640,7 @@ function addToCart(productId, packType) {
   else state.cart.push({ productId, packType, qty: 1, mode });
   saveCart();
   renderCart();
+  showAddToCartToast();
 }
 
 function addJarToCart(productId, jarKg) {
@@ -3614,6 +3658,7 @@ function addJarToCart(productId, jarKg) {
   else state.cart.push({ productId, packType: "jar", customKg: weight, qty: 1, mode });
   saveCart();
   renderCart();
+  showAddToCartToast();
 }
 
 function addToCartWithQuantity(productId, packType, qty) {
@@ -3627,6 +3672,7 @@ function addToCartWithQuantity(productId, packType, qty) {
   else state.cart.push({ productId, packType, qty: n, mode });
   saveCart();
   renderCart();
+  showAddToCartToast();
 }
 
 /** Авторизован ли покупатель на сайте (JWT + профиль в localStorage). Используется на странице оформления заказа. */
@@ -3686,6 +3732,7 @@ function addJarToCartWithQuantity(productId, jarKg, qty) {
   else state.cart.push({ productId, packType: "jar", customKg: weight, qty: n, mode });
   saveCart();
   renderCart();
+  showAddToCartToast();
 }
 
 /**
@@ -4054,6 +4101,7 @@ function initEvents() {
     state.lang = next;
     state.newsVisibleCount = 12;
     applyTranslations();
+    void applyUnifiedLegalRequisites();
     applyHeaderAuthState();
     loadNews();
     if (document.getElementById("products")) renderProducts();
@@ -5211,67 +5259,140 @@ function ensureSeoMetaAndSchema() {
   const host = location.origin || "";
   const path = location.pathname || "/index.html";
   const absUrl = `${host}${path}`;
-  const defaults = {
-    title: "DP Coatings — промышленные лакокрасочные материалы",
-    description:
-      "DP Coatings (REAXON): каталог эмалей, грунтовок и специальных покрытий. Подбор материалов, доставка по Украине, B2B и розница.",
-  };
+  const isUkSeo = state.lang === "uk";
+  const defaults = isUkSeo
+    ? {
+        title: "DP Coatings — промислові лакофарбові матеріали",
+        description:
+          "DP Coatings (REAXON): каталог емалей, ґрунтовок і спеціальних покриттів. Підбір матеріалів, доставка по Україні, B2B і роздріб.",
+      }
+    : {
+        title: "DP Coatings — промышленные лакокрасочные материалы",
+        description:
+          "DP Coatings (REAXON): каталог эмалей, грунтовок и специальных покрытий. Подбор материалов, доставка по Украине, B2B и розница.",
+      };
   const seoByPage = {
-    home: {
-      title: "DP Coatings — каталог ЛКМ и промышленных покрытий",
-      description:
-        "Промышленные лакокрасочные материалы REAXON: эмали, грунтовки, лаки и специальные покрытия. Подбор, консультация, доставка.",
-    },
-    products: {
-      title: "Каталог продукции — DP Coatings",
-      description:
-        "Каталог лакокрасочных материалов: эмали, грунтовки, лаки, растворители и специальные системы покрытий для разных задач.",
-    },
-    product: {
-      title: "Карточка товара — DP Coatings",
-      description:
-        "Характеристики, фасовки и цены по выбранному продукту DP Coatings. Доступны варианты для промышленного и бытового применения.",
-    },
-    price: {
-      title: "Прайс-лист — DP Coatings",
-      description:
-        "Актуальный прайс-лист DP Coatings: цены по позициям, фасовкам и видам покрытий. Удобный поиск по каталогу.",
-    },
-    delivery: {
-      title: "Доставка и оплата — DP Coatings",
-      description:
-        "Условия доставки и оплаты DP Coatings по Украине. Доступны банковские реквизиты и онлайн-оплата.",
-    },
-    contact: {
-      title: "Контакты — DP Coatings",
-      description:
-        "Контакты DP Coatings: телефоны, email, адрес и форма обратной связи. Поможем с подбором материалов и заказом.",
-    },
-    about: {
-      title: "О компании — DP Coatings",
-      description:
-        "О компании REAXON / DP Coatings: поставки лакокрасочных материалов, поддержка B2B и розничных клиентов, системный контроль качества.",
-    },
-    news: {
-      title: "Новости — DP Coatings",
-      description:
-        "Новости и обновления DP Coatings: продукты, решения и отраслевые материалы по лакокрасочным покрытиям.",
-    },
-    "intelligent-selection": {
-      title: "Помощник ИИ — DP Coatings",
-      description:
-        "ИИ-помощник DP Coatings для подбора лакокрасочных материалов по задаче: интерьер, фасад, металл, дерево и спецпокрытия.",
-    },
-    auth: {
-      title: "Вход и регистрация — DP Coatings",
-      description:
-        "Вход и регистрация в личный кабинет DP Coatings. Управление профилем, заказами и настройками согласий пользователя.",
-    },
-    "privacy-policy": {
-      title: "Политика конфиденциальности — DP Coatings",
-      description:
-        "Политика конфиденциальности DP Coatings: цели обработки данных, права пользователя, cookies, аналитика и управление согласиями.",
-    },
+    home: isUkSeo
+      ? {
+          title: "DP Coatings — каталог ЛФМ та промислових покриттів",
+          description:
+            "Промислові лакофарбові матеріали REAXON: емалі, ґрунтовки, лаки та спеціальні покриття. Підбір, консультація, доставка.",
+        }
+      : {
+          title: "DP Coatings — каталог ЛКМ и промышленных покрытий",
+          description:
+            "Промышленные лакокрасочные материалы REAXON: эмали, грунтовки, лаки и специальные покрытия. Подбор, консультация, доставка.",
+        },
+    products: isUkSeo
+      ? {
+          title: "Каталог продукції — DP Coatings",
+          description:
+            "Каталог лакофарбових матеріалів: емалі, ґрунтовки, лаки, розчинники та спеціальні системи покриттів для різних задач.",
+        }
+      : {
+          title: "Каталог продукции — DP Coatings",
+          description:
+            "Каталог лакокрасочных материалов: эмали, грунтовки, лаки, растворители и специальные системы покрытий для разных задач.",
+        },
+    product: isUkSeo
+      ? {
+          title: "Картка товару — DP Coatings",
+          description:
+            "Характеристики, фасування та ціни обраного продукту DP Coatings. Доступні варіанти для промислового та побутового використання.",
+        }
+      : {
+          title: "Карточка товара — DP Coatings",
+          description:
+            "Характеристики, фасовки и цены по выбранному продукту DP Coatings. Доступны варианты для промышленного и бытового применения.",
+        },
+    price: isUkSeo
+      ? {
+          title: "Прайс-лист — DP Coatings",
+          description:
+            "Актуальний прайс-лист DP Coatings: ціни за позиціями, фасуванням і видами покриттів. Зручний пошук по каталогу.",
+        }
+      : {
+          title: "Прайс-лист — DP Coatings",
+          description:
+            "Актуальный прайс-лист DP Coatings: цены по позициям, фасовкам и видам покрытий. Удобный поиск по каталогу.",
+        },
+    delivery: isUkSeo
+      ? {
+          title: "Доставка та оплата — DP Coatings",
+          description:
+            "Умови доставки та оплати DP Coatings по Україні. Доступні банківські реквізити та онлайн-оплата.",
+        }
+      : {
+          title: "Доставка и оплата — DP Coatings",
+          description:
+            "Условия доставки и оплаты DP Coatings по Украине. Доступны банковские реквизиты и онлайн-оплата.",
+        },
+    contact: isUkSeo
+      ? {
+          title: "Контакти — DP Coatings",
+          description:
+            "Контакти DP Coatings: телефони, email, адреса та форма зворотного зв'язку. Допоможемо з підбором матеріалів і замовленням.",
+        }
+      : {
+          title: "Контакты — DP Coatings",
+          description:
+            "Контакты DP Coatings: телефоны, email, адрес и форма обратной связи. Поможем с подбором материалов и заказом.",
+        },
+    about: isUkSeo
+      ? {
+          title: "Про компанію — DP Coatings",
+          description:
+            "Про компанію REAXON / DP Coatings: постачання лакофарбових матеріалів, підтримка B2B та роздрібних клієнтів, системний контроль якості.",
+        }
+      : {
+          title: "О компании — DP Coatings",
+          description:
+            "О компании REAXON / DP Coatings: поставки лакокрасочных материалов, поддержка B2B и розничных клиентов, системный контроль качества.",
+        },
+    news: isUkSeo
+      ? {
+          title: "Новини — DP Coatings",
+          description:
+            "Новини та оновлення DP Coatings: продукти, рішення й галузеві матеріали щодо лакофарбових покриттів.",
+        }
+      : {
+          title: "Новости — DP Coatings",
+          description:
+            "Новости и обновления DP Coatings: продукты, решения и отраслевые материалы по лакокрасочным покрытиям.",
+        },
+    "intelligent-selection": isUkSeo
+      ? {
+          title: "Помічник ШІ — DP Coatings",
+          description:
+            "ШІ-помічник DP Coatings для підбору лакофарбових матеріалів під задачу: інтер'єр, фасад, метал, дерево та спецпокриття.",
+        }
+      : {
+          title: "Помощник ИИ — DP Coatings",
+          description:
+            "ИИ-помощник DP Coatings для подбора лакокрасочных материалов по задаче: интерьер, фасад, металл, дерево и спецпокрытия.",
+        },
+    auth: isUkSeo
+      ? {
+          title: "Вхід і реєстрація — DP Coatings",
+          description:
+            "Вхід і реєстрація в особистий кабінет DP Coatings. Керування профілем, замовленнями та налаштуваннями згод.",
+        }
+      : {
+          title: "Вход и регистрация — DP Coatings",
+          description:
+            "Вход и регистрация в личный кабинет DP Coatings. Управление профилем, заказами и настройками согласий пользователя.",
+        },
+    "privacy-policy": isUkSeo
+      ? {
+          title: "Політика конфіденційності — DP Coatings",
+          description:
+            "Політика конфіденційності DP Coatings: цілі обробки даних, права користувача, cookies, аналітика та керування згодами.",
+        }
+      : {
+          title: "Политика конфиденциальности — DP Coatings",
+          description:
+            "Политика конфиденциальности DP Coatings: цели обработки данных, права пользователя, cookies, аналитика и управление согласиями.",
+        },
   };
   const seo = seoByPage[page] || defaults;
   if (seo.title && document.title !== seo.title) document.title = seo.title;
@@ -5376,10 +5497,154 @@ function ensureSeoMetaAndSchema() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Главная", item: `${host}/index.html` },
+      { "@type": "ListItem", position: 1, name: isUkSeo ? "Головна" : "Главная", item: `${host}/index.html` },
       { "@type": "ListItem", position: 2, name: seo.title, item: absUrl },
     ],
   });
+}
+
+async function applyUnifiedLegalRequisites() {
+  try {
+    if (!window.__dpLegalRequisitesCache) {
+      const url = typeof window.dpApiUrl === "function" ? window.dpApiUrl("/api/legal-requisites") : "/api/legal-requisites";
+      const res = await fetch(url, { credentials: "same-origin" });
+      if (!res.ok) return;
+      window.__dpLegalRequisitesCache = await res.json();
+    }
+    const cfg = window.__dpLegalRequisitesCache;
+    if (!cfg) return;
+    const lang = typeof window.getDpLang === "function" && window.getDpLang() === "uk" ? "uk" : "ru";
+    const company = String(cfg.companyName?.[lang] || "");
+    const address = String(cfg.address?.[lang] || "");
+    const bank = String(cfg.bank?.[lang] || "");
+    const taxStatus = String(cfg.taxStatus?.[lang] || "");
+    const corr = String(cfg.correspondenceAddress?.[lang] || "");
+    const edrpouLabel = lang === "uk" ? "ЄДРПОУ" : "ЕГРПОУ";
+    const ipnLabel = lang === "uk" ? "ІПН" : "ИНН";
+    const corrLabel = lang === "uk" ? "адреса для кореспонденції" : "адрес для корреспонденции";
+    const mfoLabel = "МФО";
+    const phones = Array.isArray(cfg.contactPhones) ? cfg.contactPhones.filter(Boolean).slice(0, 3) : [];
+
+    const formatPhoneDisplay = (raw) => {
+      const digits = String(raw || "").replace(/\D/g, "");
+      if (digits.length === 12 && digits.startsWith("380")) {
+        return `+38 (${digits.slice(2, 5)}) ${digits.slice(5, 8)}-${digits.slice(8, 10)}-${digits.slice(10, 12)}`;
+      }
+      return raw;
+    };
+
+    document.querySelectorAll('[data-legal-requisites="contact-block"]').forEach((el) => {
+      el.innerHTML = [
+        company,
+        address,
+        `IBAN ${cfg.iban || ""}, ${bank}, ${mfoLabel} ${cfg.mfo || ""}`,
+        `код ${edrpouLabel} ${cfg.edrpou || ""} &nbsp; ${ipnLabel} ${cfg.ipn || ""} &nbsp; св-во № ${cfg.certificateNo || ""}`,
+        taxStatus,
+        `${corrLabel}: ${corr}, тел. ${cfg.phone || ""}`,
+      ]
+        .filter(Boolean)
+        .join("<br>");
+    });
+
+    // Footer contacts on all pages
+    document.querySelectorAll(".footer-laconic-row--meta").forEach((metaRow) => {
+      const phoneLinks = Array.from(metaRow.querySelectorAll('.footer-laconic-tel[href^="tel:"]'));
+      phoneLinks.forEach((a, idx) => {
+        const p = phones[idx];
+        if (!p) return;
+        a.setAttribute("href", `tel:${p}`);
+        a.textContent = formatPhoneDisplay(p);
+      });
+      const mail = metaRow.querySelector('.footer-laconic-mail[href^="mailto:"]');
+      if (mail && cfg.contactEmail) {
+        mail.setAttribute("href", `mailto:${cfg.contactEmail}`);
+        mail.textContent = cfg.contactEmail;
+      }
+      const addr = metaRow.querySelector(".footer-laconic-addr");
+      if (addr && address) {
+        addr.textContent = address;
+      }
+    });
+
+    // Contact page phone/email/address blocks
+    document.querySelectorAll(".contact-v2-phones-stack").forEach((stack) => {
+      const links = Array.from(stack.querySelectorAll('a[href^="tel:"]'));
+      links.forEach((a, idx) => {
+        const p = phones[idx];
+        if (!p) return;
+        a.setAttribute("href", `tel:${p}`);
+        a.textContent = formatPhoneDisplay(p);
+      });
+    });
+    document.querySelectorAll('.contact-v2-line-body .contact-v2-value a[href^="mailto:"]').forEach((a) => {
+      if (!cfg.contactEmail) return;
+      a.setAttribute("href", `mailto:${cfg.contactEmail}`);
+      a.textContent = cfg.contactEmail;
+    });
+    document.querySelectorAll("address").forEach((addrEl) => {
+      const html = `
+        <strong data-i18n="contactLegalTitle">${lang === "uk" ? "Юридична адреса" : "Юридический адрес"}</strong><br />
+        ${address}<br /><br />
+        <strong data-i18n="contactProductionTitle">${lang === "uk" ? "Адреса виробничих потужностей" : "Адрес производственных мощностей"}</strong><br />
+        ${String(cfg.productionAddress?.[lang] || "")}<br /><br />
+        <strong data-i18n="contactMailTitle">${lang === "uk" ? "Для кореспонденції" : "Для корреспонденции"}</strong><br />
+        ${String(cfg.mailAddress?.[lang] || "")}
+      `;
+      addrEl.innerHTML = html;
+    });
+
+    const offerMap = {
+      companyName: company,
+      address,
+      iban: String(cfg.iban || ""),
+      bankMfo: `${bank}, ${mfoLabel} ${cfg.mfo || ""}`.trim().replace(/^,/, "").trim(),
+      ipn: String(cfg.ipn || ""),
+      edrpou: String(cfg.edrpou || ""),
+      certificateNo: `№ ${cfg.certificateNo || ""}`.trim(),
+      taxStatus,
+      correspondenceAddress: corr,
+      phone: String(cfg.phone || ""),
+    };
+    Object.entries(offerMap).forEach(([k, v]) => {
+      document.querySelectorAll(`[data-legal-field="${k}"]`).forEach((el) => {
+        el.textContent = v;
+      });
+    });
+
+    document.querySelectorAll('[data-legal-requisites="privacy-list"]').forEach((el) => {
+      const intro =
+        lang === "uk"
+          ? `
+        <li>Проєкт: DP Coatings (REAXON).</li>
+        <li>Email: reaxondh@gmail.com.</li>
+        <li>Телефони: +38 (067) 613-42-20, +38 (067) 613-51-55, +38 (061) 220-94-45.</li>
+      `
+          : `
+        <li>Проект: DP Coatings (REAXON).</li>
+        <li>Email: reaxondh@gmail.com.</li>
+        <li>Телефоны: +38 (067) 613-42-20, +38 (067) 613-51-55, +38 (061) 220-94-45.</li>
+      `;
+      const dynRu = `
+        <li>Адрес: ${String(cfg.address?.ru || "")}.</li>
+        <li>Получатель: ${String(cfg.companyName?.ru || "")}.</li>
+        <li>IBAN: ${String(cfg.iban || "")}; банк: ${String(cfg.bank?.ru || "")}; МФО: ${String(cfg.mfo || "")}.</li>
+        <li>Код ЕГРПОУ: ${String(cfg.edrpou || "")}; ИНН: ${String(cfg.ipn || "")}; св-во № ${String(cfg.certificateNo || "")}.</li>
+        <li>Налоговый статус: ${String(cfg.taxStatus?.ru || "")}.</li>
+        <li>Адрес для корреспонденции: ${String(cfg.correspondenceAddress?.ru || "")}; тел. ${String(cfg.phone || "")}.</li>
+      `;
+      const dynUk = `
+        <li>Адреса: ${String(cfg.address?.uk || "")}.</li>
+        <li>Отримувач: ${String(cfg.companyName?.uk || "")}.</li>
+        <li>IBAN: ${String(cfg.iban || "")}; банк: ${String(cfg.bank?.uk || "")}; МФО: ${String(cfg.mfo || "")}.</li>
+        <li>Код ЄДРПОУ: ${String(cfg.edrpou || "")}; ІПН: ${String(cfg.ipn || "")}; св-во № ${String(cfg.certificateNo || "")}.</li>
+        <li>Податковий статус: ${String(cfg.taxStatus?.uk || "")}.</li>
+        <li>Адреса для кореспонденції: ${String(cfg.correspondenceAddress?.uk || "")}; тел. ${String(cfg.phone || "")}.</li>
+      `;
+      el.innerHTML = intro + (lang === "uk" ? dynUk : dynRu);
+    });
+  } catch {
+    /* keep static requisites if API unavailable */
+  }
 }
 
 function init() {
@@ -5397,6 +5662,7 @@ function init() {
   ensureCookieSettingsFooterLink();
   initTelegramChannelFab();
   applyTranslations();
+  void applyUnifiedLegalRequisites();
   initContactLeadFormPrefill();
   initLeadFormIdentityUI();
   initContactCallbackBanner();
@@ -5412,7 +5678,14 @@ function init() {
     let prevOwner = currentCartAuthOwner();
     window.addEventListener("dp-auth-changed", () => {
       const nextOwner = currentCartAuthOwner();
-      if (prevOwner !== nextOwner) {
+      if (prevOwner && !nextOwner) {
+        // Явный logout: не переносим корзину пользователя в гостя.
+        state.cart = [];
+        localStorage.setItem(CART_STORAGE_KEY_GUEST, "[]");
+        localStorage.setItem("cart", "[]");
+        localStorage.removeItem(CART_AUTH_OWNER_KEY);
+        renderCart();
+      } else if (prevOwner !== nextOwner) {
         state.cart = loadCartForOwner(nextOwner);
         localStorage.setItem("cart", JSON.stringify(state.cart));
         renderCart();
@@ -5477,6 +5750,7 @@ window.dpCheckoutClearCart = function dpCheckoutClearCart() {
   saveCart();
   renderCart();
 };
+window.dpShowToast = showToastMessage;
 
 function runAppInit() {
   init();

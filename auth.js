@@ -98,7 +98,7 @@ function authLocale() {
     const l = getDpLang();
     return l === "uk" ? "uk" : "ru";
   }
-  return "ru";
+  return "uk";
 }
 
 function at(key) {

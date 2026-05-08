@@ -62,6 +62,20 @@
     if (kind === "err") el.classList.add("account-status--err");
   }
 
+  function clearClientCartOnLogout() {
+    try {
+      const owner = String(localStorage.getItem("dp_cart_auth_owner") || "").trim();
+      if (owner) {
+        localStorage.removeItem(`dp_cart_auth_${encodeURIComponent(owner)}`);
+      }
+      localStorage.setItem("dp_cart_guest", "[]");
+      localStorage.setItem("cart", "[]");
+      localStorage.removeItem("dp_cart_auth_owner");
+    } catch {
+      /* ignore */
+    }
+  }
+
   function applyUserToForm(form, user) {
     if (!user || !form) return;
     form.name.value = user.name || "";
@@ -112,6 +126,7 @@
     e.preventDefault();
     if (!window.confirm("Выйти из аккаунта?")) return;
     await notifyServerLogout();
+    clearClientCartOnLogout();
     localStorage.removeItem("authToken");
     localStorage.removeItem("authUser");
     window.location.href = "index.html";

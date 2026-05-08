@@ -23,8 +23,7 @@
       liqRedirect: "Перенаправление на защищённую страницу оплаты.",
       liqLogin: "Войдите в кабинет, чтобы оплатить картой.",
       liqEnv: "Не найден ни один настроенный платёжный провайдер в .env.",
-      legalOnlyIban:
-        "Для юридических лиц доступна только оплата по реквизитам компании: 69002, г. Запорожье, ул. Константина Великого, дом 20; код ЕГРПОУ 32297953; ИНН 322979508268; св-во № 200123175; адрес для корреспонденции: г. Запорожье, Н. Почта, отд. 29; тел. (067) 6134828.",
+      legalOnlyIban: "Для юридических лиц доступно только выставление счета.",
       legalInvoiceCreating: "Формируем счёт-фактуру и отправляем на email…",
       legalInvoiceDone: "Счёт-фактура сформирована. Файлы Excel и PDF отправлены на email для счетов.",
       legalInvoiceError: "Не удалось сформировать счёт-фактуру.",
@@ -74,8 +73,7 @@
       liqRedirect: "Перенаправлення на захищену сторінку оплати.",
       liqLogin: "Увійдіть у кабінет, щоб оплатити карткою.",
       liqEnv: "Не знайдено жодного налаштованого платіжного провайдера в .env.",
-      legalOnlyIban:
-        "Для юридичних осіб доступна лише оплата за реквізитами компанії: 69002, м. Запоріжжя, вул. Костянтина Великого, буд. 20; код ЄДРПОУ 32297953; ІПН 322979508268; св-во № 200123175; адреса для кореспонденції: м. Запоріжжя, Н. Пошта, відд. 29; тел. (067) 6134828.",
+      legalOnlyIban: "Для юридичних осіб доступне лише виставлення рахунку.",
       legalInvoiceCreating: "Формуємо рахунок-фактуру та надсилаємо на email…",
       legalInvoiceDone: "Рахунок-фактуру сформовано. Файли Excel та PDF надіслано на email для рахунків.",
       legalInvoiceError: "Не вдалося сформувати рахунок-фактуру.",
@@ -108,7 +106,7 @@
 
   function apayLocale() {
     if (window.getDpLang) return getDpLang() === "uk" ? "uk" : "ru";
-    return "ru";
+    return "uk";
   }
 
   function apayT(k) {
@@ -215,20 +213,6 @@
   }
 
   function legalOnlyIbanText() {
-    const cfg = legalRequisitesCache;
-    if (cfg && cfg.address && cfg.correspondenceAddress) {
-      const uk = apayLocale() === "uk";
-      const addr = uk ? String(cfg.address.uk || "") : String(cfg.address.ru || "");
-      const corr = uk ? String(cfg.correspondenceAddress.uk || "") : String(cfg.correspondenceAddress.ru || "");
-      const ed = String(cfg.edrpou || "");
-      const ipn = String(cfg.ipn || "");
-      const cert = String(cfg.certificateNo || "");
-      const phone = String(cfg.phone || "");
-      if (uk) {
-        return `Для юридичних осіб доступна лише оплата за реквізитами компанії: ${addr}; код ЄДРПОУ ${ed}; ІПН ${ipn}; св-во № ${cert}; адреса для кореспонденції: ${corr}; тел. ${phone}.`;
-      }
-      return `Для юридических лиц доступна только оплата по реквизитам компании: ${addr}; код ЕГРПОУ ${ed}; ИНН ${ipn}; св-во № ${cert}; адрес для корреспонденции: ${corr}; тел. ${phone}.`;
-    }
     return apayT("legalOnlyIban");
   }
 
@@ -236,13 +220,28 @@
     const liqBlock = document.getElementById("apay-liqpay-block");
     const note = document.getElementById("apay-legal-only-note");
     const legalAction = document.getElementById("apay-legal-invoice-action");
+    const deliveryBlock = document.querySelector(".apay-delivery");
     const legalAuthorized = Boolean(localStorage.getItem("authToken")) && isLegalPayerFromProfile();
     if (liqBlock) liqBlock.hidden = legalAuthorized;
     if (legalAction) legalAction.hidden = !legalAuthorized;
+    if (deliveryBlock) deliveryBlock.hidden = legalAuthorized;
     if (note) {
-      note.hidden = !legalAuthorized;
-      note.textContent = legalAuthorized ? legalOnlyIbanText() : "";
+      note.hidden = true;
+      note.textContent = "";
     }
+  }
+
+  function invoiceOnlyDeliveryPayload() {
+    return {
+      method: "invoice_only",
+      city: null,
+      cityRef: null,
+      warehouse: null,
+      warehouseRef: null,
+      address: null,
+      courierNpConfirmed: null,
+      comment: null,
+    };
   }
 
   function billingPayloadFromProfile() {
@@ -511,6 +510,34 @@
     }
   }
 
+  function renderOfferForPayer(cfg) {
+    const offerBox = document.getElementById("apay-offer-body");
+    const titleEl = document.getElementById("apay-offer-title");
+    if (!offerBox) return;
+    if (titleEl && cfg?.offerTitle) titleEl.textContent = cfg.offerTitle;
+    if (cfg?.offerHtml) {
+      offerBox.innerHTML = cfg.offerHtml;
+      const legalAuthorized = Boolean(localStorage.getItem("authToken")) && isLegalPayerFromProfile();
+      if (legalAuthorized) {
+        const paragraphs = Array.from(offerBox.querySelectorAll("p"));
+        for (const p of paragraphs) {
+          const text = String(p.textContent || "").toLowerCase();
+          if (
+            text.includes("liqpay") ||
+            text.includes("онлайн-оплат") ||
+            text.includes("онлайн-оплата") ||
+            text.includes("онлайн-оплатою") ||
+            text.includes("банківський переказ на iban") ||
+            text.includes("банковский перевод на iban")
+          ) {
+            p.remove();
+          }
+        }
+      }
+      linkOfferPhraseInText(offerBox);
+    }
+  }
+
   function syncDeliveryFields() {
     const methodEl = document.getElementById("apay-delivery-method");
     const cityWrap = document.getElementById("apay-delivery-city-wrap");
@@ -525,10 +552,11 @@
     const npMode = method === "nova_poshta";
     const courierMode = method === "courier";
     const pickupMode = method === "pickup";
-    if (cityWrap) cityWrap.hidden = pickupMode;
+    const agreementMode = method === "agreement";
+    if (cityWrap) cityWrap.hidden = pickupMode || agreementMode;
     if (whWrap) whWrap.hidden = !npMode;
     if (addressWrap) addressWrap.hidden = !courierMode;
-    if (commentWrap) commentWrap.hidden = !pickupMode;
+    if (commentWrap) commentWrap.hidden = !(pickupMode || agreementMode);
     if (courierNpHint) courierNpHint.hidden = !courierMode;
     if (courierNpLinkWrap) courierNpLinkWrap.hidden = !courierMode;
     if (courierNpConfirmWrap) courierNpConfirmWrap.hidden = !courierMode;
@@ -542,13 +570,16 @@
   }
 
   function readDeliveryPayload() {
+    if (isLegalPayerFromProfile()) {
+      return { value: invoiceOnlyDeliveryPayload() };
+    }
     const method = String(document.getElementById("apay-delivery-method")?.value || "nova_poshta");
     const city = getDeliveryCityValue();
     const warehouse = String(document.getElementById("apay-delivery-warehouse")?.value || "").trim();
     const address = String(document.getElementById("apay-delivery-address")?.value || "").trim();
     const courierNpConfirmed = Boolean(document.getElementById("apay-courier-np-confirm")?.checked);
     const comment = String(document.getElementById("apay-delivery-comment")?.value || "").trim();
-    if (method !== "pickup" && !city) {
+    if (method !== "pickup" && method !== "agreement" && !city) {
       return { error: apayT("deliveryCityRequired") };
     }
     if (method === "nova_poshta" && !warehouse) {
@@ -563,13 +594,13 @@
     return {
       value: {
         method,
-        city: method === "pickup" ? null : city,
+        city: method === "pickup" || method === "agreement" ? null : city,
         cityRef: method === "nova_poshta" ? (deliveryState.cityRef || null) : null,
         warehouse: method === "nova_poshta" ? warehouse : null,
         warehouseRef: method === "nova_poshta" ? (deliveryState.warehouseRef || null) : null,
         address: method === "courier" ? address : null,
         courierNpConfirmed: method === "courier" ? courierNpConfirmed : null,
-        comment: method === "pickup" ? comment || null : null,
+        comment: method === "pickup" || method === "agreement" ? comment || null : null,
       },
     };
   }
@@ -787,13 +818,7 @@
   (async () => {
     try {
       const cfg = await loadConfig();
-      const offerBox = document.getElementById("apay-offer-body");
-      const titleEl = document.getElementById("apay-offer-title");
-      if (titleEl && cfg.offerTitle) titleEl.textContent = cfg.offerTitle;
-      if (offerBox && cfg.offerHtml) {
-        offerBox.innerHTML = cfg.offerHtml;
-        linkOfferPhraseInText(offerBox);
-      }
+      renderOfferForPayer(cfg);
       renderIban(cfg.iban);
 
       const liqHint = document.getElementById("apay-liqpay-hint");
@@ -881,11 +906,7 @@
       setStatus(apayT("cartEmpty"), true);
       return;
     }
-    const delivery = readDeliveryPayload();
-    if (delivery.error) {
-      setStatus(delivery.error, true);
-      return;
-    }
+    const delivery = { value: invoiceOnlyDeliveryPayload() };
     const profile = billingPayloadFromProfile();
     if (!profile.phone || profile.phone.length < 9) {
       setStatus(apayT("needLoginFirst"), true);
@@ -913,19 +934,13 @@
         cart: Array.isArray(order.cartItems) ? order.cartItems : [],
         cartSnapshot: Array.isArray(order.cartSnapshot) ? order.cartSnapshot : [],
         orderTotal: order.orderTotal,
-        deliveryMethod: String(delivery?.value?.method || ""),
-        deliveryCity: String(delivery?.value?.city || ""),
-        deliveryPoint: String(
-          delivery?.value?.method === "nova_poshta"
-            ? delivery?.value?.warehouse || ""
-            : delivery?.value?.method === "courier"
-              ? delivery?.value?.address || ""
-              : delivery?.value?.comment || ""
-        ),
+        deliveryMethod: "invoice_only",
+        deliveryCity: "",
+        deliveryPoint: "",
         npCityRef: delivery?.value?.cityRef || null,
         npWarehouseRef: delivery?.value?.warehouseRef || null,
-        paymentMethod: "iban",
-        paymentNote: "Оплата по реквизитам (IBAN)",
+        paymentMethod: "invoice",
+        paymentNote: "Оплата за рахунком-фактурою (invoice only)",
         legalInvoiceFormat: String(document.getElementById("apay-legal-invoice-format")?.value || "both"),
         marketingOptIn: false,
         comment: "Сформувати рахунок-фактуру (юрособа, без онлайн-оплати).",
@@ -988,8 +1003,20 @@
   syncOrderFromCart();
   window.addEventListener("dp-cart-changed", syncOrderFromCart);
   window.addEventListener("dp-catalog-updated", syncOrderFromCart);
-  window.addEventListener("dp-auth-changed", syncLegalOnlyPaymentUi);
-  window.addEventListener("dp-lang-change", syncLegalOnlyPaymentUi);
+  window.addEventListener("dp-auth-changed", () => {
+    syncLegalOnlyPaymentUi();
+    syncDeliveryFields();
+    void loadConfig()
+      .then((cfg) => renderOfferForPayer(cfg))
+      .catch(() => {});
+  });
+  window.addEventListener("dp-lang-change", () => {
+    syncLegalOnlyPaymentUi();
+    syncDeliveryFields();
+    void loadConfig()
+      .then((cfg) => renderOfferForPayer(cfg))
+      .catch(() => {});
+  });
 
   if (liqForm) {
     const acceptCheckbox = liqForm.querySelector("#apay-accept");

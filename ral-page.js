@@ -122,7 +122,7 @@ const RAL_SERIES_LABELS = {
 };
 
 function ralLang() {
-  return localStorage.getItem("lang") || "ru";
+  return localStorage.getItem("lang") || "uk";
 }
 
 function ralT(key) {

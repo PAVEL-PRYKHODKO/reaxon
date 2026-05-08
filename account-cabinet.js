@@ -37,7 +37,7 @@
     } catch (e) {
       const msg = String(e?.message || "");
       if (msg === "Failed to fetch" || msg.includes("NetworkError")) {
-        throw new Error("Сервер недоступен. Запустите npm start и откройте сайт через http://localhost:3000");
+        throw new Error(tr("Сервер недоступен. Запустите npm start и откройте сайт через http://localhost:3000", "Сервер недоступний. Запустіть npm start і відкрийте сайт через http://localhost:3000"));
       }
       throw e;
     }
@@ -45,9 +45,12 @@
     if (res.status === 401) {
       localStorage.removeItem("authToken");
       localStorage.removeItem("authUser");
-      throw new Error("Сессия истекла. Войдите снова.");
+      throw new Error(tr("Сессия истекла. Войдите снова.", "Сесія закінчилась. Увійдіть знову."));
     }
-    if (!res.ok) throw new Error(data.message || "Ошибка запроса");
+    if (!res.ok) {
+      const fallback = data.error ? `Ошибка запроса (${data.error})` : `Ошибка запроса (${res.status})`;
+      throw new Error(data.message || fallback);
+    }
     return data;
   }
 
@@ -65,6 +68,28 @@
     el.classList.remove("account-status--ok", "account-status--err");
     if (kind === "ok") el.classList.add("account-status--ok");
     if (kind === "err") el.classList.add("account-status--err");
+  }
+
+  function isUkLang() {
+    return typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+  }
+
+  function tr(ru, uk) {
+    return isUkLang() ? uk : ru;
+  }
+
+  function clearClientCartOnLogout() {
+    try {
+      const owner = String(localStorage.getItem("dp_cart_auth_owner") || "").trim();
+      if (owner) {
+        localStorage.removeItem(`dp_cart_auth_${encodeURIComponent(owner)}`);
+      }
+      localStorage.setItem("dp_cart_guest", "[]");
+      localStorage.setItem("cart", "[]");
+      localStorage.removeItem("dp_cart_auth_owner");
+    } catch {
+      /* ignore */
+    }
   }
 
   function syncLegalBillingVisibility(form) {
@@ -198,12 +223,12 @@
     if (url) {
       const img = document.createElement("img");
       img.src = mediaUrl(url);
-      img.alt = "Фото профиля";
+      img.alt = tr("Фото профиля", "Фото профілю");
       img.draggable = false;
       box.appendChild(img);
     } else {
       const s = document.createElement("span");
-      s.textContent = "Нет фото";
+      s.textContent = tr("Нет фото", "Немає фото");
       box.appendChild(s);
     }
     syncAvatarRemoveVisibility();
@@ -219,12 +244,12 @@
   function formatRoleLabel(role) {
     const r = String(role || "").toLowerCase();
     const map = {
-      admin: "Администратор",
-      moderator: "Модератор",
-      accountant: "Бухгалтер",
-      user: "Пользователь",
+      admin: tr("Администратор", "Адміністратор"),
+      moderator: tr("Модератор", "Модератор"),
+      accountant: tr("Бухгалтер", "Бухгалтер"),
+      user: tr("Пользователь", "Користувач"),
     };
-    return map[r] || (role ? String(role) : "Пользователь");
+    return map[r] || (role ? String(role) : tr("Пользователь", "Користувач"));
   }
 
   function escHtml(s) {
@@ -242,20 +267,20 @@
 
   function purchaseLeadStatusLabel(status) {
     const m = {
-      new: "Новая",
-      in_progress: "В работе",
-      quoted: "КП отправлено",
-      won: "Выполнена",
-      lost: "Отменена",
+      new: tr("Новая", "Нова"),
+      in_progress: tr("В работе", "В роботі"),
+      quoted: tr("КП отправлено", "КП надіслано"),
+      won: tr("Выполнена", "Виконана"),
+      lost: tr("Отменена", "Скасована"),
     };
     return m[String(status || "")] || (status ? String(status) : "—");
   }
 
   function paymentStatusLabel(st) {
     const s = String(st || "").toLowerCase();
-    if (s === "success" || s === "paid") return "Оплачено";
-    if (s === "pending") return "Ожидает оплаты";
-    if (s.startsWith("error")) return "Ошибка оплаты";
+    if (s === "success" || s === "paid") return tr("Оплачено", "Оплачено");
+    if (s === "pending") return tr("Ожидает оплаты", "Очікує оплату");
+    if (s.startsWith("error")) return tr("Ошибка оплаты", "Помилка оплати");
     return st ? String(st) : "";
   }
 
@@ -273,7 +298,7 @@
     const statusEl = document.getElementById("account-site-messages-status");
     if (!getToken() || !root) return;
     if (statusEl) {
-      statusEl.textContent = "Загрузка…";
+      statusEl.textContent = tr("Загрузка…", "Завантаження…");
       statusEl.classList.remove("account-status--err");
     }
     try {
@@ -284,7 +309,7 @@
     } catch (e) {
       if (e.message === "no_token") return;
       if (statusEl) {
-        statusEl.textContent = e.message || "Не удалось загрузить сообщения";
+        statusEl.textContent = e.message || tr("Не удалось загрузить сообщения", "Не вдалося завантажити повідомлення");
         statusEl.classList.add("account-status--err");
       }
       root.innerHTML = "";
@@ -298,8 +323,10 @@
       const empty = document.createElement("p");
       empty.className = "account-site-messages__empty";
       empty.setAttribute("data-i18n", "accountSiteMessagesEmpty");
-      empty.textContent =
-        "Пока нет ответов менеджера. Они появятся здесь после обработки заявки.";
+      empty.textContent = tr(
+        "Пока нет ответов менеджера. Они появятся здесь после обработки заявки.",
+        "Поки немає відповідей менеджера. Вони з'являться тут після обробки заявки."
+      );
       root.innerHTML = "";
       root.appendChild(empty);
       if (typeof window.applyTranslations === "function") window.applyTranslations();
@@ -317,7 +344,7 @@
           formatPurchaseDate(m.createdAt)
         )}</time>
           </div>
-          <p class="account-site-message__from">${escHtml(m.fromManagerName || "Менеджер")}</p>
+          <p class="account-site-message__from">${escHtml(m.fromManagerName || tr("Менеджер", "Менеджер"))}</p>
           <div class="account-site-message__body">${escHtml(m.body || "")}</div>
         </article>`;
       })
@@ -341,7 +368,12 @@
     if (!root) return;
     if (!items || !items.length) {
       root.innerHTML =
-        '<p class="account-purchase-history__empty">Пока нет заказов, привязанных к аккаунту. Оформляйте покупки, будучи авторизованным на сайте — они появятся здесь.</p>';
+        `<p class="account-purchase-history__empty">${escHtml(
+          tr(
+            "Пока нет заказов, привязанных к аккаунту. Оформляйте покупки, будучи авторизованным на сайте — они появятся здесь.",
+            "Поки немає замовлень, прив'язаних до акаунта. Оформлюйте покупки, будучи авторизованими на сайті — вони з'являться тут."
+          )
+        )}</p>`;
       return;
     }
     root.innerHTML = items
@@ -362,23 +394,25 @@
           .join("");
         const more =
           row.cartLines > (row.cartPreview || []).length
-            ? `<div class="account-purchase-item__meta">… и ещё позиций: ${row.cartLines - (row.cartPreview || []).length}</div>`
+            ? `<div class="account-purchase-item__meta">… ${escHtml(tr("и ещё позиций", "і ще позицій"))}: ${
+                row.cartLines - (row.cartPreview || []).length
+              }</div>`
             : "";
         return `<article class="account-purchase-item">
           <div class="account-purchase-item__top">
-            <span class="account-purchase-item__id">Заявка №${escHtml(String(row.id))}</span>
+            <span class="account-purchase-item__id">${escHtml(tr("Заявка №", "Заявка №"))}${escHtml(String(row.id))}</span>
             <span class="account-purchase-item__date">${escHtml(formatPurchaseDate(row.createdAt))}</span>
           </div>
           <div class="account-purchase-item__sum">${escHtml(formatMoneyUAH(row.orderTotal))}</div>
           <div class="account-purchase-item__meta">${escHtml(purchaseLeadStatusLabel(row.status))} · ${escHtml(
-          String(row.source || "сайт")
+          String(row.source || tr("сайт", "сайт"))
         )}</div>
           ${payLine}
           ${
             lines
               ? `<ul class="account-purchase-item__lines">${lines}</ul>${more}`
               : row.cartLines
-                ? `<div class="account-purchase-item__meta">Позиций в составе: ${row.cartLines}</div>`
+                ? `<div class="account-purchase-item__meta">${escHtml(tr("Позиций в составе", "Позицій у складі"))}: ${row.cartLines}</div>`
                 : ""
           }
         </article>`;
@@ -401,7 +435,7 @@
     const statusEl = document.getElementById("account-purchase-history-status");
     if (!getToken() || !root) return;
     if (statusEl) {
-      statusEl.textContent = "Загрузка…";
+      statusEl.textContent = tr("Загрузка…", "Завантаження…");
       statusEl.classList.remove("account-status--err");
     }
     try {
@@ -411,7 +445,7 @@
     } catch (e) {
       if (e.message === "no_token") return;
       if (statusEl) {
-        statusEl.textContent = e.message || "Не удалось загрузить историю";
+        statusEl.textContent = e.message || tr("Не удалось загрузить историю", "Не вдалося завантажити історію");
         statusEl.classList.add("account-status--err");
       }
       root.innerHTML = "";
@@ -433,7 +467,7 @@
     {
       const pr = user.profile || {};
       const show = [user.name, pr.lastName].filter(Boolean).join(" ").trim();
-      nm.textContent = show || "Без имени";
+      nm.textContent = show || tr("Без имени", "Без імені");
     }
     em.textContent = user.email || "";
     rl.textContent = formatRoleLabel(user.role);
@@ -497,7 +531,7 @@
         window.location.replace("auth.html");
         return;
       }
-      setStatus(statusEl, e.message || "Не удалось загрузить профиль", "err");
+      setStatus(statusEl, e.message || tr("Не удалось загрузить профиль", "Не вдалося завантажити профіль"), "err");
     }
   }
 
@@ -516,10 +550,14 @@
 
     async function performLogout() {
       const ok = window.confirm(
-        "Выйти из аккаунта?\n\n«ОК» — выйти, «Отмена» — остаться в системе."
+        tr(
+          "Выйти из аккаунта?\n\n«ОК» — выйти, «Отмена» — остаться в системе.",
+          "Вийти з акаунта?\n\n«ОК» — вийти, «Скасувати» — залишитися в системі."
+        )
       );
       if (!ok) return;
       await notifyServerLogout();
+      clearClientCartOnLogout();
       localStorage.removeItem("authToken");
       localStorage.removeItem("authUser");
       window.dispatchEvent(new CustomEvent("dp-auth-changed"));
@@ -537,11 +575,11 @@
       const f = avatarInput.files && avatarInput.files[0];
       if (!f) return;
       if (f.size > 512 * 1024) {
-        setStatus(statusEl, "Файл больше 512 КБ.", "err");
+        setStatus(statusEl, tr("Файл больше 512 КБ.", "Файл більший за 512 КБ."), "err");
         avatarInput.value = "";
         return;
       }
-      setStatus(statusEl, "Загрузка фото…", null);
+      setStatus(statusEl, tr("Загрузка фото…", "Завантаження фото…"), null);
       const reader = new FileReader();
       reader.onload = async () => {
         try {
@@ -558,19 +596,19 @@
           u.profile = u.profile || {};
           u.profile.avatarUrl = data.avatarUrl;
           localStorage.setItem("authUser", JSON.stringify(u));
-          setStatus(statusEl, "Фото обновлено.", "ok");
+          setStatus(statusEl, tr("Фото обновлено.", "Фото оновлено."), "ok");
         } catch (e) {
-          setStatus(statusEl, e.message || "Не удалось загрузить фото", "err");
+          setStatus(statusEl, e.message || tr("Не удалось загрузить фото", "Не вдалося завантажити фото"), "err");
         } finally {
           avatarInput.value = "";
         }
       };
-      reader.onerror = () => setStatus(statusEl, "Не удалось прочитать файл", "err");
+      reader.onerror = () => setStatus(statusEl, tr("Не удалось прочитать файл", "Не вдалося прочитати файл"), "err");
       reader.readAsDataURL(f);
     });
 
     async function removeProfileAvatar() {
-      setStatus(statusEl, "Удаление…", null);
+      setStatus(statusEl, tr("Удаление…", "Видалення…"), null);
       try {
         await apiAuth("DELETE", "/api/auth/profile/avatar");
         updateAvatarPreview(preview, "");
@@ -582,22 +620,22 @@
         }
         if (u.profile) u.profile.avatarUrl = null;
         localStorage.setItem("authUser", JSON.stringify(u));
-        setStatus(statusEl, "Фото удалено.", "ok");
+        setStatus(statusEl, tr("Фото удалено.", "Фото видалено."), "ok");
       } catch (e) {
-        setStatus(statusEl, e.message || "Ошибка", "err");
+        setStatus(statusEl, e.message || tr("Ошибка", "Помилка"), "err");
       }
     }
 
     avatarRemoveBtn?.addEventListener("click", async () => {
       if (avatarRemoveBtn.hidden) return;
-      const ok = window.confirm("Удалить фото профиля?");
+      const ok = window.confirm(tr("Удалить фото профиля?", "Видалити фото профілю?"));
       if (!ok) return;
       await removeProfileAvatar();
     });
 
     form?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      setStatus(statusEl, "Сохранение…", null);
+      setStatus(statusEl, tr("Сохранение…", "Збереження…"), null);
       const fd = new FormData(form);
       const payload = {
         name: fd.get("name"),
@@ -639,14 +677,18 @@
         updateAvatarPreview(preview, data.user?.profile?.avatarUrl);
         updateProfileSummaryCard(data.user);
         if (data.user) syncStaffToolsVisibility(data.user);
-        setStatus(statusEl, "Данные сохранены.", "ok");
+        setStatus(statusEl, tr("Данные сохранены.", "Дані збережено."), "ok");
+        if (typeof window.dpShowToast === "function") {
+          const uk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+          window.dpShowToast(uk ? "Зміни збережено." : "Изменения сохранены.", 2400);
+        }
         try {
           window.dispatchEvent(new CustomEvent("dp-auth-changed"));
         } catch {
           /* ignore */
         }
       } catch (err) {
-        setStatus(statusEl, err.message || "Ошибка сохранения", "err");
+        setStatus(statusEl, err.message || tr("Ошибка сохранения", "Помилка збереження"), "err");
       }
     });
 
@@ -654,25 +696,25 @@
     const passStatus = document.getElementById("account-password-form-status");
     passForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      setStatus(passStatus, "Смена пароля…", null);
+      setStatus(passStatus, tr("Смена пароля…", "Зміна пароля…"), null);
       const fd = new FormData(passForm);
       const cur = String(fd.get("currentPassword") || "");
       const n1 = String(fd.get("newPassword") || "");
       const n2 = String(fd.get("newPasswordConfirm") || "");
       if (!cur) {
-        setStatus(passStatus, "Введите текущий пароль.", "err");
+        setStatus(passStatus, tr("Введите текущий пароль.", "Введіть поточний пароль."), "err");
         return;
       }
       if (n1.length < 6) {
-        setStatus(passStatus, "Новый пароль не короче 6 символов.", "err");
+        setStatus(passStatus, tr("Новый пароль не короче 6 символов.", "Новий пароль не коротший за 6 символів."), "err");
         return;
       }
       if (n1 !== n2) {
-        setStatus(passStatus, "Новый пароль и подтверждение не совпадают.", "err");
+        setStatus(passStatus, tr("Новый пароль и подтверждение не совпадают.", "Новий пароль і підтвердження не збігаються."), "err");
         return;
       }
       if (n1 === cur) {
-        setStatus(passStatus, "Новый пароль должен отличаться от текущего.", "err");
+        setStatus(passStatus, tr("Новый пароль должен отличаться от текущего.", "Новий пароль має відрізнятися від поточного."), "err");
         return;
       }
       try {
@@ -689,10 +731,10 @@
           updateProfileSummaryCard(data.user);
           syncStaffToolsVisibility(data.user);
         }
-        setStatus(passStatus, "Пароль изменён.", "ok");
+        setStatus(passStatus, tr("Пароль изменён.", "Пароль змінено."), "ok");
         window.dispatchEvent(new CustomEvent("dp-auth-changed"));
       } catch (err) {
-        setStatus(passStatus, err.message || "Не удалось сменить пароль", "err");
+        setStatus(passStatus, err.message || tr("Не удалось сменить пароль", "Не вдалося змінити пароль"), "err");
       }
     });
   }

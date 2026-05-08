@@ -22,7 +22,6 @@
 
   let citySuggestOpen = false;
   const CHECKOUT_DRAFT_COOKIE = "dp_checkout_draft_v1";
-  let legalRequisitesCache = null;
 
   function $(id) {
     return document.getElementById(id);
@@ -84,6 +83,7 @@
       autolux: "checkoutDeliveryAutolux",
       pickup: "checkoutDeliveryPickup",
       courier: "checkoutDeliveryCourier",
+      agreement: "checkoutDeliveryOther",
       other: "checkoutDeliveryOther",
     }[dmv];
     const title = key ? t(key) : dmv;
@@ -120,18 +120,14 @@
     const useNpSelect = ok && isNv && state.npConfigured;
     const useManual = !useNpSelect;
     const delBlock = $("co-delivery-block");
-    const payBlock = $("co-payment-block");
     const del = $("co-delivery");
-    const pay = $("co-payment");
     const wh = $("co-warehouse");
     const whMan = $("co-warehouse-manual");
     const whNp = $("co-np-warehouse-wrap");
     const lbl = $("co-warehouse-row-label");
 
     if (delBlock) delBlock.classList.toggle("checkout-block-muted", !ok);
-    if (payBlock) payBlock.classList.toggle("checkout-block-muted", !ok);
     if (del) del.disabled = !ok;
-    if (pay) pay.disabled = !ok;
 
     if (whNp) whNp.classList.toggle("is-hidden", !useNpSelect);
     if (whMan) {
@@ -198,6 +194,7 @@
       typeof window.checkoutGuestNoVatPricingActive === "function" && window.checkoutGuestNoVatPricingActive();
     const legalVat =
       typeof window.checkoutLegalEntityVatPricingActive === "function" && window.checkoutLegalEntityVatPricingActive();
+    const legalBuyer = isLoggedLegalEntityBuyer();
 
     const delText = escapeHtml(getDeliveryLineText());
 
@@ -248,12 +245,15 @@
               }</button></p>`
             : ""
         }
-        <p class="checkout-coupon" data-i18n="checkoutCoupon">${escapeHtml(t("checkoutCoupon"))}</p>
         <div class="checkout-order-meta">
-          <div class="checkout-order-row">
-            <span data-i18n="checkoutDelivery">${escapeHtml(t("checkoutDelivery"))}</span>
-            <span>${delText}</span>
-          </div>
+          ${
+            legalBuyer
+              ? ""
+              : `<div class="checkout-order-row">
+                   <span data-i18n="checkoutDelivery">${escapeHtml(t("checkoutDelivery"))}</span>
+                   <span>${delText}</span>
+                 </div>`
+          }
           <div class="checkout-total">
             <span data-i18n="total">${escapeHtml(t("total"))}</span>
             <span>${lines.length ? escapeHtml(formatMoney(orderTotal)) : "—"}</span>
@@ -278,7 +278,7 @@
     state.warehouseRef = "";
     state.warehouseLabel = "";
     const whMan = $("co-warehouse-manual");
-    if (whMan) whMan.value = "";
+    if (whMan && state.npConfigured && isNovaDelivery()) whMan.value = "";
     const wh = $("co-warehouse");
     if (wh) {
       wh.innerHTML = `<option value="">${escapeHtml(t("checkoutWarehousePlaceholder"))}</option>`;
@@ -304,7 +304,7 @@
     state.warehouseRef = "";
     state.warehouseLabel = "";
     const whMan = $("co-warehouse-manual");
-    if (whMan) whMan.value = "";
+    if (whMan && state.npConfigured && isNovaDelivery()) whMan.value = "";
     sel.innerHTML = `<option value="">${escapeHtml(t("checkoutWarehousePlaceholder"))}</option>`;
     if (!isNovaDelivery() || !hasCityComplete()) {
       refreshDisabled();
@@ -563,6 +563,7 @@
       email.readOnly = loggedIn;
     }
     syncCheckoutPaymentRules();
+    syncCheckoutLegalEntityFieldVisibility();
   }
 
   function isLoggedLegalEntityBuyer() {
@@ -575,59 +576,22 @@
     }
   }
 
-  function legalCompanyRequisitesText() {
-    const uk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
-    const cfg = legalRequisitesCache;
-    if (cfg && cfg.address && cfg.correspondenceAddress) {
-      const addr = uk ? String(cfg.address.uk || "") : String(cfg.address.ru || "");
-      const corr = uk ? String(cfg.correspondenceAddress.uk || "") : String(cfg.correspondenceAddress.ru || "");
-      const ed = String(cfg.edrpou || "");
-      const ipn = String(cfg.ipn || "");
-      const cert = String(cfg.certificateNo || "");
-      const phone = String(cfg.phone || "");
-      if (uk) {
-        return `Для юридичних осіб доступна лише оплата за реквізитами компанії: ${addr}; код ЄДРПОУ ${ed}; ІПН ${ipn}; св-во № ${cert}; адреса для кореспонденції: ${corr}; тел. ${phone}.`;
-      }
-      return `Для юридических лиц доступна только оплата по реквизитам компании: ${addr}; код ЕГРПОУ ${ed}; ИНН ${ipn}; св-во № ${cert}; адрес для корреспонденции: ${corr}; тел. ${phone}.`;
-    }
-    if (uk) {
-      return "Для юридичних осіб доступна лише оплата за реквізитами компанії: 69002, м. Запоріжжя, вул. Костянтина Великого, буд. 20; код ЄДРПОУ 32297953; ІПН 322979508268; св-во № 200123175; адреса для кореспонденції: м. Запоріжжя, Н. Пошта, відд. 29; тел. (067) 6134828.";
-    }
-    return "Для юридических лиц доступна только оплата по реквизитам компании: 69002, г. Запорожье, ул. Константина Великого, дом 20; код ЕГРПОУ 32297953; ИНН 322979508268; св-во № 200123175; адрес для корреспонденции: г. Запорожье, Н. Почта, отд. 29; тел. (067) 6134828.";
+  function syncCheckoutPaymentRules() {
+    const paymentBlock = $("co-payment-block");
+    const formatWrap = $("co-legal-invoice-format-wrap");
+    const legal = isLoggedLegalEntityBuyer();
+    if (paymentBlock) paymentBlock.hidden = !legal;
+    if (formatWrap) formatWrap.hidden = !legal;
   }
 
-  function syncCheckoutPaymentRules() {
-    const pay = $("co-payment");
-    const note = $("co-legal-payment-note");
-    const formatWrap = $("co-legal-invoice-format-wrap");
-    if (!pay) return;
-    const cardOpt = pay.querySelector('option[value="liqpay"]');
+  function syncCheckoutLegalEntityFieldVisibility() {
     const legal = isLoggedLegalEntityBuyer();
-    if (cardOpt) {
-      cardOpt.disabled = legal;
-      cardOpt.hidden = legal;
-    }
-    if (legal) {
-      pay.value = "iban";
-      if (note) {
-        note.hidden = false;
-        note.textContent = legalCompanyRequisitesText();
-      }
-      if (formatWrap) formatWrap.hidden = false;
-      return;
-    }
-    if (cardOpt) {
-      cardOpt.disabled = false;
-      cardOpt.hidden = false;
-    }
-    if (!pay.value) {
-      pay.value = "liqpay";
-    }
-    if (note) {
-      note.hidden = true;
-      note.textContent = "";
-    }
-    if (formatWrap) formatWrap.hidden = true;
+    const deliveryBlock = $("co-delivery-block");
+    const warehouseBlock = $("co-warehouse-block");
+    const npHint = $("co-np-fallback-hint");
+    if (deliveryBlock) deliveryBlock.hidden = legal;
+    if (warehouseBlock) warehouseBlock.hidden = legal;
+    if (npHint && legal) npHint.hidden = true;
   }
 
   function clearCheckoutRequiredHighlights() {
@@ -715,7 +679,6 @@
       comment: $("co-comment")?.value?.trim() || "",
       delivery: $("co-delivery")?.value || "nova_poshta",
       warehouseManual: $("co-warehouse-manual")?.value?.trim() || "",
-      payment: $("co-payment")?.value || "liqpay",
       ts: Date.now(),
     };
   }
@@ -738,7 +701,6 @@
       if ($("co-email") && draft.email) $("co-email").value = String(draft.email);
     }
     if ($("co-comment") && draft.comment) $("co-comment").value = String(draft.comment);
-    if ($("co-payment") && draft.payment) $("co-payment").value = String(draft.payment);
     if ($("co-delivery") && draft.delivery) {
       $("co-delivery").value = String(draft.delivery);
       $("co-delivery").dispatchEvent(new Event("change", { bubbles: true }));
@@ -866,13 +828,6 @@
       } catch {
         state.majorCities = [];
       }
-      try {
-        const rr = await fetch(api("/api/legal-requisites"), { cache: "no-store" });
-        const jj = await rr.json().catch(() => null);
-        if (jj && typeof jj === "object") legalRequisitesCache = jj;
-      } catch {
-        /* keep fallback text */
-      }
       fillCitySelect();
       if (window.applyTranslations) window.applyTranslations(document.getElementById("co-city-select"));
       prefillFromAuth();
@@ -891,6 +846,7 @@
       }
       refreshDisabled();
       syncCheckoutPaymentRules();
+      syncCheckoutLegalEntityFieldVisibility();
     })();
 
     renderOrderSummary();
@@ -902,6 +858,7 @@
     syncNewsletterConsentUi();
     syncRegisteredLoginPrompt();
     syncCheckoutPaymentRules();
+    syncCheckoutLegalEntityFieldVisibility();
 
     const regLoginForm = $("co-reg-login-form");
     regLoginForm?.addEventListener("submit", async (e) => {
@@ -955,12 +912,14 @@
       syncCheckoutContactRules();
       syncRegisteredLoginPrompt();
       syncCheckoutPaymentRules();
+      syncCheckoutLegalEntityFieldVisibility();
       renderOrderSummary();
     });
     window.addEventListener("dp-consent-changed", () => syncNewsletterConsentUi());
     window.addEventListener("dp-lang-change", () => {
       syncNewsletterConsentUi();
       syncCheckoutPaymentRules();
+      syncCheckoutLegalEntityFieldVisibility();
     });
 
     const form = $("checkout-form");
@@ -977,7 +936,7 @@
       state.warehouseLabel = "";
       state.cityRef = "";
       if (whSel) whSel.innerHTML = `<option value="">${escapeHtml(t("checkoutWarehousePlaceholder"))}</option>`;
-      if (whMan) whMan.value = "";
+      if (whMan && state.npConfigured && isNovaDelivery()) whMan.value = "";
       if (!v) {
         state.cityLabel = "";
         if ($("co-city")) $("co-city").value = "";
@@ -1119,7 +1078,6 @@
       "co-city-select",
       "co-delivery",
       "co-warehouse-manual",
-      "co-payment",
       "co-accept-offer",
     ].forEach((id) => {
       const el = $(id);
@@ -1142,12 +1100,14 @@
       const email = ($("co-email") && $("co-email").value.trim()) || "";
       const comment = ($("co-comment") && $("co-comment").value.trim()) || "";
       const pay = ($("co-payment") && $("co-payment").value) || "liqpay";
-      const payFinal = isLoggedLegalEntityBuyer() ? "iban" : pay;
+      const payFinal = isLoggedLegalEntityBuyer() ? "invoice" : pay;
+      const legalInvoiceOnly = isLoggedLegalEntityBuyer();
       const legalInvoiceFormat = ($("co-legal-invoice-format") && $("co-legal-invoice-format").value) || "both";
       const newsletter = $("co-newsletter") && $("co-newsletter").checked;
       const acceptOffer = Boolean($("co-accept-offer")?.checked);
       const deliveryMethod = ($("co-delivery") && $("co-delivery").value) || "nova_poshta";
       const nova = deliveryMethod === "nova_poshta";
+      const byAgreement = deliveryMethod === "agreement";
       const loggedIn = isCustomerLoggedIn();
       if (state.tab === "reg" && !loggedIn) {
         if (st) st.textContent = "";
@@ -1175,27 +1135,28 @@
       if (nameFinal.length < 2) missing.push("co-name");
       if (phoneFinal.length < 9) missing.push("co-phone");
       if (!/.+@.+\..+/.test(emailFinal)) missing.push("co-email");
-      if (!$("co-city-select")?.value) {
-        missing.push("co-city-select");
-      } else if ($("co-city-select")?.value === "__other__") {
-        if (state.npConfigured) {
-          if (!state.cityRef) missing.push("co-city");
-        } else if (!(($("co-city") && $("co-city").value.trim().length >= 2))) {
-          missing.push("co-city");
+      if (!legalInvoiceOnly) {
+        if (!$("co-city-select")?.value) {
+          missing.push("co-city-select");
+        } else if ($("co-city-select")?.value === "__other__") {
+          if (state.npConfigured) {
+            if (!state.cityRef) missing.push("co-city");
+          } else if (!(($("co-city") && $("co-city").value.trim().length >= 2))) {
+            missing.push("co-city");
+          }
+        } else if (state.npConfigured && !state.cityRef) {
+          missing.push("co-city-select");
         }
-      } else if (state.npConfigured && !state.cityRef) {
-        missing.push("co-city-select");
-      }
-      if (!($("co-delivery") && $("co-delivery").value)) missing.push("co-delivery");
-      if (!($("co-payment") && $("co-payment").value)) missing.push("co-payment");
-      if (nova) {
-        if (state.npConfigured) {
-          if (!state.warehouseRef) missing.push("co-warehouse");
-        } else if (!(whMan && whMan.value.trim().length >= 2)) {
+        if (!($("co-delivery") && $("co-delivery").value)) missing.push("co-delivery");
+        if (nova) {
+          if (state.npConfigured) {
+            if (!state.warehouseRef) missing.push("co-warehouse");
+          } else if (!(whMan && whMan.value.trim().length >= 2)) {
+            missing.push("co-warehouse-manual");
+          }
+        } else if (!byAgreement && !(whMan && whMan.value.trim().length >= 2)) {
           missing.push("co-warehouse-manual");
         }
-      } else if (!(whMan && whMan.value.trim().length >= 2)) {
-        missing.push("co-warehouse-manual");
       }
       if (missing.length) {
         markCheckoutMissingFields(missing);
@@ -1241,33 +1202,35 @@
           return;
         }
       }
-      if (!hasCityComplete()) {
-        if (st) st.textContent = t("checkoutCityPick");
-        return;
-      }
-      if (nova) {
-        if (state.npConfigured) {
-          if (!state.cityRef) {
-            if (st) st.textContent = t("checkoutCityPlaceholder");
-            return;
+      if (!legalInvoiceOnly) {
+        if (!hasCityComplete()) {
+          if (st) st.textContent = t("checkoutCityPick");
+          return;
+        }
+        if (nova) {
+          if (state.npConfigured) {
+            if (!state.cityRef) {
+              if (st) st.textContent = t("checkoutCityPlaceholder");
+              return;
+            }
+            if (!state.warehouseRef) {
+              if (st) st.textContent = t("checkoutWarehousePlaceholder");
+              return;
+            }
+          } else {
+            if (!(whMan && whMan.value.trim().length >= 2)) {
+              if (st) st.textContent = t("checkoutWarehouseManual");
+              return;
+            }
+            state.warehouseRef = "";
           }
-          if (!state.warehouseRef) {
-            if (st) st.textContent = t("checkoutWarehousePlaceholder");
-            return;
-          }
-        } else {
+        } else if (!byAgreement) {
           if (!(whMan && whMan.value.trim().length >= 2)) {
             if (st) st.textContent = t("checkoutWarehouseManual");
             return;
           }
           state.warehouseRef = "";
         }
-      } else {
-        if (!(whMan && whMan.value.trim().length >= 2)) {
-          if (st) st.textContent = t("checkoutWarehouseManual");
-          return;
-        }
-        state.warehouseRef = "";
       }
 
       let cityDisp = state.cityLabel || "";
@@ -1281,17 +1244,23 @@
         ? state.warehouseRef
           ? state.warehouseLabel
           : whText
-        : whText;
+        : byAgreement
+          ? (comment || "")
+          : whText;
 
       const { cartSnapshot, orderTotal } = window.dpCheckoutLeadPayloadBase();
       const checkoutMeta = typeof window.dpCheckoutGetCart === "function" ? window.dpCheckoutGetCart() : {};
       const rawCart = typeof window.dpGetCartItems === "function" ? window.dpGetCartItems() : [];
       const paymentNote =
-        payFinal === "iban"
-          ? t("checkoutPayIban")
-          : payFinal === "liqpay"
-            ? t("checkoutPayCard")
-            : String(payFinal);
+        payFinal === "invoice"
+          ? typeof window.getDpLang === "function" && window.getDpLang() === "uk"
+            ? "Рахунок-фактура для оплати надіслана на email."
+            : "Счет-фактура для оплаты отправлен на email."
+          : payFinal === "iban"
+            ? t("checkoutPayIban")
+            : payFinal === "liqpay"
+              ? t("checkoutPayCard")
+              : String(payFinal);
 
       const billingExtras =
         typeof checkoutBillingPayloadFromStoredProfile === "function" ? checkoutBillingPayloadFromStoredProfile() : {};
@@ -1344,15 +1313,27 @@
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("bad");
-        if (st) st.textContent = t("submitted");
+        let successText = t("submitted");
+        if (st) {
+          const uk = typeof window.getDpLang === "function" && window.getDpLang() === "uk";
+          const legalInvoiceFlow = isLoggedLegalEntityBuyer() && payFinal === "invoice";
+          successText = legalInvoiceFlow
+            ? uk
+              ? "Замовлення сформовано, рахунок відправлено на email."
+              : "Заказ сформирован, счет отправлен на почту."
+            : t("submitted");
+          st.textContent = successText;
+        }
+        if (typeof window.dpShowToast === "function") {
+          window.dpShowToast(successText, 2800);
+        }
         if (typeof window.dpCheckoutClearCart === "function") {
           window.dpCheckoutClearCart();
         } else {
           localStorage.setItem("cart", "[]");
         }
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 1200);
+        renderOrderSummary();
+        if (btn) btn.disabled = false;
       } catch {
         localStorage.setItem("lastLead", JSON.stringify(payload));
         if (st) st.textContent = `${t("submitted")} (offline)`;

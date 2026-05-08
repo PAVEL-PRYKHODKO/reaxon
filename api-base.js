@@ -29,10 +29,9 @@
     const meta = document.querySelector('meta[name="dp-api-base"]')?.getAttribute("content");
     if (trimBase(meta)) return trimBase(meta);
     if (location.protocol === "file:") {
-      try {
-        const lastGood = trimBase(localStorage.getItem("dp_api_last_good_base"));
-        if (lastGood) return lastGood;
-      } catch (_) {}
+      // При открытии HTML с диска всегда используем локальный API.
+      // Это исключает случай, когда в localStorage остался старый "last good"
+      // base от другого окружения и логин уходит не в текущий backend.
       return "http://localhost:3000";
     }
     const apiPort = document.querySelector('meta[name="dp-api-port"]')?.getAttribute("content") || "3000";

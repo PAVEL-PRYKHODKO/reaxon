@@ -150,7 +150,7 @@
   function renderConsentModal() {
     closeConsentUi();
     const consent = currentConsentOrDefault();
-    const currentLang = typeof window.getDpLang === "function" ? window.getDpLang() : "ru";
+    const currentLang = typeof window.getDpLang === "function" ? window.getDpLang() : "uk";
     const i18n = currentLang === "uk"
       ? {
           title: "Налаштування cookie",

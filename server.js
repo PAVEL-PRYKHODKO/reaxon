@@ -95,16 +95,40 @@ function readPrivacyPolicyConfig() {
 
 function readLegalRequisitesConfig() {
   const fallback = {
+    companyName: {
+      ru: 'ТОВ Виробниче підприємство "Дніпрохім"',
+      uk: 'ТОВ Виробниче підприємство "Дніпрохім"',
+    },
     address: {
       ru: "69002, г. Запорожье, ул. Константина Великого, дом 20",
       uk: "69002, м. Запоріжжя, вул. Костянтина Великого, буд. 20",
     },
+    iban: "UA363003350000000026009327975",
+    contactEmail: "reaxondh@gmail.com",
+    contactPhones: ["+380676134220", "+380676135155", "+380612209445"],
+    bank: {
+      ru: 'АТ "Райффайзен Банк Аваль"',
+      uk: 'АТ "Райффайзен Банк Аваль"',
+    },
+    mfo: "300335",
     edrpou: "32297953",
     ipn: "322979508268",
     certificateNo: "200123175",
+    taxStatus: {
+      ru: "является плательщиком налога на прибыль на общих основаниях",
+      uk: "є платником податку на прибуток на загальних підставах",
+    },
     correspondenceAddress: {
       ru: "г. Запорожье, Н. Почта, отд. 29",
       uk: "м. Запоріжжя, Н. Пошта, відд. 29",
+    },
+    productionAddress: {
+      ru: "Запорожская обл., пгт Балабино, ул. Степная, д. 2-е",
+      uk: "Запорізька обл., смт Балабине, вул. Степова, буд. 2-е",
+    },
+    mailAddress: {
+      ru: "69002, г. Запорожье, а/я 2330",
+      uk: "69002, м. Запоріжжя, а/с 2330",
     },
     phone: "(067) 6134828",
   };
@@ -112,16 +136,43 @@ function readLegalRequisitesConfig() {
     const raw = fs.readFileSync(LEGAL_REQUISITES_PATH, "utf8");
     const cfg = JSON.parse(raw);
     return {
+      companyName: {
+        ru: String(cfg?.companyName?.ru || fallback.companyName.ru),
+        uk: String(cfg?.companyName?.uk || fallback.companyName.uk),
+      },
       address: {
         ru: String(cfg?.address?.ru || fallback.address.ru),
         uk: String(cfg?.address?.uk || fallback.address.uk),
       },
+      iban: String(cfg?.iban || fallback.iban),
+      contactEmail: String(cfg?.contactEmail || fallback.contactEmail),
+      contactPhones: (Array.isArray(cfg?.contactPhones) ? cfg.contactPhones : fallback.contactPhones)
+        .map((x) => String(x || "").trim())
+        .filter(Boolean)
+        .slice(0, 5),
+      bank: {
+        ru: String(cfg?.bank?.ru || fallback.bank.ru),
+        uk: String(cfg?.bank?.uk || fallback.bank.uk),
+      },
+      mfo: String(cfg?.mfo || fallback.mfo),
       edrpou: String(cfg?.edrpou || fallback.edrpou),
       ipn: String(cfg?.ipn || fallback.ipn),
       certificateNo: String(cfg?.certificateNo || fallback.certificateNo),
+      taxStatus: {
+        ru: String(cfg?.taxStatus?.ru || fallback.taxStatus.ru),
+        uk: String(cfg?.taxStatus?.uk || fallback.taxStatus.uk),
+      },
       correspondenceAddress: {
         ru: String(cfg?.correspondenceAddress?.ru || fallback.correspondenceAddress.ru),
         uk: String(cfg?.correspondenceAddress?.uk || fallback.correspondenceAddress.uk),
+      },
+      productionAddress: {
+        ru: String(cfg?.productionAddress?.ru || fallback.productionAddress.ru),
+        uk: String(cfg?.productionAddress?.uk || fallback.productionAddress.uk),
+      },
+      mailAddress: {
+        ru: String(cfg?.mailAddress?.ru || fallback.mailAddress.ru),
+        uk: String(cfg?.mailAddress?.uk || fallback.mailAddress.uk),
       },
       phone: String(cfg?.phone || fallback.phone),
     };
@@ -1857,6 +1908,15 @@ function signToken(user) {
   );
 }
 
+function userIdMatches(a, b) {
+  if (a == null || b == null) return false;
+  if (a === b) return true;
+  const sa = String(a).trim();
+  const sb = String(b).trim();
+  if (!sa || !sb) return false;
+  return sa === sb;
+}
+
 function parseCookiesFromHeader(headerValue) {
   const out = {};
   const raw = String(headerValue || "");
@@ -2468,6 +2528,13 @@ app.get("/api/payment/config", (req, res) => {
   res.set("Cache-Control", "no-store");
   const providers = paymentProviderAvailability();
   const legalRequisites = readLegalRequisitesConfig();
+  const ibanUnified = {
+    recipient: String(legalRequisites.companyName?.uk || ""),
+    edrpou: String(legalRequisites.edrpou || ""),
+    iban: String(legalRequisites.iban || ""),
+    bank: String(legalRequisites.bank?.uk || ""),
+    mfo: String(legalRequisites.mfo || ""),
+  };
   res.json({
     liqpayEnabled: providers.liqpay.configured,
     liqpaySandbox: LIQPAY_SANDBOX,
@@ -2482,7 +2549,7 @@ app.get("/api/payment/config", (req, res) => {
           : "fondy",
     offerTitle,
     offerHtml,
-    iban: ap.iban,
+    iban: ibanUnified,
     legalRequisites,
   });
 });
@@ -2520,12 +2587,8 @@ function isLegalEntityProfile(profile) {
 
 function onlinePaymentRestrictionForUser(user) {
   if (!isLegalEntityProfile(user?.profile)) return null;
-  const rq = readLegalRequisitesConfig();
-  const msg = `Для юридичних осіб онлайн-оплата карткою недоступна. Використовуйте оплату за реквізитами (IBAN): ${String(
-    rq.address?.uk || ""
-  )}; код ЄДРПОУ ${String(rq.edrpou || "")}; ІПН ${String(rq.ipn || "")}; св-во № ${String(
-    rq.certificateNo || ""
-  )}; адреса для кореспонденції: ${String(rq.correspondenceAddress?.uk || "")}; тел. ${String(rq.phone || "")}.`;
+  const msg =
+    "Для юридичних осіб онлайн-оплата карткою недоступна. Реквізити надсилаються у рахунку-фактурі на email.";
   return {
     status: 403,
     error: "legal_entity_bank_transfer_only",
@@ -3399,8 +3462,8 @@ app.post("/api/auth/logout", (_req, res) => {
 
 app.get("/api/auth/me", authMiddleware, async (req, res) => {
   const db = await crmSnapshot();
-  const user = db.users.find((u) => u.id === req.user.sub);
-  if (!user) return res.status(404).json({ error: "user_not_found" });
+  const user = db.users.find((u) => userIdMatches(u.id, req.user?.sub));
+  if (!user) return res.status(404).json({ error: "user_not_found", message: "Пользователь не найден." });
   ensureUserProfile(user);
   res.json({ ...publicUser(user), permissions: normalizeRolePermissions(db.meta.rolePermissions)[user.role || "client"] || {} });
 });
@@ -3410,6 +3473,12 @@ app.get("/api/auth/my-purchases", authMiddleware, async (req, res) => {
   const uid = Number(req.user.sub);
   if (!Number.isFinite(uid)) return res.status(400).json({ error: "invalid_user" });
   const db = await crmSnapshot();
+  const catalog = readProductsCatalog();
+  const catalogById = new Map(
+    (Array.isArray(catalog) ? catalog : [])
+      .map((p) => [String(p?.id || "").trim(), p])
+      .filter(([id]) => id)
+  );
   const items = [];
   for (const lead of db.leads || []) {
     normalizeLeadCrm(lead);
@@ -3419,6 +3488,29 @@ app.get("/api/auth/my-purchases", authMiddleware, async (req, res) => {
     const owned =
       (acc != null && Number(acc) === uid) || (payUid != null && Number(payUid) === uid);
     if (!owned) continue;
+    const rawSnapshot = Array.isArray(lead.cartSnapshot) ? lead.cartSnapshot : [];
+    const rawCart = Array.isArray(lead.cart) ? lead.cart : [];
+    const cartSnapshot = rawSnapshot.map((r, idx) => {
+      const cartRow = rawCart[idx] || {};
+      const product = catalogById.get(String(cartRow?.productId || "").trim()) || null;
+      const image =
+        String(
+          product?.cardImageUrl ||
+            product?.heroImageUrl ||
+            product?.image ||
+            (Array.isArray(product?.images) ? product.images[0] : "") ||
+            "assets/product-template.png"
+        ).trim() || "assets/product-template.png";
+      return {
+        title: r.title,
+        details: r.details,
+        qty: r.qty,
+        lineTotal: r.lineTotal,
+        image,
+        productId: String(cartRow?.productId || "").trim() || null,
+      };
+    });
+
     items.push({
       id: lead.id,
       createdAt: lead.createdAt,
@@ -3427,6 +3519,8 @@ app.get("/api/auth/my-purchases", authMiddleware, async (req, res) => {
       source: lead.source || "",
       orderTotal: lead.orderTotal,
       deliveryMethod: lead.deliveryMethod,
+      deliveryCity: lead.deliveryCity || "",
+      deliveryPoint: lead.deliveryPoint || "",
       paymentMethod: lead.paymentMethod,
       cartLines: Array.isArray(lead.cartSnapshot) ? lead.cartSnapshot.length : 0,
       cartPreview: (lead.cartSnapshot || []).slice(0, 4).map((r) => ({
@@ -3434,6 +3528,7 @@ app.get("/api/auth/my-purchases", authMiddleware, async (req, res) => {
         qty: r.qty,
         lineTotal: r.lineTotal,
       })),
+      cartSnapshot,
       paymentStatus: crm.payment?.status || null,
       paidAt: crm.payment?.paidAt || null,
     });
@@ -3503,10 +3598,10 @@ app.patch("/api/auth/profile", authMiddleware, async (req, res) => {
   let token;
   let userOut;
   await crmUpdate(async (db) => {
-    const user = db.users.find((u) => u.id === req.user.sub);
+    const user = db.users.find((u) => userIdMatches(u.id, req.user?.sub));
     if (!user) {
       exit.status = 404;
-      exit.json = { error: "user_not_found" };
+      exit.json = { error: "user_not_found", message: "Пользователь не найден." };
       return;
     }
     ensureUserProfile(user);
@@ -3927,9 +4022,33 @@ app.post("/api/leads", leadsPostLimiter, optionalAuthMiddleware, async (req, res
     const u = snap.users.find((x) => x.id === accountUserId);
     if (u) {
       ensureUserProfile(u);
+      const profileIsLegalEntity = isLegalEntityProfile(u.profile);
+      if (Boolean(payload.isLegalEntityBuyer) !== profileIsLegalEntity) {
+        payload = { ...payload, isLegalEntityBuyer: profileIsLegalEntity };
+      }
       if (!String(payload.phone || "").trim() && u.profile?.phone) {
         payload = { ...payload, phone: String(u.profile.phone).trim() };
       }
+    }
+  }
+  {
+    const rawPaymentMethod = String(payload.paymentMethod || "")
+      .trim()
+      .toLowerCase();
+    if (payload.isLegalEntityBuyer) {
+      payload = {
+        ...payload,
+        paymentMethod: "invoice",
+        paymentNote:
+          String(payload.paymentNote || "").trim() ||
+          "Оплата за рахунком-фактурою (invoice only)",
+      };
+    } else {
+      const allowedForIndividual = new Set(["liqpay", "iban", "fondy", "wayforpay", "card"]);
+      payload = {
+        ...payload,
+        paymentMethod: allowedForIndividual.has(rawPaymentMethod) ? rawPaymentMethod : "liqpay",
+      };
     }
   }
   if (!payload.customerName || !String(payload.phone || "").trim()) {

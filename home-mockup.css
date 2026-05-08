@@ -507,6 +507,7 @@ a {
   flex-direction: column;
   min-width: 0;
   height: 100%;
+  min-height: clamp(246px, 23vw, 278px);
   overflow: hidden;
   background: #fff;
   border: none;
@@ -537,7 +538,7 @@ a {
   text-align: center;
   background: linear-gradient(180deg, #1a3d8f 0%, #19284d 100%);
   color: #fff;
-  padding: 4px 6px 8px;
+  padding: 6px 8px 16px;
   min-height: 0;
 }
 

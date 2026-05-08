@@ -28,7 +28,7 @@
             <a href="index.html" class="logo" aria-label="Reaxon">
               <span class="logo-main">Rea<span class="logo-red">xon</span></span>
             </a>
-            <nav class="topnav" aria-label="Основная навигация">
+            <nav class="topnav" data-ru-aria-label="Основная навигация" data-uk-aria-label="Основна навігація" aria-label="Основна навігація">
               <a href="index.html" data-i18n="navHome">Главная</a>
               <a href="products.html" data-i18n="navCatalog">Каталог</a>
               <a href="price.html" data-i18n="navPrice">Прайс</a>
@@ -39,7 +39,7 @@
               <a href="contact.html" data-i18n="navContacts">Контакты</a>
             </nav>
             <div class="top-actions">
-              <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+              <div class="lang-switcher" role="navigation" data-ru-aria-label="Переключение языка" data-uk-aria-label="Перемикання мови" aria-label="Перемикання мови">
                 <label for="language-switcher" class="visually-hidden">
                   <span data-i18n="langLabel">Язык</span>
                 </label>
@@ -58,7 +58,7 @@
                   autocomplete="off"
                 />
               </div>
-              <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+              <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" data-ru-aria-label="Корзина" data-uk-aria-label="Кошик" aria-label="Кошик">
                 🛒
                 <span class="cart-badge" id="cart-count">0</span>
               </button>
@@ -68,7 +68,9 @@
                 id="home-account-trigger"
                 aria-current="page"
                 data-i18n-aria-label="accountDrawerTrigger"
-                aria-label="Личный кабинет"
+                data-ru-aria-label="Личный кабинет"
+                data-uk-aria-label="Особистий кабінет"
+                aria-label="Особистий кабінет"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -83,7 +85,7 @@
 
       <main class="account-page">
         <div class="container site-content-card">
-          <nav class="products-breadcrumbs" aria-label="Навигация по разделу">
+          <nav class="products-breadcrumbs" data-ru-aria-label="Навигация по разделу" data-uk-aria-label="Навігація розділом" aria-label="Навігація розділом">
             <a href="index.html" data-i18n="navHome">Главная</a>
             <span aria-hidden="true">/</span>
             <span data-i18n="accountDrawerTitle">Личный кабинет</span>
@@ -100,7 +102,9 @@
               <section
                 class="account-card account-card--compact account-site-messages"
                 id="account-site-messages"
-                aria-label="Сообщения с сайта"
+                data-ru-aria-label="Сообщения с сайта"
+                data-uk-aria-label="Повідомлення з сайту"
+                aria-label="Повідомлення з сайту"
               >
                 <h3 class="account-card-subtitle" data-i18n="accountSiteMessagesTitle">Сообщения с сайта</h3>
                 <p id="account-site-messages-status" class="account-purchase-history__status" role="status" aria-live="polite"></p>
@@ -110,18 +114,24 @@
                 id="account-drawer-profile-summary"
                 class="account-card account-card--compact account-drawer-profile-summary"
                 hidden
-                aria-label="Карточка профиля"
+                data-ru-aria-label="Карточка профиля"
+                data-uk-aria-label="Картка профілю"
+                aria-label="Картка профілю"
               >
-                <h3 class="account-card-subtitle">Ваш профиль</h3>
+                <h3 class="account-card-subtitle" data-ru="Ваш профиль" data-uk="Ваш профіль">Ваш профіль</h3>
                 <div class="account-drawer-profile-summary-inner">
                   <div class="account-avatar-wrap account-drawer-profile-avatar-wrap">
                     <div class="account-avatar-preview-shell account-avatar-preview--sm">
-                      <div class="account-avatar-preview" id="account-drawer-avatar-preview"><span>Нет фото</span></div>
+                      <div class="account-avatar-preview" id="account-drawer-avatar-preview"><span data-ru="Нет фото" data-uk="Немає фото">Немає фото</span></div>
                       <label
                         class="account-avatar-photo-hit"
                         for="account-drawer-avatar-input"
-                        aria-label="Загрузить или заменить фото профиля"
-                        title="Нажмите, чтобы выбрать фото"
+                        data-ru-aria-label="Загрузить или заменить фото профиля"
+                        data-uk-aria-label="Завантажити або замінити фото профілю"
+                        aria-label="Завантажити або замінити фото профілю"
+                        data-ru-title="Нажмите, чтобы выбрать фото"
+                        data-uk-title="Натисніть, щоб вибрати фото"
+                        title="Натисніть, щоб вибрати фото"
                       ></label>
                     </div>
                     <div class="account-avatar-actions">
@@ -130,10 +140,12 @@
                         class="visually-hidden"
                         type="file"
                         accept="image/png,image/jpeg,image/webp"
-                        aria-label="Файл фото профиля"
+                        data-ru-aria-label="Файл фото профиля"
+                        data-uk-aria-label="Файл фото профілю"
+                        aria-label="Файл фото профілю"
                       />
-                      <p class="account-privacy-hint" style="margin: 0">Нажмите на фото, чтобы выбрать файл. PNG, JPG или WebP, до 512 КБ.</p>
-                      <button type="button" class="btn btn-ghost account-avatar-remove-btn" id="account-drawer-avatar-remove-btn" hidden>Удалить фото</button>
+                      <p class="account-privacy-hint" style="margin: 0" data-ru="Нажмите на фото, чтобы выбрать файл. PNG, JPG или WebP, до 512 КБ." data-uk="Натисніть на фото, щоб вибрати файл. PNG, JPG або WebP, до 512 КБ.">Натисніть на фото, щоб вибрати файл. PNG, JPG або WebP, до 512 КБ.</p>
+                      <button type="button" class="btn btn-ghost account-avatar-remove-btn" id="account-drawer-avatar-remove-btn" hidden data-ru="Удалить фото" data-uk="Видалити фото">Видалити фото</button>
                     </div>
                   </div>
                   <div class="account-drawer-profile-summary-text">
@@ -146,9 +158,14 @@
               <section
                 id="account-purchase-history"
                 class="account-card account-card--compact account-purchase-history"
-                aria-label="История покупок"
+                data-ru-aria-label="История покупок"
+                data-uk-aria-label="Історія покупок"
+                aria-label="Історія покупок"
               >
-                <h3 class="account-card-subtitle">История покупок</h3>
+                <h3 class="account-card-subtitle" data-ru="История покупок" data-uk="Історія покупок">Історія покупок</h3>
+                <div class="account-purchase-history__actions">
+                  <a href="account-orders.html" class="btn btn-ghost" data-ru="Смотреть все заявки" data-uk="Дивитися всі заявки">Дивитися всі заявки</a>
+                </div>
                 <p id="account-purchase-history-status" class="account-purchase-history__status" role="status" aria-live="polite"></p>
                 <div id="account-purchase-history-list" class="account-purchase-history__list"></div>
               </section>
@@ -167,7 +184,7 @@
             </div>
             <div class="account-drawer-right-col">
               <form id="account-drawer-form" class="account-card account-card--compact" autocomplete="on">
-              <h3 class="account-card-subtitle">Данные профиля</h3>
+              <h3 class="account-card-subtitle" data-ru="Данные профиля" data-uk="Дані профілю">Дані профілю</h3>
               <div class="account-form-grid account-form-grid--2">
                 <label
                   ><span data-ru="Имя на сайте" data-uk="Ім'я на сайті">Имя на сайте</span
@@ -177,8 +194,8 @@
                   ><span data-ru="Фамилия" data-uk="Прізвище">Фамилия</span
                   ><input name="lastName" type="text" maxlength="200" autocomplete="family-name"
                 /></label>
-                <label>Электронная почта<input name="email" type="email" required autocomplete="email" /></label>
-                <label>Возраст<input name="age" type="number" min="0" max="120" placeholder="необязательно" /></label>
+                <label><span data-ru="Электронная почта" data-uk="Електронна пошта">Електронна пошта</span><input name="email" type="email" required autocomplete="email" /></label>
+                <label><span data-ru="Возраст" data-uk="Вік">Вік</span><input name="age" type="number" min="0" max="120" data-ru-placeholder="необязательно" data-uk-placeholder="необов'язково" placeholder="необов'язково" /></label>
                 <div class="account-form-row-gender-phone">
                   <label class="account-field-gender">
                     <span data-ru="Пол" data-uk="Стать">Пол</span>
@@ -239,24 +256,24 @@
                       /></label>
                     </div>
                   </div>
-                  <label style="grid-column: 1 / -1">Юридический адрес<textarea name="legalAddress" maxlength="500" rows="2"></textarea></label>
-                  <label style="grid-column: 1 / -1">Адрес доставки<textarea name="deliveryAddress" maxlength="500" rows="2"></textarea></label>
+                  <label style="grid-column: 1 / -1"><span data-ru="Юридический адрес" data-uk="Юридична адреса">Юридична адреса</span><textarea name="legalAddress" maxlength="500" rows="2"></textarea></label>
+                  <label style="grid-column: 1 / -1"><span data-ru="Адрес доставки" data-uk="Адреса доставки">Адреса доставки</span><textarea name="deliveryAddress" maxlength="500" rows="2"></textarea></label>
                 </div>
               </div>
               <div class="account-privacy-block">
-                <h4 class="account-privacy-heading">Видимость для других пользователей сайта</h4>
-                <p class="account-privacy-hint" style="margin: 0 0 12px">
-                  Администратор и модератор в CRM всегда видят полные контакты и адреса — независимо от этих настроек.
+                <h4 class="account-privacy-heading" data-ru="Видимость для других пользователей сайта" data-uk="Видимість для інших користувачів сайту">Видимість для інших користувачів сайту</h4>
+                <p class="account-privacy-hint" style="margin: 0 0 12px" data-ru="Администратор и модератор в CRM всегда видят полные контакты и адреса — независимо от этих настроек." data-uk="Адміністратор і модератор у CRM завжди бачать повні контакти та адреси — незалежно від цих налаштувань.">
+                  Адміністратор і модератор у CRM завжди бачать повні контакти та адреси — незалежно від цих налаштувань.
                 </p>
                 <div class="account-privacy-list">
-                  <label><input type="checkbox" name="hideEmail" value="1" /><span>Скрыть email от других пользователей</span></label>
-                  <label><input type="checkbox" name="hidePhone" value="1" /><span>Скрыть телефон от других пользователей</span></label>
-                  <label><input type="checkbox" name="hideLegalAddress" value="1" /><span>Скрыть юридический адрес</span></label>
-                  <label><input type="checkbox" name="hideDeliveryAddress" value="1" /><span>Скрыть адрес доставки</span></label>
+                  <label><input type="checkbox" name="hideEmail" value="1" /><span data-ru="Скрыть email от других пользователей" data-uk="Приховати email від інших користувачів">Приховати email від інших користувачів</span></label>
+                  <label><input type="checkbox" name="hidePhone" value="1" /><span data-ru="Скрыть телефон от других пользователей" data-uk="Приховати телефон від інших користувачів">Приховати телефон від інших користувачів</span></label>
+                  <label><input type="checkbox" name="hideLegalAddress" value="1" /><span data-ru="Скрыть юридический адрес" data-uk="Приховати юридичну адресу">Приховати юридичну адресу</span></label>
+                  <label><input type="checkbox" name="hideDeliveryAddress" value="1" /><span data-ru="Скрыть адрес доставки" data-uk="Приховати адресу доставки">Приховати адресу доставки</span></label>
                 </div>
               </div>
               <div class="account-actions">
-                <button class="btn btn-primary" type="submit">Сохранить изменения</button>
+                <button class="btn btn-primary" type="submit" data-ru="Сохранить изменения" data-uk="Зберегти зміни">Зберегти зміни</button>
               </div>
               <p id="account-drawer-form-status" class="account-status" role="status" aria-live="polite"></p>
               </form>
@@ -310,7 +327,7 @@
       <div class="cart-drawer-shell">
         <header class="cart-header">
           <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
-          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть корзину">×</button>
+          <button type="button" id="close-cart" class="cart-close-btn" data-ru-aria-label="Закрыть корзину" data-uk-aria-label="Закрити кошик" aria-label="Закрити кошик">×</button>
         </header>
         <div class="cart-modal-toolbar">
           <label class="cart-sort-label">

@@ -216,11 +216,11 @@
       "profile": {
         "age": null,
         "gender": "",
-        "countryRegion": "",
-        "companyName": "",
+        "countryRegion": "Запорожье",
+        "companyName": "йвцй",
         "phone": "+380667223475",
-        "legalAddress": "",
-        "deliveryAddress": "",
+        "legalAddress": "Автозаводская",
+        "deliveryAddress": "12",
         "accountManagerId": null,
         "avatarUrl": null,
         "privacy": {
@@ -245,40 +245,1216 @@
       "id": 9,
       "name": "Павел",
       "email": "webarn1@gmail.com",
-      "passwordHash": "$2a$10$WTK.8CyYU53UM.LrTDBOPe7AGfqgjMJzyvFT/cLN2neQxxxGeTUa2",
+      "passwordHash": "$2a$10$d..08W6ZDV6J8siAg8ljUuLqHI.2TfesMydzOo9Ba894pldI1r1TG",
       "role": "admin",
-      "createdAt": "2026-05-08T10:58:00.000Z",
+      "createdAt": "2026-05-08T20:08:00.000Z",
       "profile": {
         "age": null,
         "gender": "",
-        "countryRegion": "",
-        "lastName": "",
-        "city": "",
-        "website": "",
-        "isLegalEntity": false,
-        "companyName": "",
-        "edrpou": "",
-        "invoiceEmail": "",
-        "billingIban": "",
-        "phone": "",
-        "legalAddress": "",
-        "deliveryAddress": "",
-        "accountManagerId": null,
+        "countryRegion": "Запорожье",
+        "companyName": "йвцй",
+        "phone": "+38067723475",
+        "legalAddress": "Автозаводская",
+        "deliveryAddress": "44",
         "avatarUrl": null,
-        "marketingOptIn": false,
         "privacy": {
           "hideEmail": false,
           "hidePhone": false,
           "hideLegalAddress": false,
           "hideDeliveryAddress": false
         },
-        "siteInbox": []
+        "accountManagerId": null,
+        "lastName": "",
+        "city": "Запорожье",
+        "website": "",
+        "isLegalEntity": true,
+        "siteInbox": [],
+        "edrpou": "555456645465",
+        "invoiceEmail": "webarn1@gmail.com",
+        "billingIban": "UA00000000000000000000000000",
+        "marketingOptIn": false
       },
-      "profileUpdatedAt": "2026-05-08T11:08:03.400Z",
-      "updatedAt": "2026-05-08T11:07:24.213Z"
+      "profileUpdatedAt": "2026-05-08T20:22:54.012Z"
     }
   ],
   "leads": [
+    {
+      "id": 20,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Анна",
+      "phone": "+380676134828",
+      "email": "ctdthbyf100@ukr.net",
+      "comment": "Итого: 19039.80 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "jar",
+          "customKg": 0.8,
+          "qty": 3,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-жов",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "jar",
+          "customKg": 2.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-жов",
+          "packType": "jar",
+          "customKg": 2.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-син",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-тем",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-хак",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-чор",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 19039.8,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Банка 0.8 кг · с НДС × 3",
+          "qty": 3,
+          "lineTotal": 254.59
+        },
+        {
+          "title": "Емаль Артикул: 101000",
+          "details": "АК-512 Жовта · Банка 2.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 291.98
+        },
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Банка 2.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 297.02
+        },
+        {
+          "title": "Емаль Артикул: 105000",
+          "details": "АК-512 Чорна · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2025.6
+        },
+        {
+          "title": "Емаль Артикул: 101000",
+          "details": "АК-512 Жовта · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2085.6
+        },
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2121.6
+        },
+        {
+          "title": "Емаль Артикул: 102000",
+          "details": "АК-512 Синя · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2124
+        },
+        {
+          "title": "Емаль Артикул: 104000",
+          "details": "АК-512 Хакі · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 4761
+        },
+        {
+          "title": "Емаль Артикул: 103000",
+          "details": "АК-512 Темно-зелена · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 5078.4
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Счет на email",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "34",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645466",
+      "billingInvoiceEmail": "ctdthbyf100@ukr.net",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T19:00:42.299Z",
+      "updatedAt": "2026-05-08T19:00:42.299Z"
+    },
+    {
+      "id": 19,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 7579.25 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "jar",
+          "customKg": 0.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-жов",
+          "packType": "jar",
+          "customKg": 2.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-син",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-тем",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 7579.25,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Банка 0.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 84.86
+        },
+        {
+          "title": "Емаль Артикул: 101000",
+          "details": "АК-512 Жовта · Банка 2.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 291.98
+        },
+        {
+          "title": "Емаль Артикул: 102000",
+          "details": "АК-512 Синя · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2124
+        },
+        {
+          "title": "Емаль Артикул: 103000",
+          "details": "АК-512 Темно-зелена · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 5078.4
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "44",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 8,
+        "assigneeName": "anna",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T18:06:28.502Z",
+      "updatedAt": "2026-05-08T18:06:28.502Z"
+    },
+    {
+      "id": 18,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 7579.25 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "jar",
+          "customKg": 0.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-жов",
+          "packType": "jar",
+          "customKg": 2.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-син",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-тем",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 7579.25,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Банка 0.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 84.86
+        },
+        {
+          "title": "Емаль Артикул: 101000",
+          "details": "АК-512 Жовта · Банка 2.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 291.98
+        },
+        {
+          "title": "Емаль Артикул: 102000",
+          "details": "АК-512 Синя · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2124
+        },
+        {
+          "title": "Емаль Артикул: 103000",
+          "details": "АК-512 Темно-зелена · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 5078.4
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "44",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 2,
+        "assigneeName": "Модератор",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T18:02:26.674Z",
+      "updatedAt": "2026-05-08T18:02:26.674Z"
+    },
+    {
+      "id": 17,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 7579.25 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "jar",
+          "customKg": 0.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-жов",
+          "packType": "jar",
+          "customKg": 2.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-син",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-тем",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 7579.25,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Банка 0.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 84.86
+        },
+        {
+          "title": "Емаль Артикул: 101000",
+          "details": "АК-512 Жовта · Банка 2.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 291.98
+        },
+        {
+          "title": "Емаль Артикул: 102000",
+          "details": "АК-512 Синя · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2124
+        },
+        {
+          "title": "Емаль Артикул: 103000",
+          "details": "АК-512 Темно-зелена · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 5078.4
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "45",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T17:57:49.755Z",
+      "updatedAt": "2026-05-08T17:57:49.755Z"
+    },
+    {
+      "id": 16,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 7579.25 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "jar",
+          "customKg": 0.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-жов",
+          "packType": "jar",
+          "customKg": 2.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-син",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-тем",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 7579.25,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Банка 0.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 84.86
+        },
+        {
+          "title": "Емаль Артикул: 101000",
+          "details": "АК-512 Жовта · Банка 2.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 291.98
+        },
+        {
+          "title": "Емаль Артикул: 102000",
+          "details": "АК-512 Синя · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2124
+        },
+        {
+          "title": "Емаль Артикул: 103000",
+          "details": "АК-512 Темно-зелена · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 5078.4
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "45",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 8,
+        "assigneeName": "anna",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T17:52:53.439Z",
+      "updatedAt": "2026-05-08T17:52:53.439Z"
+    },
+    {
+      "id": 15,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 7267.82 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "jar",
+          "customKg": 2.8,
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-жов",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        },
+        {
+          "productId": "price-ак-512-син",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 7267.82,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Банка 2.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 297.02
+        },
+        {
+          "title": "Емаль Артикул: 101000",
+          "details": "АК-512 Жовта · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2085.6
+        },
+        {
+          "title": "Емаль Артикул: 102000",
+          "details": "АК-512 Синя · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 4885.2
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "45",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 2,
+        "assigneeName": "Модератор",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T17:49:02.084Z",
+      "updatedAt": "2026-05-08T17:49:02.084Z"
+    },
+    {
+      "id": 14,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 4658.88 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-чор",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 4658.88,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 105000",
+          "details": "АК-512 Чорна · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 4658.88
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "54",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "xlsx",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T17:38:03.593Z",
+      "updatedAt": "2026-05-08T17:38:03.593Z"
+    },
+    {
+      "id": 13,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 2208 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-тем",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 2208,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 103000",
+          "details": "АК-512 Темно-зелена · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2208
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "34",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "xlsx",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 8,
+        "assigneeName": "anna",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T17:33:04.911Z",
+      "updatedAt": "2026-05-08T17:33:04.911Z"
+    },
+    {
+      "id": 12,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 4879.68 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 4879.68,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 4879.68
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "44",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "xlsx",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 2,
+        "assigneeName": "Модератор",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T17:26:52.203Z",
+      "updatedAt": "2026-05-08T17:26:52.203Z"
+    },
+    {
+      "id": 11,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 4885.20 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-син",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 4885.2,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 102000",
+          "details": "АК-512 Синя · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 4885.2
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "59",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "xlsx",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T17:21:26.443Z",
+      "updatedAt": "2026-05-08T17:21:26.443Z"
+    },
+    {
+      "id": 10,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 88.32 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-тем",
+          "packType": "jar",
+          "customKg": 0.8,
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 88.32,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 103000",
+          "details": "АК-512 Темно-зелена · Банка 0.8 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 88.32
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "44",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 8,
+        "assigneeName": "anna",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T16:11:29.905Z",
+      "updatedAt": "2026-05-08T16:11:29.905Z"
+    },
+    {
+      "id": 9,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 4658.88 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-чор",
+          "packType": "drum",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 4658.88,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 105000",
+          "details": "АК-512 Чорна · Барабан 46 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 4658.88
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "59",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 2,
+        "assigneeName": "Модератор",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T15:54:26.230Z",
+      "updatedAt": "2026-05-08T15:54:26.230Z"
+    },
+    {
+      "id": 8,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 2085.60 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-жов",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 2085.6,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 101000",
+          "details": "АК-512 Жовта · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2085.6
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "35",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "xlsx",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 1,
+        "assigneeName": "Павел",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T15:47:54.688Z",
+      "updatedAt": "2026-05-08T15:47:54.688Z"
+    },
+    {
+      "id": 7,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 2121.60 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 2121.6,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2121.6
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "35",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "both",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 8,
+        "assigneeName": "anna",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T15:44:05.490Z",
+      "updatedAt": "2026-05-08T15:44:05.490Z"
+    },
+    {
+      "id": 6,
+      "status": "invoice_issued",
+      "priority": "normal",
+      "customerName": "Павел",
+      "phone": "+38067723475",
+      "email": "webarn1@gmail.com",
+      "comment": "Итого: 2121.60 грн",
+      "source": "checkout",
+      "customerType": "retail",
+      "cart": [
+        {
+          "productId": "price-ак-512-біл",
+          "packType": "bucket",
+          "qty": 1,
+          "mode": "retail"
+        }
+      ],
+      "orderTotal": 2121.6,
+      "cartSnapshot": [
+        {
+          "title": "Емаль Артикул: 100000",
+          "details": "АК-512 Біла · Ведро 20 кг · с НДС × 1",
+          "qty": 1,
+          "lineTotal": 2121.6
+        }
+      ],
+      "deliveryMethod": "nova_poshta",
+      "paymentMethod": "iban",
+      "paymentNote": "Оплата по реквизитам (IBAN)",
+      "topic": "",
+      "deliveryCity": "Запорожье",
+      "deliveryPoint": "35",
+      "npCityRef": null,
+      "npWarehouseRef": null,
+      "marketingOptIn": false,
+      "buyerIsAuthenticated": true,
+      "guestIndividualNoVatPricing": false,
+      "legalEntityVatPricing": true,
+      "isLegalEntityBuyer": true,
+      "billingCompanyName": "йвцй",
+      "billingEdrpou": "555456645465",
+      "billingInvoiceEmail": "webarn1@gmail.com",
+      "billingIban": "UA00000000000000000000000000",
+      "billingLegalAddress": "Автозаводская",
+      "legalInvoiceFormat": "xlsx",
+      "crm": {
+        "stage": "invoice_issued",
+        "tags": [],
+        "managerNote": "",
+        "managerNotes": [],
+        "clientMessages": [],
+        "assigneeId": 2,
+        "assigneeName": "Модератор",
+        "accountUserId": 9,
+        "interactions": []
+      },
+      "createdAt": "2026-05-08T15:38:31.168Z",
+      "updatedAt": "2026-05-08T15:38:31.168Z"
+    },
     {
       "id": 5,
       "status": "new",
@@ -541,7 +1717,7 @@
     }
   ],
   "meta": {
-    "nextLeadId": 6,
+    "nextLeadId": 21,
     "nextUserId": 10,
     "assignCursor": 1,
     "rolePermissions": {

@@ -117,9 +117,9 @@
       return window.getDpLang() === "uk" ? "uk" : "ru";
     }
     try {
-      return typeof localStorage !== "undefined" && localStorage.getItem("lang") === "uk" ? "uk" : "ru";
+      return typeof localStorage !== "undefined" && localStorage.getItem("lang") === "ru" ? "ru" : "uk";
     } catch (_) {
-      return "ru";
+      return "uk";
     }
   }
 

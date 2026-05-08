@@ -19,10 +19,10 @@
   };
 
   function getLang() {
-    const l = String(localStorage.getItem(KEY) || "ru");
+    const l = String(localStorage.getItem(KEY) || "uk");
     if (l === "uk") return "uk";
-    if (l === "en") return "ru";
-    return "ru";
+    if (l === "en") return "uk";
+    return "uk";
   }
 
   function setHtmlLang() {
@@ -55,6 +55,16 @@
       const ph = l === "uk" ? el.getAttribute("data-uk-placeholder") : el.getAttribute("data-ru-placeholder");
       if (ph == null) return;
       el.setAttribute("placeholder", ph);
+    });
+    document.querySelectorAll("[data-ru-aria-label][data-uk-aria-label]").forEach((el) => {
+      const v = l === "uk" ? el.getAttribute("data-uk-aria-label") : el.getAttribute("data-ru-aria-label");
+      if (v == null) return;
+      el.setAttribute("aria-label", v);
+    });
+    document.querySelectorAll("[data-ru-title][data-uk-title]").forEach((el) => {
+      const v = l === "uk" ? el.getAttribute("data-uk-title") : el.getAttribute("data-ru-title");
+      if (v == null) return;
+      el.setAttribute("title", v);
     });
   }
 

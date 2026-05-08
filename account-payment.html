@@ -19,7 +19,7 @@
             <a href="index.html" class="logo" aria-label="Reaxon">
               <span class="logo-main">Rea<span class="logo-red">xon</span></span>
             </a>
-            <nav class="topnav" aria-label="Основная навигация">
+            <nav class="topnav" data-ru-aria-label="Основная навигация" data-uk-aria-label="Основна навігація" aria-label="Основна навігація">
               <a href="index.html" data-i18n="navHome">Главная</a>
               <a href="products.html" data-i18n="navCatalog">Каталог</a>
               <a href="price.html" data-i18n="navPrice">Прайс</a>
@@ -30,7 +30,7 @@
               <a href="contact.html" data-i18n="navContacts">Контакты</a>
             </nav>
             <div class="top-actions">
-              <div class="lang-switcher" role="navigation" aria-label="Переключение языка">
+              <div class="lang-switcher" role="navigation" data-ru-aria-label="Переключение языка" data-uk-aria-label="Перемикання мови" aria-label="Перемикання мови">
                 <label for="language-switcher" class="visually-hidden">
                   <span data-i18n="langLabel">Язык</span>
                 </label>
@@ -49,7 +49,7 @@
                   autocomplete="off"
                 />
               </div>
-              <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" aria-label="Корзина">
+              <button class="icon-btn cart-btn" id="open-cart" type="button" data-i18n-aria-label="cartButton" data-ru-aria-label="Корзина" data-uk-aria-label="Кошик" aria-label="Кошик">
                 🛒
                 <span class="cart-badge" id="cart-count">0</span>
               </button>
@@ -58,7 +58,9 @@
                 class="icon-btn header-account-trigger topbar-account-btn"
                 id="home-account-trigger"
                 data-i18n-aria-label="accountDrawerTrigger"
-                aria-label="Личный кабинет"
+                data-ru-aria-label="Личный кабинет"
+                data-uk-aria-label="Особистий кабінет"
+                aria-label="Особистий кабінет"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -73,7 +75,7 @@
 
       <main class="apay-main">
         <div class="container apay-grid site-content-card">
-          <nav class="products-breadcrumbs" aria-label="Навигация по разделу">
+          <nav class="products-breadcrumbs" data-ru-aria-label="Навигация по разделу" data-uk-aria-label="Навігація розділом" aria-label="Навігація розділом">
             <a href="index.html" data-i18n="navHome">Главная</a>
             <span aria-hidden="true">/</span>
             <a href="account.html" data-i18n="accountDrawerTitle">Личный кабинет</a>
@@ -98,10 +100,10 @@
             </h1>
             <p
               class="apay-lead"
-              data-ru="Онлайн-оплата картой через защищённый платёжный шлюз (Fondy / WayForPay / LiqPay). Бесплатно для IBAN: перевод по реквизитам ниже."
-              data-uk="Онлайн-оплата карткою через захищений платіжний шлюз (Fondy / WayForPay / LiqPay). Безкоштовно для IBAN: переказ за реквізитами нижче."
+              data-ru="Для физического лица доступны онлайн-оплата картой и IBAN. Для юридического лица — только формирование счёта-фактуры."
+              data-uk="Для фізичної особи доступні онлайн-оплата карткою та IBAN. Для юридичної особи — лише формування рахунку-фактури."
             >
-              Онлайн-оплата картой через защищённый платёжный шлюз (Fondy / WayForPay / LiqPay). Бесплатно для IBAN: перевод по реквизитам ниже.
+              Для фізичної особи доступні онлайн-оплата карткою та IBAN. Для юридичної особи — лише формування рахунку-фактури.
             </p>
             <p id="apay-status" class="form-status" role="status" aria-live="polite"></p>
           </header>
@@ -144,6 +146,7 @@
                   <option value="nova_poshta" data-ru="Новая Почта" data-uk="Нова Пошта">Новая Почта</option>
                   <option value="courier" data-ru="Курьер Новой Почты по адресу" data-uk="Кур'єр Нової Пошти за адресою">Курьер Новой Почты по адресу</option>
                   <option value="pickup" data-ru="Самовывоз" data-uk="Самовивіз">Самовывоз</option>
+                  <option value="agreement" data-ru="По согласованию" data-uk="За погодженням">По согласованию</option>
                 </select>
               </label>
               <label class="apay-field" id="apay-delivery-city-wrap">
@@ -314,7 +317,7 @@
         </div>
       </main>
 
-      <footer class="footer footer--site-laconic" aria-label="Подвал">
+      <footer class="footer footer--site-laconic" data-ru-aria-label="Подвал" data-uk-aria-label="Підвал" aria-label="Підвал">
         <div class="container footer-site-laconic-inner">
           <div class="footer-laconic-row footer-laconic-row--brand">
             <span class="footer-laconic-brand" aria-hidden="true">REAXON</span>
@@ -322,7 +325,7 @@
               Промышленные лакокрасочные материалы: эмали, грунтовки и сопутствующие решения для B2B и розницы.
             </p>
           </div>
-          <nav class="footer-laconic-nav" aria-label="Разделы сайта">
+          <nav class="footer-laconic-nav" data-ru-aria-label="Разделы сайта" data-uk-aria-label="Розділи сайту" aria-label="Розділи сайту">
             <a href="products.html" data-i18n="navCatalog">Каталог</a>
             <a href="price.html" data-i18n="navPrice">Прайс</a>
             <a href="ral.html" data-i18n="navRal">Таблица RAL</a>
@@ -354,7 +357,7 @@
       <div class="cart-drawer-shell">
         <header class="cart-header">
           <h3 id="cart-title" data-i18n="cartTitle">Корзина</h3>
-          <button type="button" id="close-cart" class="cart-close-btn" aria-label="Закрыть корзину">
+          <button type="button" id="close-cart" class="cart-close-btn" data-ru-aria-label="Закрыть корзину" data-uk-aria-label="Закрити кошик" aria-label="Закрити кошик">
             <svg class="cart-close-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
         </header>
