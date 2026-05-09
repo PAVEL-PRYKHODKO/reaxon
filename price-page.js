@@ -475,6 +475,81 @@ function buildPdfTableWidths(header) {
   return header.map((_, i) => (i === nameIdx ? nameW : other));
 }
 
+function priceExportLang() {
+  return typeof window.getDpLang === "function" && window.getDpLang() === "uk" ? "uk" : "ru";
+}
+
+/** Реквізити для шапки файлу прайсу (як на контактах / у legal-requisites.json). */
+async function loadLegalRequisitesForPriceExport() {
+  if (window.__dpLegalRequisitesCache && typeof window.__dpLegalRequisitesCache === "object") {
+    return window.__dpLegalRequisitesCache;
+  }
+  try {
+    const url = typeof window.dpApiUrl === "function" ? window.dpApiUrl("/api/legal-requisites") : "/api/legal-requisites";
+    const res = await fetch(url, { credentials: "same-origin" });
+    if (res.ok) {
+      const j = await res.json();
+      window.__dpLegalRequisitesCache = j;
+      return j;
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    const res = await fetch("legal-requisites.json", { credentials: "same-origin", cache: "no-store" });
+    if (res.ok) {
+      const j = await res.json();
+      window.__dpLegalRequisitesCache = j;
+      return j;
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function buildLegalRequisitesHeaderLines(cfg, lang) {
+  if (!cfg || typeof cfg !== "object") return [];
+  const L = lang === "uk" ? "uk" : "ru";
+  const company = String(cfg.companyName?.[L] || cfg.companyName?.ru || "").trim();
+  const address = String(cfg.address?.[L] || cfg.address?.ru || "").trim();
+  const bank = String(cfg.bank?.[L] || cfg.bank?.ru || "").trim();
+  const taxStatus = String(cfg.taxStatus?.[L] || cfg.taxStatus?.ru || "").trim();
+  const corr = String(cfg.correspondenceAddress?.[L] || cfg.correspondenceAddress?.ru || "").trim();
+  const production = String(cfg.productionAddress?.[L] || cfg.productionAddress?.ru || "").trim();
+  const mailAddr = String(cfg.mailAddress?.[L] || cfg.mailAddress?.ru || "").trim();
+  const edrpouLabel = L === "uk" ? "ЄДРПОУ" : "ЕГРПОУ";
+  const ipnLabel = L === "uk" ? "ІПН" : "ИНН";
+  const mfoLabel = "МФО";
+  const certLabel = L === "uk" ? "Свідоцтво №" : "Св-во №";
+  const bankParts = [];
+  if (String(cfg.iban || "").trim()) bankParts.push(`IBAN ${String(cfg.iban).trim()}`);
+  if (bank) bankParts.push(bank);
+  if (String(cfg.mfo || "").trim()) bankParts.push(`${mfoLabel} ${String(cfg.mfo).trim()}`);
+  const bankLine = bankParts.join(", ");
+  const regLine = `${edrpouLabel}: ${cfg.edrpou || ""} · ${ipnLabel}: ${cfg.ipn || ""} · ${certLabel} ${cfg.certificateNo || ""}`;
+  const telWord = L === "uk" ? "тел." : "тел.";
+  let corrLine = corr;
+  if (cfg.phone) corrLine = corrLine ? `${corrLine}, ${telWord} ${cfg.phone}` : `${telWord} ${cfg.phone}`;
+  const phones = Array.isArray(cfg.contactPhones) ? cfg.contactPhones.filter(Boolean) : [];
+  const phoneLine = phones.length ? `${L === "uk" ? "Тел." : "Тел."}: ${phones.join(", ")}` : "";
+  const email = String(cfg.contactEmail || "").trim();
+
+  const lines = [];
+  lines.push(L === "uk" ? "Прайс-лист" : "Прайс-лист");
+  if (company) lines.push(company);
+  if (address) lines.push(`${L === "uk" ? "Юридична адреса" : "Юридический адрес"}: ${address}`);
+  if (bankLine) lines.push(`${L === "uk" ? "Банківські реквізити" : "Банковские реквизиты"}: ${bankLine}`);
+  lines.push(`${L === "uk" ? "Реєстраційні дані" : "Регистрационные данные"}: ${regLine}`);
+  if (taxStatus) lines.push(`${L === "uk" ? "Податковий статус" : "Налоговый статус"}: ${taxStatus}`);
+  if (corrLine) lines.push(`${L === "uk" ? "Для кореспонденції" : "Для корреспонденции"}: ${corrLine}`);
+  if (production) lines.push(`${L === "uk" ? "Виробництво" : "Производство"}: ${production}`);
+  if (mailAddr) lines.push(`${L === "uk" ? "Поштова адреса" : "Почтовый адрес"}: ${mailAddr}`);
+  if (phoneLine) lines.push(phoneLine);
+  if (email) lines.push(`E-mail: ${email}`);
+  return lines.map((x) => String(x || "").trim()).filter(Boolean);
+}
+
 async function downloadPriceExcel() {
   try {
     await loadExcelJsOnce();
@@ -483,6 +558,9 @@ async function downloadPriceExcel() {
     return;
   }
 
+  const cfg = await loadLegalRequisitesForPriceExport();
+  const reqLines = buildLegalRequisitesHeaderLines(cfg, priceExportLang());
+
   const { header, body } = getPriceExportTableData();
   const ExcelJS = window.ExcelJS;
   const wb = new ExcelJS.Workbook();
@@ -490,8 +568,34 @@ async function downloadPriceExcel() {
 
   const ncol = header.length;
   const thin = { style: "thin", color: { argb: "FFBAC8DB" } };
+  const letterLast = excelColumnLetters(ncol);
 
-  const headerRowIdx = 1;
+  let rowIdx = 1;
+  if (reqLines.length) {
+    reqLines.forEach((line, li) => {
+      const row = ws.getRow(rowIdx);
+      const c = row.getCell(1);
+      c.value = line;
+      c.alignment = { vertical: "top", horizontal: "left", wrapText: true };
+      if (li === 0) {
+        c.font = { bold: true, size: 12, color: { argb: "FF0F172A" } };
+      } else if (li === 1 && reqLines.length > 1) {
+        c.font = { bold: true, size: 11, color: { argb: "FF1E3A5F" } };
+      } else {
+        c.font = { size: 9, color: { argb: "FF334155" } };
+      }
+      try {
+        ws.mergeCells(`A${rowIdx}:${letterLast}${rowIdx}`);
+      } catch {
+        /* ignore merge edge cases */
+      }
+      row.height = li === 0 ? 22 : Math.min(48, 14 + Math.ceil(String(line).length / 110) * 12);
+      rowIdx += 1;
+    });
+    rowIdx += 1;
+  }
+
+  const headerRowIdx = rowIdx;
   const hr = ws.getRow(headerRowIdx);
   header.forEach((text, i) => {
     const cell = hr.getCell(i + 1);
@@ -549,6 +653,21 @@ async function downloadPricePdf() {
     return;
   }
 
+  const cfg = await loadLegalRequisitesForPriceExport();
+  const reqLines = buildLegalRequisitesHeaderLines(cfg, priceExportLang());
+  const reqBlock =
+    reqLines.length > 0
+      ? {
+          stack: reqLines.map((line, i) => ({
+            text: line,
+            fontSize: i === 0 ? 11 : i === 1 ? 10 : 8,
+            bold: i <= 1,
+            margin: [0, 0, 0, i === reqLines.length - 1 ? 10 : 2],
+          })),
+          margin: [0, 0, 0, 8],
+        }
+      : null;
+
   const { header, body } = getPriceExportTableData();
 
   const tableBody = [
@@ -565,6 +684,7 @@ async function downloadPricePdf() {
       pdfTd: { fontSize: 6.8 },
     },
     content: [
+      ...(reqBlock ? [reqBlock] : []),
       {
         table: {
           headerRows: 1,
